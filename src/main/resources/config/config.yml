@@ -1,0 +1,11 @@
+# Kafka particulars
+server:
+    host: "localhost"
+    port: 9999
+    username: ""
+    password: ""
+    domains: ["\"kafka.server\"", "\"kafka.cluster\"", "\"kafka.controller\"", "\"kafka.network\"", "\"kafka.log\"", "\"kafka.consumer\""]
+
+#prefix used to show up metrics in AppDynamics
+metricPrefix:  "Custom Metrics|Kafka|"
+
