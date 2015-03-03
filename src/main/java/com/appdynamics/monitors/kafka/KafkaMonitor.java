@@ -1,7 +1,9 @@
 package com.appdynamics.monitors.kafka;
 
 import com.appdynamics.extensions.PathResolver;
-import com.appdynamics.monitors.kafka.config.ConfigUtil;
+import com.appdynamics.extensions.util.metrics.Metric;
+import com.appdynamics.extensions.util.metrics.MetricFactory;
+import com.appdynamics.extensions.yml.YmlReader;
 import com.appdynamics.monitors.kafka.config.Configuration;
 import com.appdynamics.monitors.kafka.config.KafkaMonitorConstants;
 import com.appdynamics.monitors.kafka.config.Server;
@@ -31,7 +33,6 @@ public class KafkaMonitor extends AManagedMonitor {
     private static final String CONFIG_ARG = "config-file";
     private static final String FILE_NAME = "monitors/KafkaMonitor/config.yml";
 
-    private static final ConfigUtil<Configuration> configUtil = new ConfigUtil<Configuration>();
 
     public KafkaMonitor() {
         String details = KafkaMonitor.class.getPackage().getImplementationTitle();
@@ -45,9 +46,12 @@ public class KafkaMonitor extends AManagedMonitor {
             logger.info("Starting the Kafka Monitoring task.");
             String configFilename = getConfigFilename(taskArgs.get(CONFIG_ARG));
             try {
-                Configuration config = configUtil.readConfig(configFilename, Configuration.class);
+                Configuration config = YmlReader.readFromFile(configFilename, Configuration.class);
                 Map<String, Number> metrics = populateStats(config);
-                printStats(config, metrics);
+                //metric overrides
+                MetricFactory<Number> metricFactory = new MetricFactory<Number>(config.getMetricOverrides());
+                List<Metric> allMetrics = metricFactory.process(metrics);
+                printStats(config, allMetrics);
                 logger.info("Completed the Kafka Monitoring Task successfully");
                 return new TaskOutput("Kafka Monitor executed successfully");
             } catch (FileNotFoundException e) {
@@ -151,32 +155,27 @@ public class KafkaMonitor extends AManagedMonitor {
         return configFileName;
     }
 
-    private void printStats(Configuration config, Map<String, Number> metrics) {
-        String metricPath = config.getMetricPrefix();
-        for (Map.Entry<String, Number> entry : metrics.entrySet()) {
-            printMetric(metricPath + entry.getKey(), entry.getValue());
+    private void printStats(Configuration config, List<Metric> metrics) {
+        String metricPathPrefix = config.getMetricPathPrefix();
+        for(Metric aMetric : metrics){
+            printMetric(metricPathPrefix + aMetric.getMetricPath(),aMetric.getMetricValue().toString(),aMetric.getAggregator(),aMetric.getTimeRollup(),aMetric.getClusterRollup());
         }
     }
 
-    private void printMetric(String metricPath, Number metricValue) {
-        printMetric(metricPath, metricValue, MetricWriter.METRIC_AGGREGATION_TYPE_AVERAGE, MetricWriter.METRIC_TIME_ROLLUP_TYPE_AVERAGE,
-                MetricWriter.METRIC_CLUSTER_ROLLUP_TYPE_COLLECTIVE);
-    }
 
-    private void printMetric(String metricPath, Number metricValue, String aggregation, String timeRollup, String cluster) {
-        MetricWriter metricWriter = super.getMetricWriter(metricPath, aggregation, timeRollup, cluster);
-        if (metricValue != null) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Metric [" + metricPath + " = " + metricValue + "]");
-            }
-            if (metricValue instanceof Double) {
-                metricWriter.printMetric(String.valueOf(Math.round((Double) metricValue)));
-            } else if (metricValue instanceof Float) {
-                metricWriter.printMetric(String.valueOf(Math.round((Float) metricValue)));
-            } else {
-                metricWriter.printMetric(String.valueOf(metricValue));
-            }
+    private void printMetric(String metricName,String metricValue,String aggType,String timeRollupType,String clusterRollupType){
+        MetricWriter metricWriter = getMetricWriter(metricName,
+                aggType,
+                timeRollupType,
+                clusterRollupType
+        );
+        //   System.out.println("Sending [" + aggType + METRIC_SEPARATOR + timeRollupType + METRIC_SEPARATOR + clusterRollupType
+        //           + "] metric = " + metricName + " = " + metricValue);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Sending [" + aggType + METRICS_SEPARATOR + timeRollupType + METRICS_SEPARATOR + clusterRollupType
+                    + "] metric = " + metricName + " = " + metricValue);
         }
+        metricWriter.printMetric(metricValue);
     }
 
     public static void main(String[] args) throws TaskExecutionException {

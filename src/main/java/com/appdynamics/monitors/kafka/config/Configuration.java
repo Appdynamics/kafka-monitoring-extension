@@ -15,10 +15,13 @@
  */
 package com.appdynamics.monitors.kafka.config;
 
+import com.appdynamics.extensions.util.metrics.MetricOverride;
+
 public class Configuration {
 
 	private Server server;
-	private String metricPrefix;
+	private String metricPathPrefix;
+	private MetricOverride[] metricOverrides;
 
 	public Server getServer() {
 		return server;
@@ -28,11 +31,19 @@ public class Configuration {
 		this.server = server;
 	}
 
-	public String getMetricPrefix() {
-		return metricPrefix;
+	public String getMetricPathPrefix() {
+		return metricPathPrefix;
 	}
 
-	public void setMetricPrefix(String metricPrefix) {
-		this.metricPrefix = metricPrefix;
+	public void setMetricPathPrefix(String metricPathPrefix) {
+		this.metricPathPrefix = metricPathPrefix;
+	}
+
+	public MetricOverride[] getMetricOverrides() {
+		return metricOverrides;
+	}
+
+	public void setMetricOverrides(MetricOverride[] metricOverrides) {
+		this.metricOverrides = metricOverrides;
 	}
 }
