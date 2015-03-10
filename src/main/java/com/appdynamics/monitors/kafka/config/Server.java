@@ -19,49 +19,49 @@ import java.util.List;
 
 public class Server {
 
-	private String host;
-	private int port;
-	private String username;
-	private String password;
-    private List<String> domains;
+    private String host;
+    private int port;
+    private String username;
+    private String password;
+    private List<Domain> domains;
 
-	public String getHost() {
-		return host;
-	}
+    public String getHost() {
+        return host;
+    }
 
-	public void setHost(String host) {
-		this.host = host;
-	}
+    public void setHost(String host) {
+        this.host = host;
+    }
 
-	public int getPort() {
-		return port;
-	}
+    public int getPort() {
+        return port;
+    }
 
-	public void setPort(int port) {
-		this.port = port;
-	}
+    public void setPort(int port) {
+        this.port = port;
+    }
 
-	public String getUsername() {
-		return username;
-	}
+    public String getUsername() {
+        return username;
+    }
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-    public List<String> getDomains() {
+    public List<Domain> getDomains() {
         return domains;
     }
 
-    public void setDomains(List<String> domains) {
+    public void setDomains(List<Domain> domains) {
         this.domains = domains;
     }
 }

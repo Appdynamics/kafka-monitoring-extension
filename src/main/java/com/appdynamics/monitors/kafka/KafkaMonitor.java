@@ -5,6 +5,7 @@ import com.appdynamics.extensions.util.metrics.Metric;
 import com.appdynamics.extensions.util.metrics.MetricFactory;
 import com.appdynamics.extensions.yml.YmlReader;
 import com.appdynamics.monitors.kafka.config.Configuration;
+import com.appdynamics.monitors.kafka.config.Domain;
 import com.appdynamics.monitors.kafka.config.KafkaMonitorConstants;
 import com.appdynamics.monitors.kafka.config.Server;
 import com.google.common.base.Strings;
@@ -29,7 +30,7 @@ import java.util.Set;
 public class KafkaMonitor extends AManagedMonitor {
     private static final Logger logger = Logger.getLogger(KafkaMonitor.class);
 
-    public static final String METRICS_SEPARATOR = "|";
+    public static final String METRIC_SEPARATOR = "|";
     private static final String CONFIG_ARG = "config-file";
     private static final String FILE_NAME = "monitors/KafkaMonitor/config.yml";
 
@@ -69,11 +70,11 @@ public class KafkaMonitor extends AManagedMonitor {
         JMXConnector connector = null;
         try {
             connector = KafkaJMXConnector.connect(server);
-            List<String> domains = server.getDomains();
-            for (String domain : domains) {
-                Set<ObjectInstance> mBeans = KafkaJMXConnector.queryMBeans(connector, domain);
+            List<Domain> domains = server.getDomains();
+            for (Domain domain : domains) {
+                Set<ObjectInstance> mBeans = KafkaJMXConnector.queryMBeans(connector, domain.getName());
                 if (mBeans != null) {
-                    Map<String, Number> curMetrics = extractMetrics(connector, mBeans);
+                    Map<String, Number> curMetrics = extractMetrics(connector, domain, mBeans);
                     metrics.putAll(curMetrics);
                 } else {
                     logger.debug("Error while getting data from MBean domain" + domain);
@@ -89,10 +90,18 @@ public class KafkaMonitor extends AManagedMonitor {
         return metrics;
     }
 
-    private Map<String, Number> extractMetrics(JMXConnector connector, Set<ObjectInstance> allMbeans) {
+    private Map<String, Number> extractMetrics(JMXConnector connector, Domain domain, Set<ObjectInstance> allMbeans) {
         Map<String, Number> metrics = new HashMap<String, Number>();
+        List<String> excludeObjects = domain.getExcludeObjects();
         for (ObjectInstance mbean : allMbeans) {
             ObjectName objectName = mbean.getObjectName();
+
+            String name = objectName.getKeyProperty("name");
+            if (excludeObjects.contains(name)) {
+                String type = objectName.getKeyProperty("type");
+                logger.debug("Excluding [" + name + "] of type [" + type + "] in domain [" + domain.getName() + "] as configured");
+                continue; // Skip if the attribute is excluded
+            }
             MBeanAttributeInfo[] attributes = KafkaJMXConnector.fetchAllAttributesForMbean(connector, objectName);
             if (attributes != null) {
                 for (MBeanAttributeInfo attr : attributes) {
@@ -129,8 +138,8 @@ public class KafkaMonitor extends AManagedMonitor {
         String type = objectName.getKeyProperty("type");
         String name = objectName.getKeyProperty("name");
 
-        metricsKey.append(objectName.getDomain()).append(METRICS_SEPARATOR).append(type).append(METRICS_SEPARATOR).append(name);
-        metricsKey.append(METRICS_SEPARATOR).append(attr.getName());
+        metricsKey.append(objectName.getDomain()).append(METRIC_SEPARATOR).append(type).append(METRIC_SEPARATOR).append(name);
+        metricsKey.append(METRIC_SEPARATOR).append(attr.getName());
         return metricsKey.toString();
     }
 
@@ -157,22 +166,22 @@ public class KafkaMonitor extends AManagedMonitor {
 
     private void printStats(Configuration config, List<Metric> metrics) {
         String metricPathPrefix = config.getMetricPathPrefix();
-        for(Metric aMetric : metrics){
-            printMetric(metricPathPrefix + aMetric.getMetricPath(),aMetric.getMetricValue().toString(),aMetric.getAggregator(),aMetric.getTimeRollup(),aMetric.getClusterRollup());
+        for (Metric aMetric : metrics) {
+            printMetric(metricPathPrefix + aMetric.getMetricPath(), aMetric.getMetricValue().toString(), aMetric.getAggregator(), aMetric.getTimeRollup(), aMetric.getClusterRollup());
         }
     }
 
 
-    private void printMetric(String metricName,String metricValue,String aggType,String timeRollupType,String clusterRollupType){
+    private void printMetric(String metricName, String metricValue, String aggType, String timeRollupType, String clusterRollupType) {
         MetricWriter metricWriter = getMetricWriter(metricName,
                 aggType,
                 timeRollupType,
                 clusterRollupType
         );
-        //   System.out.println("Sending [" + aggType + METRIC_SEPARATOR + timeRollupType + METRIC_SEPARATOR + clusterRollupType
-        //           + "] metric = " + metricName + " = " + metricValue);
+        //System.out.println("Sending [" + aggType + METRIC_SEPARATOR + timeRollupType + METRIC_SEPARATOR + clusterRollupType
+        //        + "] metric = " + metricName + " = " + metricValue);
         if (logger.isDebugEnabled()) {
-            logger.debug("Sending [" + aggType + METRICS_SEPARATOR + timeRollupType + METRICS_SEPARATOR + clusterRollupType
+            logger.debug("Sending [" + aggType + METRIC_SEPARATOR + timeRollupType + METRIC_SEPARATOR + clusterRollupType
                     + "] metric = " + metricName + " = " + metricValue);
         }
         metricWriter.printMetric(metricValue);

@@ -4,7 +4,19 @@ server:
     port: 9999
     username: ""
     password: ""
-    domains: ["\"kafka.server\"", "\"kafka.cluster\"", "\"kafka.controller\"", "\"kafka.network\"", "\"kafka.log\"", "\"kafka.consumer\""]
+    domains:
+        -   name: "\"kafka.server\""
+            excludeObjects: ["\"Replica-MaxLag\""]
+        -   name: "\"kafka.cluster\""
+            excludeObjects: []
+        -   name: "\"kafka.controller\""
+            excludeObjects: []
+        -   name: "\"kafka.network\""
+            excludeObjects: []
+        -   name: "\"kafka.log\""
+            excludeObjects: []
+        -   name: "\"kafka.consumer\""
+            excludeObjects: []
 
 #prefix used to show up metrics in AppDynamics
 metricPathPrefix:  "Custom Metrics|Kafka|"
