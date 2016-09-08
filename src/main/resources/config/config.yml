@@ -1,23 +1,24 @@
 # Kafka particulars
 server:
+    #Kafka host
     host: "localhost"
+    #Kafka JMX port
     port: 9999
     username: ""
     password: ""
     domains:
-        -   name: "\"kafka.server\""
-            excludeObjects: ["\"Replica-MaxLag\""]
-        -   name: "\"kafka.cluster\""
+        -   name: "kafka.server"
+            excludeObjects: ["BytesInPerSec"]
+        -   name: "kafka.cluster"
             excludeObjects: []
-        -   name: "\"kafka.controller\""
+        -   name: "kafka.controller"
             excludeObjects: []
-        -   name: "\"kafka.network\""
+        -   name: "kafka.network"
             excludeObjects: []
-        -   name: "\"kafka.log\""
+        -   name: "kafka.log"
             excludeObjects: []
-        -   name: "\"kafka.consumer\""
+        -   name: "kafka.consumer"
             excludeObjects: []
 
 #prefix used to show up metrics in AppDynamics
 metricPathPrefix:  "Custom Metrics|Kafka|"
-

@@ -14,7 +14,10 @@ import com.singularity.ee.agent.systemagent.api.MetricWriter;
 import com.singularity.ee.agent.systemagent.api.TaskExecutionContext;
 import com.singularity.ee.agent.systemagent.api.TaskOutput;
 import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 
 import javax.management.MBeanAttributeInfo;
 import javax.management.ObjectInstance;
@@ -22,6 +25,7 @@ import javax.management.ObjectName;
 import javax.management.remote.JMXConnector;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -189,8 +193,14 @@ public class KafkaMonitor extends AManagedMonitor {
 
     public static void main(String[] args) throws TaskExecutionException {
 
+        ConsoleAppender ca = new ConsoleAppender();
+        ca.setWriter(new OutputStreamWriter(System.out));
+        ca.setLayout(new PatternLayout("%-5p [%t]: %m%n"));
+        ca.setThreshold(Level.DEBUG);
+        logger.getRootLogger().addAppender(ca);
+
         Map<String, String> taskArgs = new HashMap<String, String>();
-        taskArgs.put(CONFIG_ARG, "/home/satish/AppDynamics/Code/extensions/kafka-monitoring-extension/src/main/resources/config/config.yml");
+        taskArgs.put(CONFIG_ARG, "/Users/Muddam/AppDynamics/Code/extensions/kafka-monitoring-extension/src/main/resources/config/config.yml");
 
         KafkaMonitor kafkaMonitor = new KafkaMonitor();
         kafkaMonitor.execute(taskArgs, null);
