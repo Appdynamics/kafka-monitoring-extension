@@ -17,7 +17,7 @@
                 </task-arguments>
                 <java-task>
                         <classpath>kafka-monitoring-extension.jar</classpath>
-                        <impl-class>com.appdynamics.monitors.kafka.KafkaMonitor</impl-class>
+                        <impl-class>com.appdynamics.extensions.kafka.KafkaMonitor</impl-class>
                 </java-task>
         </monitor-run-task>
 </monitor>
