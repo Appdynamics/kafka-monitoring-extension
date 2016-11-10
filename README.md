@@ -64,30 +64,66 @@ Note : Please make sure to not use tab (\t) while editing yaml files. You may wa
    For eg.
 
    ```
-   # Kafka particulars
-   server:
-       #Kafka host
-       host: "localhost"
-       #Kafka JMX port
-       port: 9999
-       username: ""
-       password: ""
-       domains:
-           -   name: "kafka.server"
-               excludeObjects: ["BytesInPerSec"]
-           -   name: "kafka.cluster"
-               excludeObjects: []
-           -   name: "kafka.controller"
-               excludeObjects: []
-           -   name: "kafka.network"
-               excludeObjects: []
-           -   name: "kafka.log"
-               excludeObjects: []
-           -   name: "kafka.consumer"
-               excludeObjects: []
+### ANY CHANGES TO THIS FILE DOES NOT REQUIRE A RESTART ###
 
-   #prefix used to show up metrics in AppDynamics
-   metricPathPrefix:  "Custom Metrics|Kafka|"
+#This will create this metric in all the tiers, under this path
+metricPrefix: Custom Metrics|Kafka
+
+#This will create it in specific Tier/Component. Make sure to replace <COMPONENT_ID> with the appropriate one from your environment.
+#To find the <COMPONENT_ID> in your environment, please follow the screenshot https://docs.appdynamics.com/display/PRO42/Build+a+Monitoring+Extension+Using+Java
+#metricPrefix: Server|Component:<COMPONENT_ID>|Custom Metrics|Kafka
+
+# List of Kafka Instances
+instances:
+  - host: "localhost"
+    port: 9999
+    username:
+    password:
+    #encryptedPassword:
+    #encryptionKey:
+    displayName: "Local Kafka Server"  #displayName is a REQUIRED field for level metrics.
+
+
+# number of concurrent tasks.
+# This doesn't need to be changed unless many instances are configured
+numberOfThreads: 10
+
+
+# The configuration of different metrics from various mbeans of Kafka server
+# For most cases, the mbean configuration does not need to be changed.
+mbeans:
+
+#All MBeans which have attributes Count and MeanRate
+  - mbeanFullPath: ["kafka.server:type=BrokerTopicMetrics,*",
+                    "kafka.server:type=DelayedFetchMetrics,*",
+                    "kafka.server:type=KafkaRequestHandlerPool,*",
+                    "kafka.server:type=ReplicaManager,name=IsrExpandsPerSec",
+                    "kafka.server:type=ReplicaManager,name=IsrShrinksPerSec",
+                    "kafka.server:type=SessionExpireListener,*",
+                    "kafka.network:type=RequestMetrics,*",
+                    "kafka.controller:type=ControllerStats,*"
+                  ]
+    metrics:
+       include:
+          - Count: "Count"
+          - MeanRate: "MeanRate"
+
+#All MBeans which have attributes Value
+  - mbeanFullPath: ["kafka.server:type=DelayedOperationPurgatory,*",
+                    "kafka.server:type=KafkaServer,name=BrokerState",
+                    "kafka.server:type=ReplicaFetcherManager,*",
+                    "kafka.server:type=ReplicaManager,name=LeaderCount",
+                    "kafka.server:type=ReplicaManager,name=PartitionCount",
+                    "kafka.server:type=ReplicaManager,name=UnderReplicatedPartitions",
+                    "kafka.network:type=Processor,*",
+                    "kafka.network:type=RequestChannel,*",
+                    "kafka.network:type=SocketServer,*"
+                   ]
+    metrics:
+       include:
+          - Value: "Value"
+
+
 
    ```
 
