@@ -145,6 +145,9 @@ To avoid setting the clear text password in the config.yaml, please follow the p
 `java -cp appd-exts-commons-1.1.2.jar com.appdynamics.extensions.crypto.Encryptor encryptionKey myPassword`
 3. Specify the passwordEncrypted and encryptionKey in config.yaml
 
+## Custom Dashboard ##
+![](https://github.com/Appdynamics/kafka-monitoring-extension/blob/master/Kafka_CustomDashboard.png?raw=true)
+
 ## Contributing ##
 
 Always feel free to fork and contribute any changes directly via [GitHub][].
