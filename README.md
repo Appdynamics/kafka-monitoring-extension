@@ -1,4 +1,4 @@
-kafka-monitoring-extension
+AppDynamics Monitoring Extension for use with Kafka
 ==============================
 
 An AppDynamics extension to be used with a stand alone Java machine agent to provide metrics for Apache Kafka
