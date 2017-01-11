@@ -162,8 +162,8 @@ For any questions or feature request, please contact [AppDynamics Center of Exce
 
 **Version:** 1.0.0
 **Controller Compatibility:** 3.7+
-**Kafka Versions Tested On:** 2.11-0.9.0.0
+**Kafka Versions Tested On:** 2.11-0.9.0.0 and 2.11-0.10.1.0
 
 [Github]: https://github.com/Appdynamics/kafka-monitoring-extension
-[AppDynamics Exchange]: http://community.appdynamics.com/t5/AppDynamics-eXchange/idb-p/extensions
+[AppDynamics Exchange]: https://www.appdynamics.com/community/exchange/kafka-monitoring-extension/
 [AppDynamics Center of Excellence]: mailto:help@appdynamics.com
