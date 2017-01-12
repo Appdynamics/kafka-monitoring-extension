@@ -30,11 +30,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>1.13</version>
-        </dependency>
-        <dependency>
             <groupId>com.appdynamics</groupId>
             <artifactId>machine-agent</artifactId>
             <version>3.7.11</version>
@@ -131,6 +126,12 @@
                                 </copy>
                                 <copy todir="${target.dir}">
                                     <fileset dir="${build.directory}" includes="${project.artifactId}.${project.packaging}"/>
+                                </copy>
+                                <copy todir="${target.dir}">
+                                    <fileset dir="${project.basedir}" includes="LICENSE.txt"/>
+                                </copy>
+                                <copy todir="${target.dir}">
+                                    <fileset dir="${project.basedir}" includes="Notice.txt"/>
                                 </copy>
                                 <zip destfile="${target.dir}-${project.version}.zip">
                                     <zipfileset dir="${target.dir}" filemode="755" prefix="KafkaMonitor/"/>
