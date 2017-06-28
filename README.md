@@ -63,7 +63,7 @@ Note : Please make sure to not use tab (\t) while editing yaml files. You may wa
 2. Below is the default config.yml which has metrics configured already
    For eg.
 
-   ```
+```
 ### ANY CHANGES TO THIS FILE DOES NOT REQUIRE A RESTART ###
 
 #This will create this metric in all the tiers, under this path
@@ -122,22 +122,19 @@ mbeans:
     metrics:
        include:
           - Value: "Value"
-
-
-
-   ```
+```
 
 3. Configure the path to the config.yml file by editing the <task-arguments> in the monitor.xml file in the `<MACHINE_AGENT_HOME>/monitors/KafkaMonitor/` directory. Below is the sample
    For Windows, make sure you enter the right path.
-     ```
+```
      <task-arguments>
          <!-- config file-->
          <argument name="config-file" is-required="true" default-value="monitors/KafkaMonitor/config.yml" />
           ....
      </task-arguments>
-    ```
+```
     
-##Password Encryption Support
+## Password Encryption Support
 To avoid setting the clear text password in the config.yaml, please follow the process below to encrypt the password
 
 1. Download the util jar to encrypt the password from [https://github.com/Appdynamics/maven-repo/blob/master/releases/com/appdynamics/appd-exts-commons/1.1.2/appd-exts-commons-1.1.2.jar](https://github.com/Appdynamics/maven-repo/blob/master/releases/com/appdynamics/appd-exts-commons/1.1.2/appd-exts-commons-1.1.2.jar) and navigate to the downloaded directory
