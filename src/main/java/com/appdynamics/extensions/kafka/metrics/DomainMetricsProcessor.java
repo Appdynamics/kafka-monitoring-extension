@@ -8,6 +8,7 @@ import static com.appdynamics.extensions.kafka.Util.convertToString;
 import com.appdynamics.extensions.kafka.JMXConnectionAdapter;
 import com.appdynamics.extensions.kafka.filters.ExcludeFilter;
 import com.appdynamics.extensions.kafka.filters.IncludeFilter;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.slf4j.LoggerFactory;
@@ -105,12 +106,22 @@ public class DomainMetricsProcessor {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append(objectName.getDomain()).append("|");
+        sb.append(objectName.getDomain());
 
         String type = keyPropertyList.get("type");
         String name = keyPropertyList.get("name");
 
-        sb.append(type).append("|").append(name).append("|");
+        if(!Strings.isNullOrEmpty(type)) {
+            sb.append("|");
+            sb.append(type);
+        }
+
+        if(!Strings.isNullOrEmpty(name)) {
+            sb.append("|");
+            sb.append(name);
+        }
+
+        sb.append("|");
 
         keyPropertyList.remove("type");
         keyPropertyList.remove("name");
