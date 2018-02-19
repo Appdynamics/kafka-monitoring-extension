@@ -145,6 +145,20 @@ To avoid setting the clear text password in the config.yaml, please follow the p
 ## Custom Dashboard ##
 ![](https://github.com/Appdynamics/kafka-monitoring-extension/blob/master/Kafka_CustomDashboard.png?raw=true)
 
+## Enable JMX ##
+To enable JMX Monitoring for Kafka broker, please follow below instructions:
+
+Edit kafka-run-class.sh and modify KAFKA_JMX_OPTS variable like below (please replace <> with your Kafka Broker hostname)
+
+```
+KAFKA_JMX_OPTS="-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=<kafka.broker.hostname >-Djava.net.preferIPv4Stack=true"
+```
+Add below line in kafka-server-start.sh
+
+```
+export JMX_PORT=${JMX_PORT:-9999}
+```
+
 ## Contributing ##
 
 Always feel free to fork and contribute any changes directly via [GitHub][].
