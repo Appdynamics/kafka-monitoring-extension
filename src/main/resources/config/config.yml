@@ -10,7 +10,7 @@ metricPrefix: Custom Metrics|Kafka
 # List of Kafka Instances
 instances:
   - host: "localhost"
-    port: 9999
+    port: "9999"
     username:
     password:
     #encryptedPassword:

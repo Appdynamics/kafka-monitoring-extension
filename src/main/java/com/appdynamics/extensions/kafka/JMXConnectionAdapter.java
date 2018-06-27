@@ -43,19 +43,16 @@ public class JMXConnectionAdapter {
         this.password = password;
     }
 
-    private JMXConnectionAdapter(String serviceUrl, String username, String password) throws MalformedURLException {
-        this.serviceUrl = new JMXServiceURL(serviceUrl);
-        this.username = username;
-        this.password = password;
+    private JMXConnectionAdapter(Map<String, String> requestMap) throws MalformedURLException {
+        this.serviceUrl = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + requestMap.get("host") + ":" + requestMap.get("port") + "/jmxrmi");
+        this.username = requestMap.get("username");
+        this.password = requestMap.get("password");
     }
 
 
-    static JMXConnectionAdapter create(String serviceUrl, String host, int port, String username, String password) throws MalformedURLException {
-        if (Strings.isNullOrEmpty(serviceUrl)) {
-            return new JMXConnectionAdapter(host, port, username, password);
-        } else {
-            return new JMXConnectionAdapter(serviceUrl, username, password);
-        }
+    static JMXConnectionAdapter create(Map<String, String> requestMap) throws MalformedURLException {
+
+        return new JMXConnectionAdapter(requestMap);
     }
 
     JMXConnector open() throws IOException {
