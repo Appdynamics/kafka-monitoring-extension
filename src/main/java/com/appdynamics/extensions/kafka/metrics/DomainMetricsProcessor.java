@@ -8,87 +8,109 @@
 
 package com.appdynamics.extensions.kafka.metrics;
 
-import static com.appdynamics.extensions.kafka.utils.Constants.EXCLUDE;
-import static com.appdynamics.extensions.kafka.utils.Constants.INCLUDE;
-import static com.appdynamics.extensions.kafka.utils.Constants.METRICS;
 
+import com.appdynamics.extensions.MetricWriteHelper;
+import com.appdynamics.extensions.conf.MonitorContext;
 import com.appdynamics.extensions.kafka.JMXConnectionAdapter;
-import com.appdynamics.extensions.kafka.filters.ExcludeFilter;
-import com.appdynamics.extensions.kafka.filters.IncludeFilter;
-import com.appdynamics.extensions.kafka.utils.Constants;
 import com.appdynamics.extensions.metrics.Metric;
-import com.google.common.base.Strings;
+
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+
 import org.slf4j.LoggerFactory;
 
-import javax.management.Attribute;
-import javax.management.InstanceNotFoundException;
-import javax.management.IntrospectionException;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectInstance;
-import javax.management.ObjectName;
-import javax.management.ReflectionException;
+import javax.management.*;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeDataSupport;
 import javax.management.remote.JMXConnector;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.Hashtable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Phaser;
 
-
-public class DomainMetricsProcessor {
-
+public class DomainMetricsProcessor implements Runnable{
     static final org.slf4j.Logger logger = LoggerFactory.getLogger(DomainMetricsProcessor.class);
     private final JMXConnectionAdapter jmxAdapter;
     private final JMXConnector jmxConnection;
+    private MonitorContext context;
+    private MetricWriteHelper metricWriteHelper;
+    private List<Metric> metrics = new ArrayList<Metric>();
+    private String metricPrefix;
+    private Phaser phaser;
+    private Map mbeanFromConfig;
+    private String displayName;
 
-    public DomainMetricsProcessor(JMXConnectionAdapter jmxAdapter, JMXConnector jmxConnection) {
+    public DomainMetricsProcessor( JMXConnectionAdapter jmxAdapter, JMXConnector jmxConnection, Map mbeanFromConfig, String displayName, MetricWriteHelper metricWriteHelper, String metricPrefix, Phaser phaser) {
         this.jmxAdapter = jmxAdapter;
         this.jmxConnection = jmxConnection;
+        this.metricWriteHelper = metricWriteHelper;
+        this.metricPrefix = metricPrefix;
+        this.phaser = phaser;
+        this.phaser.register();
+        this.mbeanFromConfig = mbeanFromConfig;
+        this.displayName = displayName;
     }
 
-    public List<Metric> getNodeMetrics(String objectName, Map aConfigMBean) throws IntrospectionException, ReflectionException, InstanceNotFoundException, IOException, MalformedObjectNameException {
+    @Override
+    public void run() {
+        try {
+
+            logger.debug(String.format("Processing metricProps from the config file"));
+            Map<String, ?> metricProperties = (Map<String, ?>) this.mbeanFromConfig.get("metrics");
+
+
+            List<String> mbeanNames = (List<String>) this.mbeanFromConfig.get("mbeanFullPath");
+                for (String mbeanName : mbeanNames) {
+
+                    logger.debug(String.format("Processing mbean %s from the config file", mbeanName));
+
+                    getNodeMetrics(jmxConnection,mbeanName,metricProperties);
+                    logger.debug("Registering phaser for " + displayName);
+                }
+
+
+
+            //printmetric and heartbeat
+
+        } catch (IntrospectionException | IOException | MalformedObjectNameException | InstanceNotFoundException | ReflectionException e) {
+            e.printStackTrace();
+        } finally {
+            logger.debug("DomainProcessor Phaser arrived for {}", displayName);
+            phaser.arriveAndDeregister();
+        }
+
+    }
+
+    private   List<Metric> getNodeMetrics(JMXConnector jmxConnection, String objectName,Map<String, ?> metricProperties) throws IntrospectionException, ReflectionException, InstanceNotFoundException, IOException, MalformedObjectNameException {
         List<Metric> nodeMetrics = Lists.newArrayList();
         Set<ObjectInstance> objectInstances = jmxAdapter.queryMBeans(jmxConnection, ObjectName.getInstance(objectName));
         for (ObjectInstance instance : objectInstances) {
             List<String> metricNamesDictionary = jmxAdapter.getReadableAttributeNames(jmxConnection, instance);
-            List<String> metricNamesToBeExtracted = applyFilters(aConfigMBean, metricNamesDictionary);
-            List<Attribute> attributes = jmxAdapter.getAttributes(jmxConnection, instance.getObjectName(), metricNamesToBeExtracted.toArray(new String[metricNamesToBeExtracted.size()]));
-            collect(nodeMetrics, attributes, instance);
+            List<Attribute> attributes = jmxAdapter.getAttributes(jmxConnection, instance.getObjectName(), metricNamesDictionary.toArray(new String[metricNamesDictionary.size()]));
+            collect(nodeMetrics, attributes, instance,metricProperties);
         }
         return nodeMetrics;
     }
 
-    private List<String> applyFilters(Map aConfigMBean, List<String> metricNamesDictionary) throws IntrospectionException, ReflectionException, InstanceNotFoundException, IOException {
-        Set<String> filteredSet = Sets.newHashSet();
-        Map configMetrics = (Map) aConfigMBean.get(METRICS);
-        List includeDictionary = (List) configMetrics.get(Constants.INCLUDE);
-        List excludeDictionary = (List) configMetrics.get(Constants.EXCLUDE);
-        new ExcludeFilter(excludeDictionary).apply(filteredSet, metricNamesDictionary);
-        new IncludeFilter(includeDictionary).apply(filteredSet, metricNamesDictionary);
-        return Lists.newArrayList(filteredSet);
-    }
 
-
-    private void collect(List<Metric> nodeMetrics, List<Attribute> attributes, ObjectInstance instance) {
+    private void collect(List<Metric> nodeMetrics, List<Attribute> attributes, ObjectInstance instance, Map<String, ?> metricProperties) {
         for (Attribute attribute : attributes) {
             try {
-                String attrName = attribute.getName();
+
                 if(isCompositeDataObject(attribute)){
                     Set<String> attributesFound = ((CompositeData)attribute.getValue()).getCompositeType().keySet();
                     for(String str: attributesFound){
                         String key = attribute.getName()+ "."+ str;
                         Object attributeValue = ((CompositeDataSupport) attribute.getValue()).get(str);
-//                        setMetricDetails(metricPrefix, key, attributeValue, instance, metricPropsPerMetricName, nodeMetrics);
+                        if(metricProperties.containsKey(key)){
+//                            setMetricDetails(metricPrefix, key, attributeValue, instance, metricProperties, nodeMetrics);
 
+                        }
                     }
                 }
 //                else
-//                    setMetricDetails(metricPrefix, attribute.getName(), attribute.getValue(), instance, metricPropsPerMetricName, nodeMetrics);
+//                    setMetricDetails(metricPrefix, attribute.getName(), attribute.getValue(), instance, metricProperties, nodeMetrics);
 
 
 
@@ -101,4 +123,13 @@ public class DomainMetricsProcessor {
     private boolean isCompositeDataObject(Attribute attribute){
         return attribute.getValue().getClass().equals(CompositeDataSupport.class);
     }
+
+
+
+
 }
+
+
+
+
+

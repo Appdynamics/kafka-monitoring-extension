@@ -37,12 +37,6 @@ public class JMXConnectionAdapter {
     private final String username;
     private final String password;
 
-    private JMXConnectionAdapter(String host, int port, String username, String password) throws MalformedURLException {
-        this.serviceUrl = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + host + ":" + port + "/jmxrmi");
-        this.username = username;
-        this.password = password;
-    }
-
     private JMXConnectionAdapter(Map<String, String> requestMap) throws MalformedURLException {
         this.serviceUrl = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + requestMap.get("host") + ":" + requestMap.get("port") + "/jmxrmi");
         this.username = requestMap.get("username");

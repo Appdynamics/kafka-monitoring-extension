@@ -38,9 +38,18 @@ mbeans:
                     "kafka.controller:type=ControllerStats,*"
                   ]
     metrics:
-       include:
-          - Count: "Count"
-          - MeanRate: "MeanRate"
+          Count:
+              alias: "Count"
+              multiplier:
+              delta:
+              aggregationType:
+              timeRollUpType:
+              clusterRollUpType:
+
+
+          MeanRate:
+              alias: "MeanRate"
+
 
 #All MBeans which have attributes Value
   - mbeanFullPath: ["kafka.server:type=DelayedOperationPurgatory,*",
@@ -54,6 +63,5 @@ mbeans:
                     "kafka.network:type=SocketServer,*"
                    ]
     metrics:
-       include:
           - Value: "Value"
 

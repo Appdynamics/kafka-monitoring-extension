@@ -9,7 +9,7 @@
 <monitor>
         <name>KafkaMonitor</name>
         <type>managed</type>
-        <description>Kafka monitor</description>
+        <description>Kafka Monitor</description>
         <monitor-configuration></monitor-configuration>
         <monitor-run-task>
                 <execution-style>periodic</execution-style>
