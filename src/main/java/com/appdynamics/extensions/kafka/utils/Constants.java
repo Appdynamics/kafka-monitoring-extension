@@ -3,13 +3,10 @@ package com.appdynamics.extensions.kafka.utils;
 import java.math.BigDecimal;
 
 public class Constants {
-    public static final String DEFAULT_METRIC_PREFIX = "Custom Metrics|Kafka|";
+    public static final String DEFAULT_METRIC_PREFIX = "Custom Metrics|Kafka";
 
     public static final String METRIC_SEPARATOR  = "|";
 
-    public static final String INCLUDE = "include";
-
-    public static final String EXCLUDE = "exclude";
 
     static final String MULTIPLIER = "multiplier";
 

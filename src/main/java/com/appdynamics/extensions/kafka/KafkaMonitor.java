@@ -12,8 +12,15 @@ package com.appdynamics.extensions.kafka;
 import com.appdynamics.extensions.ABaseMonitor;
 import com.appdynamics.extensions.TasksExecutionServiceProvider;
 import com.appdynamics.extensions.util.AssertUtils;
+import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.PatternLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.OutputStreamWriter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,7 +56,7 @@ public class KafkaMonitor extends ABaseMonitor {
 
             KafkaMonitorTask task = new KafkaMonitorTask(tasksExecutionServiceProvider, this.getContextConfiguration(), kafkaServer);
             AssertUtils.assertNotNull(kafkaServer.get("displayName"), "The displayName can not be null");
-            tasksExecutionServiceProvider.submit((String) kafkaServer.get("displayName"), task);
+            tasksExecutionServiceProvider.submit(kafkaServer.get("displayName"), task);
         }
 
     }
@@ -57,8 +64,21 @@ public class KafkaMonitor extends ABaseMonitor {
     @Override
     protected int getTaskCount() {
         List<Map<String, String>> servers = (List<Map<String, String>>) getContextConfiguration().getConfigYml().get("servers");
-        AssertUtils.assertNotNull(servers, "The 'servers' section in config.yml is not initialised");
+        AssertUtils.assertNotNull(servers, "The 'servers' section in conf.yml is not initialised");
         return servers.size();
+    }
+
+    public static void main(String[] args) throws TaskExecutionException {
+        ConsoleAppender ca = new ConsoleAppender();
+        ca.setWriter(new OutputStreamWriter(System.out));
+        ca.setLayout(new PatternLayout("%-5p [%t]: %m%n"));
+        ca.setThreshold(Level.DEBUG);
+        org.apache.log4j.Logger.getRootLogger().addAppender(ca);
+
+        KafkaMonitor monitor = new KafkaMonitor();
+        Map<String, String> taskArgs = new HashMap<String, String>();
+        taskArgs.put("config-file", "/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension/src/main/resources/conf/config.yml");
+        monitor.execute(taskArgs, null);
     }
 
 }

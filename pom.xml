@@ -7,46 +7,55 @@
     <version>1.0.3</version>
     <packaging>jar</packaging>
     <name>kafka-monitoring-extension</name>
-    <url>http://maven.apache.org</url>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
+        <target.dir>${project.build.directory}/KafkaMonitor</target.dir>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.appdynamics</groupId>
             <artifactId>appd-exts-commons</artifactId>
             <version>2.1.0</version>
+            <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
             <version>2.6</version>
         </dependency>
+
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.4</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>com.appdynamics</groupId>
             <artifactId>machine-agent</artifactId>
             <version>3.7.11</version>
-            <scope>provided</scope>
+            <!--<scope>provided</scope>-->
         </dependency>
+
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.17</version>
-            <scope>provided</scope>
+            <!--<scope>provided</scope>-->
         </dependency>
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.7.21</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
@@ -119,14 +128,14 @@
                         <phase>install</phase>
                         <configuration>
                             <target>
-                                <property name="target.dir" value="${build.directory}/KafkaMonitor"/>
+                                <property name="target.dir" value="${project.build.directory}/KafkaMonitor"/>
                                 <mkdir dir="${target.dir}"/>
                                 <copy todir="${target.dir}">
-                                    <fileset dir="src/main/resources/config" includes="monitor.xml"/>
-                                    <fileset dir="src/main/resources/config" includes="config.yml"/>
+                                    <fileset dir="src/main/resources/conf" includes="monitor.xml"/>
+                                    <fileset dir="src/main/resources/conf" includes="config.yml"/>
                                 </copy>
                                 <copy todir="${target.dir}">
-                                    <fileset dir="${build.directory}" includes="${project.artifactId}.${project.packaging}"/>
+                                    <fileset dir="${project.build.directory}" includes="${project.artifactId}.${project.packaging}"/>
                                 </copy>
                                 <copy todir="${target.dir}">
                                     <fileset dir="${project.basedir}" includes="LICENSE.txt"/>

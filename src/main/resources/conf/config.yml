@@ -8,11 +8,11 @@ metricPrefix: Custom Metrics|Kafka
 #metricPrefix: Server|Component:<COMPONENT_ID>|Custom Metrics|Kafka
 
 # List of Kafka Instances
-instances:
+servers:
   - host: "localhost"
     port: "9999"
-    username:
-    password:
+    username: ""
+    password: ""
     #encryptedPassword:
     #encryptionKey:
     displayName: "Local Kafka Server"  #displayName is a REQUIRED field for level metrics.
@@ -40,12 +40,6 @@ mbeans:
     metrics:
           Count:
               alias: "Count"
-              multiplier:
-              delta:
-              aggregationType:
-              timeRollUpType:
-              clusterRollUpType:
-
 
           MeanRate:
               alias: "MeanRate"
@@ -63,5 +57,6 @@ mbeans:
                     "kafka.network:type=SocketServer,*"
                    ]
     metrics:
-          - Value: "Value"
+          Value:
+              alias: "Value"
 

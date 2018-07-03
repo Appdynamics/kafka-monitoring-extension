@@ -35,7 +35,9 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
     private MetricWriteHelper metricWriteHelper;
     private String metricPrefix;
     private String displayName;
+    private JMXConnector jmxConnection;
     private JMXConnectionAdapter jmxAdapter;
+
     private static final BigDecimal ERROR_VALUE = BigDecimal.ZERO;
     private static final BigDecimal SUCCESS_VALUE = BigDecimal.ONE;
     private Phaser phaser;
@@ -56,35 +58,34 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
         phaser = new Phaser();
         populateAndPrintMetrics();
 
-        phaser.arriveAndAwaitAdvance();
+//        phaser.arriveAndAwaitAdvance();
         logger.info("Completed the Kafka  Monitoring task");
     }
 
     private BigDecimal populateAndPrintMetrics() {
-        JMXConnector jmxConnection = null;
         try{
-            jmxAdapter = JMXConnectionAdapter.create(buildRequestMap());
-        }catch (Exception e) {
-            logger.debug("Error in connecting to Kafka" + e);
-            }
-        try{
+            Map<String, String> requestMap;
+            requestMap = buildRequestMap();
+            jmxAdapter = JMXConnectionAdapter.create(requestMap);
             jmxConnection = jmxAdapter.open();
             logger.debug("JMX Connection is open");
             List<Map<String, ?>> mbeansFromConfig = (List<Map<String, ?>>) configuration.getConfigYml().get("mbeans");
+
             for (Map mbeanFromConfig : mbeansFromConfig) {
 
                 DomainMetricsProcessor domainMetricsProcessor = new DomainMetricsProcessor( jmxAdapter, jmxConnection, mbeanFromConfig, displayName,metricWriteHelper, metricPrefix, phaser);
                 configuration.getContext().getExecutorService().execute("DomainMetricsProcessor",domainMetricsProcessor);
-                logger.debug("Registering phaser for " + displayName);
+//                logger.debug("Registering phaser for " + displayName);
             }
 
         } catch (Exception e) {
-            logger.error("Error while opening JMX connection {}{}" + kafkaServer.get("name"), e);
+//            e.printStackTrace();
+            logger.error("Error while opening JMX connection {}{}" + this.kafkaServer.get("name"), e.getStackTrace());
         } finally {
             try {
-                jmxAdapter.close(jmxConnection);
+//                jmxAdapter.close(jmxConnection);
                 logger.debug("JMX connection is closed");
-            } catch (IOException ioe) {
+            } catch (Exception ioe) {
                 logger.error("Unable to close the connection.");
                 return ERROR_VALUE;
             }
@@ -97,14 +98,20 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
         Map<String, String> requestMap = new HashMap<String, String>();
         requestMap.put("host", kafkaServer.get("host"));
         requestMap.put("port", kafkaServer.get("port"));
-        requestMap.put("username", kafkaServer.get("username"));
         requestMap.put("displayName", kafkaServer.get("displayName"));
-        requestMap.put("password", getPassword(kafkaServer));
+
+        if(!Strings.isNullOrEmpty(kafkaServer.get("username"))) {
+            requestMap.put("username", kafkaServer.get("username"));
+            requestMap.put("password", getPassword(kafkaServer));
+        }
         return requestMap;
     }
 
     private String getPassword(Map<String, String> server) {
         String password = server.get("password");
+        if(Strings.isNullOrEmpty(password)){
+            logger.error("Password cannot be null");
+        }
         String encryptedPassword = server.get("encryptedPassword");
         Map<String, ?> configMap = configuration.getConfigYml();
         String encryptionKey = configMap.get("encryptionKey").toString();

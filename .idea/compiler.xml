@@ -18,6 +18,7 @@
       <module name="cassandra-monitoring-extension" target="1.5" />
       <module name="extensions-starter" target="1.7" />
       <module name="kafka-monitoring-extension" target="7" />
+      <module name="maven-archiver" target="1.5" />
       <module name="redis-monitoring-extension" target="1.8" />
     </bytecodeTargetLevel>
   </component>

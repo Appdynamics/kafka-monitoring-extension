@@ -49,14 +49,16 @@ public class JMXConnectionAdapter {
         return new JMXConnectionAdapter(requestMap);
     }
 
-    JMXConnector open() throws IOException {
+     JMXConnector open() throws IOException {
         JMXConnector jmxConnector;
         final Map<String, Object> env = new HashMap<String, Object>();
         if (!Strings.isNullOrEmpty(username)) {
             env.put(JMXConnector.CREDENTIALS, new String[]{username, password});
             jmxConnector = JMXConnectorFactory.connect(serviceUrl, env);
         } else {
+
             jmxConnector = JMXConnectorFactory.connect(serviceUrl);
+
         }
         if (jmxConnector == null) {
             throw new IOException("Unable to connect to Mbean server");
@@ -97,7 +99,5 @@ public class JMXConnectionAdapter {
     }
 
 
-    boolean matchAttributeName(Attribute attribute, String matchedWith) {
-        return attribute.getName().equalsIgnoreCase(matchedWith);
-    }
+
 }

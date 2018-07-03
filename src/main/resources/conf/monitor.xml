@@ -9,7 +9,9 @@
 <monitor>
         <name>KafkaMonitor</name>
         <type>managed</type>
+        <enabled>true</enabled>
         <description>Kafka Monitor</description>
+        <enabled>true</enabled>
         <monitor-configuration></monitor-configuration>
         <monitor-run-task>
                 <execution-style>periodic</execution-style>
@@ -20,7 +22,7 @@
                 <type>java</type>
                 <execution-timeout-in-secs>60</execution-timeout-in-secs>
                 <task-arguments>
-                    <!-- config file-->
+                    <!-- conf file-->
                     <argument name="config-file" is-required="true" default-value="monitors/KafkaMonitor/config.yml" />
                 </task-arguments>
                 <java-task>
