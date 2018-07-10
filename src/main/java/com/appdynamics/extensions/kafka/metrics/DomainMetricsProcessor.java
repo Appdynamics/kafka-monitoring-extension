@@ -14,19 +14,14 @@ import com.appdynamics.extensions.conf.MonitorContext;
 import com.appdynamics.extensions.kafka.JMXConnectionAdapter;
 import com.appdynamics.extensions.kafka.utils.Constants;
 import com.appdynamics.extensions.metrics.Metric;
-
-import com.appdynamics.extensions.metrics.MetricProperties;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-
 import org.slf4j.LoggerFactory;
-
 import javax.management.*;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeDataSupport;
 import javax.management.remote.JMXConnector;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.Phaser;
 
@@ -56,7 +51,7 @@ public class DomainMetricsProcessor implements Runnable{
     @Override
     public void run() {
         try {
-            Map<String, ?> metricProperties = (Map<String, ?>) this.mbeanFromConfig.get("metrics");
+            Map<String, ?> metricProperties = (Map<String, ?>) this.mbeanFromConfig.get(Constants.METRICS);
             logger.debug(String.format("Processing metrics section from the conf file"));
             logger.debug("Size of metric section {}",metricProperties.size());
             List<String> mbeanNames = (List<String>) this.mbeanFromConfig.get("mbeanFullPath");
@@ -126,11 +121,10 @@ public class DomainMetricsProcessor implements Runnable{
         ObjectName objectName = instance.getObjectName();
         Hashtable<String, String> keyPropertyList = objectName.getKeyPropertyList();
         StringBuilder sb = new StringBuilder();
-        sb.append(objectName.getDomain());
-
         String type = keyPropertyList.get("type");
         String name = keyPropertyList.get("name");
 
+        sb.append(objectName.getDomain());
         if(!Strings.isNullOrEmpty(type)) {
             sb.append(Constants.METRIC_SEPARATOR);
             sb.append(type);
@@ -142,7 +136,6 @@ public class DomainMetricsProcessor implements Runnable{
         sb.append(Constants.METRIC_SEPARATOR);
         keyPropertyList.remove("type");
         keyPropertyList.remove("name");
-
         for (Map.Entry<String, String> entry : keyPropertyList.entrySet()) {
             sb.append(entry.getKey()).append(Constants.METRIC_SEPARATOR).append(entry.getValue()).append(Constants.METRIC_SEPARATOR);
         }

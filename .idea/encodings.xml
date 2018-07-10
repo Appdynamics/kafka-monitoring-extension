@@ -6,5 +6,7 @@
     <file url="file://$PROJECT_DIR$/../extension-starter/extension-starter" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../redis-monitoring-extension" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../url-monitoring-extension" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../websphere-mq-monitoring-extension" charset="UTF-8" />
   </component>
 </project>

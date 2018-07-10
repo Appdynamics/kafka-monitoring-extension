@@ -11,6 +11,8 @@
         <module name="extensions-starter" />
         <module name="kafka-monitoring-extension" />
         <module name="redis-monitoring-extension" />
+        <module name="url-monitoring-extension" />
+        <module name="websphere-mq-monitoring-extension" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -20,6 +22,8 @@
       <module name="kafka-monitoring-extension" target="7" />
       <module name="maven-archiver" target="1.5" />
       <module name="redis-monitoring-extension" target="1.8" />
+      <module name="url-monitoring-extension" target="1.5" />
+      <module name="websphere-mq-monitoring-extension" target="1.5" />
     </bytecodeTargetLevel>
   </component>
 </project>

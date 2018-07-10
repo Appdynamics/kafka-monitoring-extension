@@ -9,6 +9,7 @@
 package com.appdynamics.extensions.kafka;
 
 
+import com.appdynamics.extensions.kafka.utils.Constants;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
@@ -38,31 +39,25 @@ public class JMXConnectionAdapter {
     private final String password;
 
     private JMXConnectionAdapter(Map<String, String> requestMap) throws MalformedURLException {
-        this.serviceUrl = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + requestMap.get("host") + ":" + requestMap.get("port") + "/jmxrmi");
-        this.username = requestMap.get("username");
-        this.password = requestMap.get("password");
+        this.serviceUrl = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + requestMap.get(Constants.HOST) + ":" + requestMap.get(Constants.PORT) + "/jmxrmi");
+        this.username = requestMap.get(Constants.USERNAME);
+        this.password = requestMap.get(Constants.PASSWORD);
     }
 
-
     static JMXConnectionAdapter create(Map<String, String> requestMap) throws MalformedURLException {
-
         return new JMXConnectionAdapter(requestMap);
     }
 
-     JMXConnector open() throws IOException {
+    JMXConnector open() throws IOException {
         JMXConnector jmxConnector;
         final Map<String, Object> env = new HashMap<String, Object>();
         if (!Strings.isNullOrEmpty(username)) {
             env.put(JMXConnector.CREDENTIALS, new String[]{username, password});
             jmxConnector = JMXConnectorFactory.connect(serviceUrl, env);
-        } else {
-
-            jmxConnector = JMXConnectorFactory.connect(serviceUrl);
-
         }
-        if (jmxConnector == null) {
-            throw new IOException("Unable to connect to Mbean server");
-        }
+        else { jmxConnector = JMXConnectorFactory.connect(serviceUrl); }
+
+        if (jmxConnector == null) { throw new IOException("Unable to connect to Mbean server"); }
         return jmxConnector;
     }
 
@@ -97,7 +92,4 @@ public class JMXConnectionAdapter {
         }
         return Lists.newArrayList();
     }
-
-
-
 }

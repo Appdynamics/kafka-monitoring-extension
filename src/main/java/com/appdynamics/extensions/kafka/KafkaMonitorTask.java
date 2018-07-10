@@ -15,6 +15,7 @@ import com.appdynamics.extensions.conf.MonitorContextConfiguration;
 import com.appdynamics.extensions.crypto.CryptoUtil;
 import com.appdynamics.extensions.kafka.metrics.DomainMetricsProcessor;
 
+import com.appdynamics.extensions.kafka.utils.Constants;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import org.slf4j.LoggerFactory;
@@ -45,9 +46,9 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
     public KafkaMonitorTask(TasksExecutionServiceProvider serviceProvider, MonitorContextConfiguration configuration, Map kafkaServer) {
         this.configuration = configuration;
         this.kafkaServer = kafkaServer;
-        this.metricPrefix = configuration.getMetricPrefix() + "|" + kafkaServer.get("displayName");
+        this.metricPrefix = configuration.getMetricPrefix() + Constants.METRIC_SEPARATOR + kafkaServer.get(Constants.DISPLAY_NAME);
         this.metricWriteHelper = serviceProvider.getMetricWriteHelper();
-        this.displayName = (String) kafkaServer.get("displayName");
+        this.displayName = (String) kafkaServer.get(Constants.DISPLAY_NAME);
     }
 
     public void onTaskComplete() {
@@ -69,17 +70,14 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
             jmxAdapter = JMXConnectionAdapter.create(requestMap);
             jmxConnection = jmxAdapter.open();
             logger.debug("JMX Connection is open");
-            List<Map<String, ?>> mbeansFromConfig = (List<Map<String, ?>>) configuration.getConfigYml().get("mbeans");
+            List<Map<String, ?>> mbeansFromConfig = (List<Map<String, ?>>) configuration.getConfigYml().get(Constants.MBEANS);
 
             for (Map mbeanFromConfig : mbeansFromConfig) {
-
                 DomainMetricsProcessor domainMetricsProcessor = new DomainMetricsProcessor( jmxAdapter, jmxConnection, mbeanFromConfig, displayName,metricWriteHelper, metricPrefix, phaser);
                 configuration.getContext().getExecutorService().execute("DomainMetricsProcessor",domainMetricsProcessor);
 //                logger.debug("Registering phaser for " + displayName);
             }
-
         } catch (Exception e) {
-//            e.printStackTrace();
             logger.error("Error while opening JMX connection {}{}" + this.kafkaServer.get("name"), e.getStackTrace());
         } finally {
             try {
@@ -96,25 +94,25 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
 
     private Map<String, String> buildRequestMap() {
         Map<String, String> requestMap = new HashMap<String, String>();
-        requestMap.put("host", kafkaServer.get("host"));
-        requestMap.put("port", kafkaServer.get("port"));
-        requestMap.put("displayName", kafkaServer.get("displayName"));
+        requestMap.put("host", kafkaServer.get(Constants.HOST));
+        requestMap.put("port", kafkaServer.get(Constants.PORT));
+        requestMap.put("displayName", kafkaServer.get(Constants.DISPLAY_NAME));
 
-        if(!Strings.isNullOrEmpty(kafkaServer.get("username"))) {
-            requestMap.put("username", kafkaServer.get("username"));
+        if(!Strings.isNullOrEmpty(kafkaServer.get(Constants.USERNAME))) {
+            requestMap.put("username", kafkaServer.get(Constants.USERNAME));
             requestMap.put("password", getPassword(kafkaServer));
         }
         return requestMap;
     }
 
     private String getPassword(Map<String, String> server) {
-        String password = server.get("password");
+        String password = server.get(Constants.PASSWORD);
         if(Strings.isNullOrEmpty(password)){
             logger.error("Password cannot be null");
         }
-        String encryptedPassword = server.get("encryptedPassword");
+        String encryptedPassword = server.get(Constants.ENCRYPTED_PASSWORD);
         Map<String, ?> configMap = configuration.getConfigYml();
-        String encryptionKey = configMap.get("encryptionKey").toString();
+        String encryptionKey = configMap.get(Constants.ENCRYPTION_KEY).toString();
         if(!Strings.isNullOrEmpty(password)){
             return password;
         }

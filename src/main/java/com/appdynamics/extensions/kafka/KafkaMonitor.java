@@ -11,8 +11,10 @@ package com.appdynamics.extensions.kafka;
 
 import com.appdynamics.extensions.ABaseMonitor;
 import com.appdynamics.extensions.TasksExecutionServiceProvider;
+import com.appdynamics.extensions.kafka.utils.Constants;
 import com.appdynamics.extensions.util.AssertUtils;
 import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException;
+import com.sun.tools.internal.jxc.ap.Const;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.PatternLayout;
@@ -30,14 +32,13 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
+import static com.appdynamics.extensions.kafka.utils.Constants.DEFAULT_METRIC_PREFIX;
+
 public class KafkaMonitor extends ABaseMonitor {
-    private static final String DEFAULT_METRIC_PREFIX = "Custom Metrics|Kafka";
     private static final Logger logger = LoggerFactory.getLogger(KafkaMonitor.class);
 
     @Override
-    protected void initializeMoreStuff(Map<String, String> args){
-
-    }
+    protected void initializeMoreStuff(Map<String, String> args){ }
 
     @Override
     protected String getDefaultMetricPrefix() {
@@ -51,19 +52,17 @@ public class KafkaMonitor extends ABaseMonitor {
 
     @Override
     protected void doRun(TasksExecutionServiceProvider tasksExecutionServiceProvider) {
-        List<Map<String, String>> kafkaServers = (List<Map<String, String>>) this.getContextConfiguration().getConfigYml().get("servers");
+        List<Map<String, String>> kafkaServers = (List<Map<String, String>>) this.getContextConfiguration().getConfigYml().get(Constants.SERVERS);
         for (Map<String, String> kafkaServer : kafkaServers) {
-
             KafkaMonitorTask task = new KafkaMonitorTask(tasksExecutionServiceProvider, this.getContextConfiguration(), kafkaServer);
-            AssertUtils.assertNotNull(kafkaServer.get("displayName"), "The displayName can not be null");
-            tasksExecutionServiceProvider.submit(kafkaServer.get("displayName"), task);
+            AssertUtils.assertNotNull(kafkaServer.get(Constants.DISPLAY_NAME), "The displayName can not be null");
+            tasksExecutionServiceProvider.submit(kafkaServer.get(Constants.DISPLAY_NAME), task);
         }
-
     }
 
     @Override
     protected int getTaskCount() {
-        List<Map<String, String>> servers = (List<Map<String, String>>) getContextConfiguration().getConfigYml().get("servers");
+        List<Map<String, String>> servers = (List<Map<String, String>>) getContextConfiguration().getConfigYml().get(Constants.SERVERS);
         AssertUtils.assertNotNull(servers, "The 'servers' section in conf.yml is not initialised");
         return servers.size();
     }
