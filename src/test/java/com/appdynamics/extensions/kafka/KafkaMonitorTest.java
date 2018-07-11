@@ -15,7 +15,7 @@ public class KafkaMonitorTest {
     public void testKafkaMonitorExtension() throws TaskExecutionException {
         KafkaMonitor kafkaMonitor = new KafkaMonitor();
         Map<String, String> taskArgs = Maps.newHashMap();
-        taskArgs.put(CONFIG_ARG, "src/test/resources/conf/config.yml");
+        taskArgs.put(CONFIG_ARG, "/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension/src/test/resources/conf/config.yml");
         kafkaMonitor.execute(taskArgs, null);
 
     }

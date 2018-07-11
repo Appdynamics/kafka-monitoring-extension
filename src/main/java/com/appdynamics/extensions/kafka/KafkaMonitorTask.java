@@ -31,7 +31,6 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
     private MonitorContextConfiguration configuration;
     private Map<String, String> kafkaServer;
     private MetricWriteHelper metricWriteHelper;
-    private String metricPrefix;
     private String displayName;
     private JMXConnector jmxConnection;
     private JMXConnectionAdapter jmxAdapter;
@@ -42,7 +41,6 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
     public KafkaMonitorTask(TasksExecutionServiceProvider serviceProvider, MonitorContextConfiguration configuration, Map kafkaServer) {
         this.configuration = configuration;
         this.kafkaServer = kafkaServer;
-        this.metricPrefix = configuration.getMetricPrefix() + Constants.METRIC_SEPARATOR + kafkaServer.get(Constants.DISPLAY_NAME);
         this.metricWriteHelper = serviceProvider.getMetricWriteHelper();
         this.displayName = (String) kafkaServer.get(Constants.DISPLAY_NAME);
     }
@@ -66,7 +64,7 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
             logger.debug("JMX Connection is open");
             List<Map<String, ?>> mbeansFromConfig = (List<Map<String, ?>>) configuration.getConfigYml().get(Constants.MBEANS);
             for (Map mbeanFromConfig : mbeansFromConfig) {
-                DomainMetricsProcessor domainMetricsProcessor = new DomainMetricsProcessor( jmxAdapter, jmxConnection, mbeanFromConfig, displayName,metricWriteHelper, metricPrefix, phaser);
+                DomainMetricsProcessor domainMetricsProcessor = new DomainMetricsProcessor( configuration, jmxAdapter, jmxConnection, mbeanFromConfig, displayName,metricWriteHelper, phaser);
                 domainMetricsProcessor.populateMetricsForMBean();
                 logger.debug("Registering phaser for " + displayName);
             }

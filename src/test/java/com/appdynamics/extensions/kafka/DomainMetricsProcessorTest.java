@@ -4,9 +4,16 @@ import com.appdynamics.extensions.AMonitorJob;
 import com.appdynamics.extensions.MetricWriteHelper;
 import com.appdynamics.extensions.conf.MonitorContextConfiguration;
 import com.appdynamics.extensions.kafka.metrics.DomainMetricsProcessor;
+import com.appdynamics.extensions.kafka.utils.Constants;
+import com.appdynamics.extensions.metrics.Metric;
+import com.appdynamics.extensions.util.PathResolver;
 import com.appdynamics.extensions.yml.YmlReader;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.singularity.ee.agent.systemagent.api.AManagedMonitor;
+import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -20,54 +27,55 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Phaser;
 
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class DomainMetricsProcessorTest {
-
     JMXConnector jmxConnector = mock(JMXConnector.class);
     JMXConnectionAdapter jmxConnectionAdapter = mock(JMXConnectionAdapter.class);
 
     @Test
-
     public void getNodeMetrics() throws IOException,IntrospectionException,ReflectionException, InstanceNotFoundException,MalformedObjectNameException {
-
-        ArgumentCaptor<List> pathCaptor = ArgumentCaptor.forClass(List.class);
-        AMonitorJob aMonitorJob = mock(AMonitorJob.class);
-        //pass config file name
-        MonitorContextConfiguration monitorContextConfiguration = new MonitorContextConfiguration("Kafka Monitor", "Custom Metrics|Kafka|", aMonitorJob);
-        monitorContextConfiguration.setConfigYml("src/test/resources/conf/conf.yml");
         MetricWriteHelper metricWriteHelper = mock(MetricWriteHelper.class);
+        MonitorContextConfiguration contextConfiguration = new MonitorContextConfiguration("Kafka", "Custom Metrics|Kafka|", PathResolver.resolveDirectory(AManagedMonitor.class), Mockito.mock(AMonitorJob.class));
+        contextConfiguration.setConfigYml("/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension/src/test/resources/conf/config_for_metrics.yml");
 
-//        Map config = YmlReader.readFromFileAsMap(new File(this.getClass().getResource("/conf/config.yml").getFile()));
+        Map config = contextConfiguration.getConfigYml();
         List<Map> mBeans = (List) config.get("mbeans");
         Set<ObjectInstance> objectInstances = Sets.newHashSet();
-        objectInstances.add(new ObjectInstance("kafka.server:type=BrokerTopicMetrics,*", "test"));
+        objectInstances.add(new ObjectInstance("org.apache.kafka.server:type=ReplicaManager,name=IsrExpandsPerSec", "test"));
 
-        Set<Attribute> attributes = Sets.newHashSet();
-        attributes.add(new Attribute("Count", new Integer(100));
-        attributes.add(new Attribute("Value", new Integer(200) );
+        List<Attribute> attributes = Lists.newArrayList();
+        attributes.add(new Attribute("Count", new Integer(100)));
+        attributes.add(new Attribute("Value", new Integer(200) ));
 
         List<String> metricNames = Lists.newArrayList();
-        metricNames.add("testmetric1");
-        metricNames.add("testmetric2");
+        metricNames.add("Count");
+        metricNames.add("Value");
 
         when(jmxConnectionAdapter.queryMBeans(eq(jmxConnector), Mockito.any(ObjectName.class))).thenReturn(objectInstances);
         when(jmxConnectionAdapter.getReadableAttributeNames(eq(jmxConnector), Mockito.any(ObjectInstance.class))).thenReturn(metricNames);
         when(jmxConnectionAdapter.getAttributes(eq(jmxConnector), Mockito.any(ObjectName.class), Mockito.any(String[]
-                .class))).thenReturn((List<Attribute>) eq(attributes));
+                .class))).thenReturn(attributes);
 
-        DomainMetricsProcessor domainMetricsProcessor = new
+        Map<String, String> server = Maps.newHashMap();
+        server.put("host", "localhost");
+        server.put("port", "9999");
+        server.put("displayName", "TestServer1");
 
-
-
-
+        for(Map mBean : mBeans){
+            Phaser phaser = new Phaser();
+            phaser.register();
+            Map<String, ?> metricProperties = (Map<String, ?>) mBean.get("metrics");
+            DomainMetricsProcessor domainMetricsProcessor = new DomainMetricsProcessor(contextConfiguration, jmxConnectionAdapter,
+                    jmxConnector, mBean, server.get("displayName"), metricWriteHelper,phaser);
+            List<Metric> metrics = domainMetricsProcessor.getNodeMetrics(jmxConnector, mBean.get("objectName").toString(),metricProperties );
+            Assert.assertTrue(metrics.get(0).getMetricName().equals("Count"));
+            Assert.assertTrue(metrics.get(1).getMetricName().equals("Value"));
+        }
 
     }
-
-
-
-
 }

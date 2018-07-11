@@ -10,6 +10,7 @@ package com.appdynamics.extensions.kafka.metrics;
 
 
 import com.appdynamics.extensions.MetricWriteHelper;
+import com.appdynamics.extensions.conf.MonitorContextConfiguration;
 import com.appdynamics.extensions.kafka.JMXConnectionAdapter;
 import com.appdynamics.extensions.kafka.utils.Constants;
 import com.appdynamics.extensions.metrics.Metric;
@@ -36,12 +37,13 @@ public class DomainMetricsProcessor {
     private Map mbeanFromConfig;
     private String displayName;
 
-    public DomainMetricsProcessor( JMXConnectionAdapter jmxAdapter, JMXConnector jmxConnection, Map mbeanFromConfig, String displayName, MetricWriteHelper metricWriteHelper, String metricPrefix, Phaser phaser) {
+    public DomainMetricsProcessor(MonitorContextConfiguration configuration, JMXConnectionAdapter jmxAdapter, JMXConnector jmxConnection, Map mbeanFromConfig, String displayName, MetricWriteHelper metricWriteHelper, Phaser phaser) {
         this.jmxAdapter = jmxAdapter;
         this.jmxConnection = jmxConnection;
         this.metricWriteHelper = metricWriteHelper;
-        this.metricPrefix = metricPrefix;
-        this.phaser = phaser;this.phaser.register();
+        this.metricPrefix = configuration.getMetricPrefix() + Constants.METRIC_SEPARATOR + displayName;
+        this.phaser = phaser;
+        this.phaser.register();
         this.mbeanFromConfig = mbeanFromConfig;
         this.displayName = displayName;
     }
@@ -72,7 +74,7 @@ public class DomainMetricsProcessor {
     }
 
     @SuppressWarnings("unchecked")
-    private   List<Metric> getNodeMetrics(JMXConnector jmxConnection, String objectName, Map<String, ?> metricProperties) throws IntrospectionException, ReflectionException, InstanceNotFoundException, IOException, MalformedObjectNameException {
+    public   List<Metric> getNodeMetrics(JMXConnector jmxConnection, String objectName, Map<String, ?> metricProperties) throws IntrospectionException, ReflectionException, InstanceNotFoundException, IOException, MalformedObjectNameException {
         List<Metric> nodeMetrics = Lists.newArrayList();
         Set<ObjectInstance> objectInstances = this.jmxAdapter.queryMBeans(jmxConnection, ObjectName.getInstance(objectName));
         for (ObjectInstance instance : objectInstances) {

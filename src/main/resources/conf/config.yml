@@ -41,14 +41,9 @@ numberOfThreads: 10
 mbeans:
 
 #All MBeans which have attributes Count and MeanRate
-  - objectName: ["kafka.server:type=BrokerTopicMetrics,*",
-                    "kafka.server:type=DelayedFetchMetrics,*",
-                    "kafka.server:type=KafkaRequestHandlerPool,*",
+  - objectName: [
                     "kafka.server:type=ReplicaManager,name=IsrExpandsPerSec",
-                    "kafka.server:type=ReplicaManager,name=IsrShrinksPerSec",
-                    "kafka.server:type=SessionExpireListener,*",
-                    "kafka.network:type=RequestMetrics,*",
-                    "kafka.controller:type=ControllerStats,*"
+
                   ]
     metrics:
           Count:
@@ -59,17 +54,17 @@ mbeans:
 
 
 #All MBeans which have attributes Value
-  - objectName: ["kafka.server:type=DelayedOperationPurgatory,*",
-                    "kafka.server:type=KafkaServer,name=BrokerState",
-                    "kafka.server:type=ReplicaFetcherManager,*",
-                    "kafka.server:type=ReplicaManager,name=LeaderCount",
-                    "kafka.server:type=ReplicaManager,name=PartitionCount",
-                    "kafka.server:type=ReplicaManager,name=UnderReplicatedPartitions",
-                    "kafka.network:type=Processor,*",
-                    "kafka.network:type=RequestChannel,*",
-                    "kafka.network:type=SocketServer,*"
-                   ]
-    metrics:
-          Value:
-              alias: "Value"
+#  - objectName: ["kafka.server:type=DelayedOperationPurgatory,*",
+#                    "kafka.server:type=KafkaServer,name=BrokerState",
+#                    "kafka.server:type=ReplicaFetcherManager,*",
+#                    "kafka.server:type=ReplicaManager,name=LeaderCount",
+#                    "kafka.server:type=ReplicaManager,name=PartitionCount",
+#                    "kafka.server:type=ReplicaManager,name=UnderReplicatedPartitions",
+#                    "kafka.network:type=Processor,*",
+#                    "kafka.network:type=RequestChannel,*",
+#                    "kafka.network:type=SocketServer,*"
+#                   ]
+#    metrics:
+#          Value:
+#              alias: "Value"
 

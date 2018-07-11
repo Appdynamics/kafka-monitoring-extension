@@ -1,0 +1,11 @@
+metricPrefix: "Custom Metrics|Kafka|"
+
+mbeans:
+
+  - objectName: "kafka.server:type=ReplicaManager,name=IsrExpandsPerSec"
+    metrics:
+
+      Count:
+          alias: "Min Latency"
+      Value:
+          alias: "Max Latency"
