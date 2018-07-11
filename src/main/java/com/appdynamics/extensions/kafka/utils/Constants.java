@@ -36,5 +36,7 @@ public class Constants {
 
     public static final String METRICS = "metrics";
 
+    public static final String OBJECTNAME = "objectName";
+
 
 }

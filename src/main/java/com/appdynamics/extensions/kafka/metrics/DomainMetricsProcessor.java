@@ -10,7 +10,6 @@ package com.appdynamics.extensions.kafka.metrics;
 
 
 import com.appdynamics.extensions.MetricWriteHelper;
-import com.appdynamics.extensions.conf.MonitorContext;
 import com.appdynamics.extensions.kafka.JMXConnectionAdapter;
 import com.appdynamics.extensions.kafka.utils.Constants;
 import com.appdynamics.extensions.metrics.Metric;
@@ -22,16 +21,16 @@ import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeDataSupport;
 import javax.management.remote.JMXConnector;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.Phaser;
 
-public class DomainMetricsProcessor implements Runnable{
+public class DomainMetricsProcessor {
     static final org.slf4j.Logger logger = LoggerFactory.getLogger(DomainMetricsProcessor.class);
     private final JMXConnectionAdapter jmxAdapter;
     private final JMXConnector jmxConnection;
-    private MonitorContext context;
     private MetricWriteHelper metricWriteHelper;
-    private List<Metric> metrics = new ArrayList<Metric>();
     private String metricPrefix;
     private Phaser phaser;
     private Map mbeanFromConfig;
@@ -42,36 +41,45 @@ public class DomainMetricsProcessor implements Runnable{
         this.jmxConnection = jmxConnection;
         this.metricWriteHelper = metricWriteHelper;
         this.metricPrefix = metricPrefix;
-        this.phaser = phaser;
-//        this.phaser.register();
+        this.phaser = phaser;this.phaser.register();
         this.mbeanFromConfig = mbeanFromConfig;
         this.displayName = displayName;
     }
 
-    @Override
-    public void run() {
+    @SuppressWarnings("unchecked")
+    public void populateMetricsForMBean() {
+        phaser.arriveAndAwaitAdvance();
         try {
             Map<String, ?> metricProperties = (Map<String, ?>) this.mbeanFromConfig.get(Constants.METRICS);
             logger.debug(String.format("Processing metrics section from the conf file"));
             logger.debug("Size of metric section {}",metricProperties.size());
-            List<String> mbeanNames = (List<String>) this.mbeanFromConfig.get("mbeanFullPath");
+            List<String> mbeanNames = (List<String>) this.mbeanFromConfig.get(Constants.OBJECTNAME);
             logger.debug("Size of mbean section {}",mbeanNames.size());
             for (String mbeanName : mbeanNames) {
+
                     logger.debug(String.format("Processing mbean %s from the conf file", mbeanName));
                     List<Metric> finalMetricList = getNodeMetrics(jmxConnection,mbeanName,metricProperties);
+                    finalMetricList.add(new Metric("HeartBeat", String.valueOf(BigInteger.ONE), metricPrefix + "|HeartBeat", "AVG", "AVG", "IND"));
+
+
                     logger.debug("Printing metrics for server {}", mbeanName);
                     metricWriteHelper.transformAndPrintMetrics(finalMetricList);
+
             }
 
-            // heartbeat
+
+
         } catch (IntrospectionException | IOException | MalformedObjectNameException | InstanceNotFoundException | ReflectionException e) {
-            e.printStackTrace();
+            logger.error("Kafka Monitor error: " + e.getMessage());
+            metricWriteHelper.printMetric(metricPrefix + "|HeartBeat", BigDecimal.ZERO, "AVG.AVG.IND");
         } finally {
+            phaser.arriveAndDeregister();
             logger.debug("DomainProcessor Phaser arrived for {}", displayName);
-//            phaser.arriveAndDeregister();
+
         }
     }
 
+    @SuppressWarnings("unchecked")
     private   List<Metric> getNodeMetrics(JMXConnector jmxConnection, String objectName, Map<String, ?> metricProperties) throws IntrospectionException, ReflectionException, InstanceNotFoundException, IOException, MalformedObjectNameException {
         List<Metric> nodeMetrics = Lists.newArrayList();
         Set<ObjectInstance> objectInstances = this.jmxAdapter.queryMBeans(jmxConnection, ObjectName.getInstance(objectName));

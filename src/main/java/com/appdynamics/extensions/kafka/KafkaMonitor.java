@@ -14,23 +14,16 @@ import com.appdynamics.extensions.TasksExecutionServiceProvider;
 import com.appdynamics.extensions.kafka.utils.Constants;
 import com.appdynamics.extensions.util.AssertUtils;
 import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException;
-import com.sun.tools.internal.jxc.ap.Const;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.PatternLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.appdynamics.extensions.util.AssertUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Map;
 
 import static com.appdynamics.extensions.kafka.utils.Constants.DEFAULT_METRIC_PREFIX;
 
@@ -47,7 +40,7 @@ public class KafkaMonitor extends ABaseMonitor {
 
     @Override
     public String getMonitorName() {
-        return "Kafka Extension";
+        return "Kafka Monitor";
     }
 
     @Override

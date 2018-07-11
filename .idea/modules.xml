@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../activemq-monitoring-extension/activemq-monitoring-extension.iml" filepath="$PROJECT_DIR$/../activemq-monitoring-extension/activemq-monitoring-extension.iml" />
       <module fileurl="file://$PROJECT_DIR$/../apache-monitoring-extension/apache-monitoring-extension.iml" filepath="$PROJECT_DIR$/../apache-monitoring-extension/apache-monitoring-extension.iml" />
       <module fileurl="file://$PROJECT_DIR$/../cassandra-monitoring-extension/cassandra-monitoring-extension.iml" filepath="$PROJECT_DIR$/../cassandra-monitoring-extension/cassandra-monitoring-extension.iml" />
       <module fileurl="file://$PROJECT_DIR$/../extension-starter/extension-starter/extensions-starter.iml" filepath="$PROJECT_DIR$/../extension-starter/extension-starter/extensions-starter.iml" />

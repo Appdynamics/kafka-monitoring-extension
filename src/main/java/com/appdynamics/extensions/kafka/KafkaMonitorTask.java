@@ -20,7 +20,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import org.slf4j.LoggerFactory;
 import javax.management.remote.JMXConnector;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +37,6 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
     private String displayName;
     private JMXConnector jmxConnection;
     private JMXConnectionAdapter jmxAdapter;
-
     private static final BigDecimal ERROR_VALUE = BigDecimal.ZERO;
     private static final BigDecimal SUCCESS_VALUE = BigDecimal.ONE;
     private Phaser phaser;
@@ -52,19 +50,20 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
     }
 
     public void onTaskComplete() {
-
+        logger.info("All tasks for server {} finished", this.kafkaServer.get(Constants.DISPLAY_NAME));
     }
 
     public void run() {
-        phaser = new Phaser();
+
         populateAndPrintMetrics();
 
-//        phaser.arriveAndAwaitAdvance();
         logger.info("Completed the Kafka  Monitoring task");
     }
 
     private BigDecimal populateAndPrintMetrics() {
+
         try{
+            phaser = new Phaser();
             Map<String, String> requestMap;
             requestMap = buildRequestMap();
             jmxAdapter = JMXConnectionAdapter.create(requestMap);
@@ -74,14 +73,16 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
 
             for (Map mbeanFromConfig : mbeansFromConfig) {
                 DomainMetricsProcessor domainMetricsProcessor = new DomainMetricsProcessor( jmxAdapter, jmxConnection, mbeanFromConfig, displayName,metricWriteHelper, metricPrefix, phaser);
-                configuration.getContext().getExecutorService().execute("DomainMetricsProcessor",domainMetricsProcessor);
-//                logger.debug("Registering phaser for " + displayName);
+                domainMetricsProcessor.populateMetricsForMBean();
+                logger.debug("Registering phaser for " + displayName);
+
             }
+
         } catch (Exception e) {
-            logger.error("Error while opening JMX connection {}{}" + this.kafkaServer.get("name"), e.getStackTrace());
+            logger.error("Error while opening JMX connection {}{}" ,this.kafkaServer.get(Constants.DISPLAY_NAME), e.getMessage());
         } finally {
             try {
-//                jmxAdapter.close(jmxConnection);
+                jmxAdapter.close(jmxConnection);
                 logger.debug("JMX connection is closed");
             } catch (Exception ioe) {
                 logger.error("Unable to close the connection.");

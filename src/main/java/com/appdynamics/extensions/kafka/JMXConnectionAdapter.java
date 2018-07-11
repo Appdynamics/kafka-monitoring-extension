@@ -25,6 +25,7 @@ import javax.management.ReflectionException;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
+import javax.rmi.ssl.SslRMIClientSocketFactory;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.HashMap;
@@ -53,6 +54,7 @@ public class JMXConnectionAdapter {
         final Map<String, Object> env = new HashMap<String, Object>();
         if (!Strings.isNullOrEmpty(username)) {
             env.put(JMXConnector.CREDENTIALS, new String[]{username, password});
+
             jmxConnector = JMXConnectorFactory.connect(serviceUrl, env);
         }
         else { jmxConnector = JMXConnectorFactory.connect(serviceUrl); }

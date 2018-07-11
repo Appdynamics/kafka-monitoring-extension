@@ -6,6 +6,6 @@ target
 *.log
 *.ipr
 *.iws
-.idea
+*.idea
 .DS_Store
 
