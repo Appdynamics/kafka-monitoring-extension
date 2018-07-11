@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Phaser;
 
-
-
 public class KafkaMonitorTask implements AMonitorTaskRunnable {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(KafkaMonitorTask.class);
     private MonitorContextConfiguration configuration;
@@ -54,14 +52,11 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
     }
 
     public void run() {
-
         populateAndPrintMetrics();
-
         logger.info("Completed the Kafka  Monitoring task");
     }
 
     private BigDecimal populateAndPrintMetrics() {
-
         try{
             phaser = new Phaser();
             Map<String, String> requestMap;
@@ -70,14 +65,11 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
             jmxConnection = jmxAdapter.open();
             logger.debug("JMX Connection is open");
             List<Map<String, ?>> mbeansFromConfig = (List<Map<String, ?>>) configuration.getConfigYml().get(Constants.MBEANS);
-
             for (Map mbeanFromConfig : mbeansFromConfig) {
                 DomainMetricsProcessor domainMetricsProcessor = new DomainMetricsProcessor( jmxAdapter, jmxConnection, mbeanFromConfig, displayName,metricWriteHelper, metricPrefix, phaser);
                 domainMetricsProcessor.populateMetricsForMBean();
                 logger.debug("Registering phaser for " + displayName);
-
             }
-
         } catch (Exception e) {
             logger.error("Error while opening JMX connection {}{}" ,this.kafkaServer.get(Constants.DISPLAY_NAME), e.getMessage());
         } finally {
@@ -92,13 +84,11 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
         return SUCCESS_VALUE;
     }
 
-
     private Map<String, String> buildRequestMap() {
         Map<String, String> requestMap = new HashMap<String, String>();
         requestMap.put("host", kafkaServer.get(Constants.HOST));
         requestMap.put("port", kafkaServer.get(Constants.PORT));
         requestMap.put("displayName", kafkaServer.get(Constants.DISPLAY_NAME));
-
         if(!Strings.isNullOrEmpty(kafkaServer.get(Constants.USERNAME))) {
             requestMap.put("username", kafkaServer.get(Constants.USERNAME));
             requestMap.put("password", getPassword(kafkaServer));
@@ -126,12 +116,6 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
         }
         return "";
     }
-
-
-
-
-
-
 }
 
 

@@ -56,26 +56,18 @@ public class DomainMetricsProcessor {
             List<String> mbeanNames = (List<String>) this.mbeanFromConfig.get(Constants.OBJECTNAME);
             logger.debug("Size of mbean section {}",mbeanNames.size());
             for (String mbeanName : mbeanNames) {
-
-                    logger.debug(String.format("Processing mbean %s from the conf file", mbeanName));
-                    List<Metric> finalMetricList = getNodeMetrics(jmxConnection,mbeanName,metricProperties);
-                    finalMetricList.add(new Metric("HeartBeat", String.valueOf(BigInteger.ONE), metricPrefix + "|HeartBeat", "AVG", "AVG", "IND"));
-
-
-                    logger.debug("Printing metrics for server {}", mbeanName);
-                    metricWriteHelper.transformAndPrintMetrics(finalMetricList);
-
+                logger.debug(String.format("Processing mbean %s from the conf file", mbeanName));
+                List<Metric> finalMetricList = getNodeMetrics(jmxConnection,mbeanName,metricProperties);
+                finalMetricList.add(new Metric("HeartBeat", String.valueOf(BigInteger.ONE), metricPrefix + "|HeartBeat", "AVG", "AVG", "IND"));
+                logger.debug("Printing metrics for server {}", mbeanName);
+                metricWriteHelper.transformAndPrintMetrics(finalMetricList);
             }
-
-
-
         } catch (IntrospectionException | IOException | MalformedObjectNameException | InstanceNotFoundException | ReflectionException e) {
             logger.error("Kafka Monitor error: " + e.getMessage());
             metricWriteHelper.printMetric(metricPrefix + "|HeartBeat", BigDecimal.ZERO, "AVG.AVG.IND");
         } finally {
             phaser.arriveAndDeregister();
             logger.debug("DomainProcessor Phaser arrived for {}", displayName);
-
         }
     }
 
