@@ -4,26 +4,18 @@ import com.appdynamics.extensions.AMonitorJob;
 import com.appdynamics.extensions.MetricWriteHelper;
 import com.appdynamics.extensions.conf.MonitorContextConfiguration;
 import com.appdynamics.extensions.kafka.metrics.DomainMetricsProcessor;
-import com.appdynamics.extensions.kafka.utils.Constants;
 import com.appdynamics.extensions.metrics.Metric;
 import com.appdynamics.extensions.util.PathResolver;
-import com.appdynamics.extensions.yml.YmlReader;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.singularity.ee.agent.systemagent.api.AManagedMonitor;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-
 import javax.management.*;
 import javax.management.remote.JMXConnector;
-
-import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,6 +30,7 @@ public class DomainMetricsProcessorTest {
     JMXConnectionAdapter jmxConnectionAdapter = mock(JMXConnectionAdapter.class);
 
     @Test
+    @SuppressWarnings("unchecked")
     public void getNodeMetrics() throws IOException,IntrospectionException,ReflectionException, InstanceNotFoundException,MalformedObjectNameException {
         MetricWriteHelper metricWriteHelper = mock(MetricWriteHelper.class);
         MonitorContextConfiguration contextConfiguration = new MonitorContextConfiguration("Kafka", "Custom Metrics|Kafka|", PathResolver.resolveDirectory(AManagedMonitor.class), Mockito.mock(AMonitorJob.class));
@@ -49,8 +42,8 @@ public class DomainMetricsProcessorTest {
         objectInstances.add(new ObjectInstance("org.apache.kafka.server:type=ReplicaManager,name=IsrExpandsPerSec", "test"));
 
         List<Attribute> attributes = Lists.newArrayList();
-        attributes.add(new Attribute("Count", new Integer(100)));
-        attributes.add(new Attribute("Value", new Integer(200) ));
+        attributes.add(new Attribute("Count", 100));
+        attributes.add(new Attribute("Value", 200 ));
 
         List<String> metricNames = Lists.newArrayList();
         metricNames.add("Count");
@@ -73,8 +66,8 @@ public class DomainMetricsProcessorTest {
             DomainMetricsProcessor domainMetricsProcessor = new DomainMetricsProcessor(contextConfiguration, jmxConnectionAdapter,
                     jmxConnector, mBean, server.get("displayName"), metricWriteHelper,phaser);
             List<Metric> metrics = domainMetricsProcessor.getNodeMetrics(jmxConnector, mBean.get("objectName").toString(),metricProperties );
-            Assert.assertTrue(metrics.get(0).getMetricName().equals("Count"));
-            Assert.assertTrue(metrics.get(1).getMetricName().equals("Value"));
+            Assert.assertEquals(metrics.get(0).getMetricName(),"Count");
+            Assert.assertEquals(metrics.get(1).getMetricName(), "Value");
         }
 
     }

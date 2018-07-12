@@ -41,30 +41,52 @@ numberOfThreads: 10
 mbeans:
 
 #All MBeans which have attributes Count and MeanRate
-  - objectName: [
+  - objectName: ["kafka.server:type=BrokerTopicMetrics,*",
+                    "kafka.server:type=DelayedFetchMetrics,*",
+                    "kafka.server:type=KafkaRequestHandlerPool,*",
                     "kafka.server:type=ReplicaManager,name=IsrExpandsPerSec",
-
+                    "kafka.server:type=ReplicaManager,name=IsrShrinksPerSec",
+                    "kafka.server:type=SessionExpireListener,*",
+                    "kafka.network:type=RequestMetrics,*",
+                    "kafka.controller:type=ControllerStats,*"
                   ]
     metrics:
           Count:
               alias: "Count"
+              multiplier:
+              delta:
+              aggregationType:
+              timeRollUpType:
+              clusterRollUpType:
+
 
           MeanRate:
               alias: "MeanRate"
 
 
 #All MBeans which have attributes Value
-#  - objectName: ["kafka.server:type=DelayedOperationPurgatory,*",
-#                    "kafka.server:type=KafkaServer,name=BrokerState",
-#                    "kafka.server:type=ReplicaFetcherManager,*",
-#                    "kafka.server:type=ReplicaManager,name=LeaderCount",
-#                    "kafka.server:type=ReplicaManager,name=PartitionCount",
-#                    "kafka.server:type=ReplicaManager,name=UnderReplicatedPartitions",
-#                    "kafka.network:type=Processor,*",
-#                    "kafka.network:type=RequestChannel,*",
-#                    "kafka.network:type=SocketServer,*"
-#                   ]
-#    metrics:
-#          Value:
-#              alias: "Value"
+  - objectName: ["kafka.server:type=DelayedOperationPurgatory,*",
+                    "kafka.server:type=KafkaServer,name=BrokerState",
+                    "kafka.server:type=ReplicaFetcherManager,*",
+                    "kafka.server:type=ReplicaManager,name=LeaderCount",
+                    "kafka.server:type=ReplicaManager,name=PartitionCount",
+                    "kafka.server:type=ReplicaManager,name=UnderReplicatedPartitions",
+                    "kafka.network:type=Processor,*",
+                    "kafka.network:type=RequestChannel,*",
+                    "kafka.network:type=SocketServer,*"
+                   ]
+    metrics:
+          - Value: "Value"
+
+#JVM Metrics
+  - objectName: ["java.lang:type=Memory"]
+    metrics:
+          HeapMemoryUsage.committed: "Heap Memory Usage | Committed"
+          HeapMemoryUsage.max: "Heap Memory Usage | Max"
+          HeapMemoryUsage.used: "Heap Memory Usage | Used"
+          NonHeapMemoryUsage.committed: "Heap Memory Usage | Committed"
+          NonHeapMemoryUsage.used: "Heap Memory Usage | Used"
+
+
+
 
