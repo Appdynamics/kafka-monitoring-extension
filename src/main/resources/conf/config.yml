@@ -1,7 +1,7 @@
 ### ANY CHANGES TO THIS FILE DOES NOT REQUIRE A RESTART ###
 
 #This will create this metric in all the tiers, under this path
-metricPrefix: Custom Metrics|Kafka
+metricPrefix: "Server|Kafka"
 
 #This will create it in specific Tier/Component. Make sure to replace <COMPONENT_ID> with the appropriate one from your environment.
 #To find the <COMPONENT_ID> in your environment, please follow the screenshot https://docs.appdynamics.com/display/PRO42/Build+a+Monitoring+Extension+Using+Java
@@ -53,15 +53,22 @@ mbeans:
     metrics:
           Count:
               alias: "Count"
-              multiplier:
-              delta:
-              aggregationType:
-              timeRollUpType:
-              clusterRollUpType:
+              multiplier: ""
+              delta: "false"
+              aggregationType: "average"
+              timeRollUpType: "average"
+              clusterRollUpType: "individual"
 
 
           MeanRate:
               alias: "MeanRate"
+              multiplier: ""
+              delta: "false"
+              aggregationType: "average"
+              timeRollUpType: "average"
+              clusterRollUpType: "individual"
+
+
 
 
 #All MBeans which have attributes Value
@@ -76,7 +83,7 @@ mbeans:
                     "kafka.network:type=SocketServer,*"
                    ]
     metrics:
-          - Value: "Value"
+          Value: "Value"
 
 #JVM Metrics
   - objectName: ["java.lang:type=Memory"]
