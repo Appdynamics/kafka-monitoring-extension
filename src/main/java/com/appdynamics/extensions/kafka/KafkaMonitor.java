@@ -31,12 +31,19 @@ public class KafkaMonitor extends ABaseMonitor {
     private static final Logger logger = LoggerFactory.getLogger(KafkaMonitor.class);
 
     @Override
-    protected void initializeMoreStuff(Map<String, String> args){ }
+    protected void initializeMoreStuff(Map<String, String> args){
+        Map<String, String> connectionMapFromConfig = new HashMap<String, String>();
+        connectionMapFromConfig = (Map<String, String>) this.getContextConfiguration().getConfigYml().get("connection");
+        Object useSsl = (connectionMapFromConfig.get("useSsl"));
+
+        if(Boolean.valueOf(useSsl.toString())) {
+            System.setProperty("javax.net.ssl.trustStore", connectionMapFromConfig.get("sslTrustStorePath"));
+            System.setProperty("javax.net.ssl.trustStorePassword", connectionMapFromConfig.get("sslTrustStorePassword"));
+        }
+    }
 
     @Override
-    protected String getDefaultMetricPrefix() {
-        return DEFAULT_METRIC_PREFIX;
-    }
+    protected String getDefaultMetricPrefix() { return DEFAULT_METRIC_PREFIX; }
 
     @Override
     public String getMonitorName() {
@@ -45,10 +52,11 @@ public class KafkaMonitor extends ABaseMonitor {
 
     @Override
     protected void doRun(TasksExecutionServiceProvider tasksExecutionServiceProvider) {
+
         List<Map<String, String>> kafkaServers = (List<Map<String, String>>) this.getContextConfiguration().getConfigYml().get(Constants.SERVERS);
         for (Map<String, String> kafkaServer : kafkaServers) {
             KafkaMonitorTask task = new KafkaMonitorTask(tasksExecutionServiceProvider, this.getContextConfiguration(), kafkaServer);
-            AssertUtils.assertNotNull(kafkaServer.get(Constants.DISPLAY_NAME), "The displayName can not be null");
+//            AssertUtils.assertNotNull(kafkaServer.get(Constants.DISPLAY_NAME), "The displayName can not be null");
             tasksExecutionServiceProvider.submit(kafkaServer.get(Constants.DISPLAY_NAME), task);
         }
     }

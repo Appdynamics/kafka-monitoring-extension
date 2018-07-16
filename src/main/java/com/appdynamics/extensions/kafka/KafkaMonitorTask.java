@@ -58,10 +58,16 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
         try{
             phaser = new Phaser();
             Map<String, String> requestMap;
+            Map<String, String> connectionMap;
+
             requestMap = buildRequestMap();
             jmxAdapter = JMXConnectionAdapter.create(requestMap);
-            jmxConnection = jmxAdapter.open();
+            connectionMap = getConnectionParameters();
+            Object flag1 = connectionMap.get("useDefaultSslConnectionFactory");
+            boolean flag = Boolean.valueOf(flag1.toString());
+            jmxConnection = jmxAdapter.open(flag);
             logger.debug("JMX Connection is open");
+
             List<Map<String, ?>> mbeansFromConfig = (List<Map<String, ?>>) configuration.getConfigYml().get(Constants.MBEANS);
             for (Map mbeanFromConfig : mbeansFromConfig) {
                 DomainMetricsProcessor domainMetricsProcessor = new DomainMetricsProcessor( configuration, jmxAdapter, jmxConnection, mbeanFromConfig, displayName,metricWriteHelper, phaser);
@@ -70,6 +76,7 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
             }
         } catch (Exception e) {
             logger.error("Error while opening JMX connection {}{}" ,this.kafkaServer.get(Constants.DISPLAY_NAME), e.getMessage());
+            e.printStackTrace();
         } finally {
             try {
                 jmxAdapter.close(jmxConnection);
@@ -91,8 +98,10 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
             requestMap.put("username", kafkaServer.get(Constants.USERNAME));
             requestMap.put("password", getPassword(kafkaServer));
         }
+
         return requestMap;
     }
+
 
     private String getPassword(Map<String, String> server) {
         String password = server.get(Constants.PASSWORD);
@@ -114,6 +123,14 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
         }
         return "";
     }
+
+    private Map<String,String> getConnectionParameters(){
+        Map<String, String> connectionMap = new HashMap<>();
+        connectionMap = (Map<String, String>) configuration.getConfigYml().get("connection");
+        return  connectionMap;
+    }
+
+
 }
 
 

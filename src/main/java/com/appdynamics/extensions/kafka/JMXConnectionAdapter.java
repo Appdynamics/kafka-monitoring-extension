@@ -25,7 +25,9 @@ import javax.management.ReflectionException;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
+import javax.management.remote.rmi.RMIConnectorServer;
 import javax.rmi.ssl.SslRMIClientSocketFactory;
+import javax.rmi.ssl.SslRMIServerSocketFactory;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.HashMap;
@@ -49,16 +51,27 @@ public class JMXConnectionAdapter {
         return new JMXConnectionAdapter(requestMap);
     }
 
-    JMXConnector open() throws IOException {
+    JMXConnector open(boolean useDefaultSslFactory ) throws IOException {
         JMXConnector jmxConnector;
         final Map<String, Object> env = new HashMap<String, Object>();
+
+//
+        if(useDefaultSslFactory){
+            SslRMIClientSocketFactory csf = new SslRMIClientSocketFactory();
+            env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, csf);
+
+        }
+        else if(!useDefaultSslFactory){
+            CustomSSLSocketFactory customSSLSocketFactory = new CustomSSLSocketFactory();
+            env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, customSSLSocketFactory.createSocketFactory());
+            env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, customSSLSocketFactory.createSocketFactory());
+        }
+
+
         if (!Strings.isNullOrEmpty(username)) {
             env.put(JMXConnector.CREDENTIALS, new String[]{username, password});
-
-            jmxConnector = JMXConnectorFactory.connect(serviceUrl, env);
         }
-        else { jmxConnector = JMXConnectorFactory.connect(serviceUrl); }
-
+        jmxConnector = JMXConnectorFactory.connect(serviceUrl, env);
         if (jmxConnector == null) { throw new IOException("Unable to connect to Mbean server"); }
         return jmxConnector;
     }

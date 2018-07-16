@@ -15,21 +15,25 @@ servers:
     password: ""
     #encryptedPassword:
     #encryptionKey:
-    useSSl: false
     displayName: "Local Kafka Server"  #displayName is a REQUIRED field for level metrics.
 
 connection:
+  useSsl: true
   socketTimeout: 3000
   connectTimeout: 1000
-  sslProtocols: ["TLSV1.2"]
-  sslCertCheckEnabled: true
-  sslVerifyHostname: true
+  sslProtocols: "TLSv1.2"
+  sslCertCheckEnabled: false
+  sslVerifyHostname: false
 
-  sslCipherSuites: []
-  sslTrustStorePath: ""
-  sslTrustStorePassword: ""
+  sslCipherSuites: ""
+  sslTrustStorePath: "/Users/vishaka.sekar/AppDynamics/client/kafka.client.truststore.jks"
+  sslTrustStorePassword: "test1234"
+  sslKeyStorePath: "/Users/vishaka.sekar/AppDynamics/client/kafka.client.keystore.jks"
+  sslKeyStorePassword: "test1234"
   sslTrustStoreEncryptedPassword: ""
-  useDefaultSslConnectionFactory:
+  useDefaultSslConnectionFactory: false
+
+
 #nsme of flag needs review
 # number of concurrent tasks.
 # This doesn't need to be changed unless many instances are configured
