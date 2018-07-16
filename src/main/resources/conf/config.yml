@@ -26,10 +26,10 @@ connection:
   sslVerifyHostname: false
 
   sslCipherSuites: ""
-  sslTrustStorePath: "/Users/vishaka.sekar/AppDynamics/client/kafka.client.truststore.jks"
-  sslTrustStorePassword: "test1234"
-  sslKeyStorePath: "/Users/vishaka.sekar/AppDynamics/client/kafka.client.keystore.jks"
-  sslKeyStorePassword: "test1234"
+  sslTrustStorePath: ""
+  sslTrustStorePassword: ""
+  sslKeyStorePath: ""
+  sslKeyStorePassword: ""
   sslTrustStoreEncryptedPassword: ""
   useDefaultSslConnectionFactory: false
 

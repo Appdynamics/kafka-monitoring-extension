@@ -23,8 +23,8 @@ public class CustomSSLSocketFactory extends SslRMIClientSocketFactory {
 
 
     public SSLSocketFactory createSocketFactory() throws IOException {
-        String truststore = "/Users/vishaka.sekar/AppDynamics/client/kafka.client.truststore.jks";
-        char truststorepass[] = "test1234".toCharArray();
+        String truststore = "";
+        char truststorepass[] = "".toCharArray();
         SSLSocketFactory ssf = null;
         try {
             KeyStore ks = KeyStore.getInstance("JKS");
