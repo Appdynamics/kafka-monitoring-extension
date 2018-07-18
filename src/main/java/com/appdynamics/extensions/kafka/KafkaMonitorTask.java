@@ -36,9 +36,9 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
     private JMXConnectionAdapter jmxAdapter;
     private static final BigDecimal ERROR_VALUE = BigDecimal.ZERO;
     private static final BigDecimal SUCCESS_VALUE = BigDecimal.ONE;
-    private Phaser phaser;
 
-    public KafkaMonitorTask(TasksExecutionServiceProvider serviceProvider, MonitorContextConfiguration configuration, Map kafkaServer) {
+
+     KafkaMonitorTask(TasksExecutionServiceProvider serviceProvider, MonitorContextConfiguration configuration, Map kafkaServer) {
         this.configuration = configuration;
         this.kafkaServer = kafkaServer;
         this.metricWriteHelper = serviceProvider.getMetricWriteHelper();
@@ -54,7 +54,9 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
         logger.info("Completed the Kafka  Monitoring task");
     }
 
+    @SuppressWarnings("unchecked")
     private BigDecimal populateAndPrintMetrics() {
+        Phaser phaser;
         try{
             phaser = new Phaser();
             Map<String, String> requestMap;
@@ -63,9 +65,9 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
             requestMap = buildRequestMap();
             jmxAdapter = JMXConnectionAdapter.create(requestMap);
             connectionMap = getConnectionParameters();
-            Object flag1 = connectionMap.get("useDefaultSslConnectionFactory");
-            boolean flag = Boolean.valueOf(flag1.toString());
-            jmxConnection = jmxAdapter.open(flag);
+            Object useDefaultSslConnectionFactory = connectionMap.get("useDefaultSslConnectionFactory");
+            Object useSsl = connectionMap.get("useSsl");
+            jmxConnection = jmxAdapter.open(Boolean.valueOf(useDefaultSslConnectionFactory.toString()), Boolean.valueOf(useSsl.toString()));
             logger.debug("JMX Connection is open");
 
             List<Map<String, ?>> mbeansFromConfig = (List<Map<String, ?>>) configuration.getConfigYml().get(Constants.MBEANS);
@@ -89,8 +91,9 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
         return SUCCESS_VALUE;
     }
 
+    @SuppressWarnings("unchecked")
     private Map<String, String> buildRequestMap() {
-        Map<String, String> requestMap = new HashMap<String, String>();
+        Map<String, String> requestMap = new HashMap<>();
         requestMap.put("host", kafkaServer.get(Constants.HOST));
         requestMap.put("port", kafkaServer.get(Constants.PORT));
         requestMap.put("displayName", kafkaServer.get(Constants.DISPLAY_NAME));
@@ -98,11 +101,10 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
             requestMap.put("username", kafkaServer.get(Constants.USERNAME));
             requestMap.put("password", getPassword(kafkaServer));
         }
-
         return requestMap;
     }
 
-
+    @SuppressWarnings("unchecked")
     private String getPassword(Map<String, String> server) {
         String password = server.get(Constants.PASSWORD);
         if(Strings.isNullOrEmpty(password)){

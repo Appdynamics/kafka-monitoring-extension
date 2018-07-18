@@ -1,0 +1,17 @@
+connection:
+  socketTimeout: 3000
+  connectTimeout: 1000
+  sslProtocols: ["TLSV1.2"]
+  sslCertCheckEnabled: true
+  sslVerifyHostname: true
+
+  sslCipherSuites: []
+  sslTrustStorePath: ""
+  sslTrustStorePassword: ""
+  sslTrustStoreEncryptedPassword: ""
+  useDefaultSslConnectionFactory:
+
+- objectName: ["java.lang:type=Memory"]
+    metrics:
+          HeapMemoryUsage.committed: "Heap Memory Usage | Committed"
+          HeapMemoryUsage.max: "Heap Memory Usage | Max"

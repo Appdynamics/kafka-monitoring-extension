@@ -1,7 +1,7 @@
 AppDynamics Monitoring Extension for use with Kafka
 ==============================
 
-An AppDynamics extension to be used with a stand alone Java machine agent to provide metrics for Apache Kafka
+An AppDynamics extension to be used with a stand alone machine agent to provide metrics for Apache Kafka
 
 
 ## Use Case ##
@@ -32,7 +32,7 @@ Before configuring the extension, please make sure to run the below steps to che
     If telnet works, it confirm the access to the Kafka server.
 
 
-2. Start jconsole. Jconsole comes as a utility with installed jdk. After giving the correct host and port , check if Kafka
+2. Start jconsole. Jconsole comes as a utility with installed jdk. After giving the correct host and port, check if Kafka
 mbean shows up.
 
 3. It is a good idea to match the mbean configuration in the config.yml against the jconsole. JMX is case sensitive so make

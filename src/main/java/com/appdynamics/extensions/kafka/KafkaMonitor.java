@@ -17,32 +17,28 @@ import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.PatternLayout;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-
 import static com.appdynamics.extensions.kafka.utils.Constants.DEFAULT_METRIC_PREFIX;
 
 public class KafkaMonitor extends ABaseMonitor {
-    private static final Logger logger = LoggerFactory.getLogger(KafkaMonitor.class);
 
     @Override
-    protected void initializeMoreStuff(Map<String, String> args){
-        Map<String, String> connectionMapFromConfig = new HashMap<String, String>();
+    @SuppressWarnings("unchecked")
+    protected void initializeMoreStuff(Map<String, String> args) {
+        Map<String, String> connectionMapFromConfig;
         connectionMapFromConfig = (Map<String, String>) this.getContextConfiguration().getConfigYml().get("connection");
         Object useSsl = (connectionMapFromConfig.get("useSsl"));
-
-        if(Boolean.valueOf(useSsl.toString())) {
+        if (Boolean.valueOf(useSsl.toString())) {
             System.setProperty("javax.net.ssl.trustStore", connectionMapFromConfig.get("sslTrustStorePath"));
             System.setProperty("javax.net.ssl.trustStorePassword", connectionMapFromConfig.get("sslTrustStorePassword"));
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected String getDefaultMetricPrefix() { return DEFAULT_METRIC_PREFIX; }
 
     @Override
@@ -51,12 +47,12 @@ public class KafkaMonitor extends ABaseMonitor {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected void doRun(TasksExecutionServiceProvider tasksExecutionServiceProvider) {
-
         List<Map<String, String>> kafkaServers = (List<Map<String, String>>) this.getContextConfiguration().getConfigYml().get(Constants.SERVERS);
         for (Map<String, String> kafkaServer : kafkaServers) {
             KafkaMonitorTask task = new KafkaMonitorTask(tasksExecutionServiceProvider, this.getContextConfiguration(), kafkaServer);
-//            AssertUtils.assertNotNull(kafkaServer.get(Constants.DISPLAY_NAME), "The displayName can not be null");
+            AssertUtils.assertNotNull(kafkaServer.get(Constants.DISPLAY_NAME), "The displayName can not be null");
             tasksExecutionServiceProvider.submit(kafkaServer.get(Constants.DISPLAY_NAME), task);
         }
     }
