@@ -43,7 +43,7 @@ public class KafkaMonitorTest {
     public void testKafkaMonitorExtension() throws TaskExecutionException {
         KafkaMonitor kafkaMonitor = new KafkaMonitor();
         Map<String, String> taskArgs = Maps.newHashMap();
-        taskArgs.put(CONFIG_ARG, "/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension/src/test/resources/conf/config.yml");
+        taskArgs.put(CONFIG_ARG, "/conf/config.yml");
         kafkaMonitor.execute(taskArgs, null);
 
     }
@@ -66,10 +66,10 @@ public class KafkaMonitorTest {
 //        JMXConnectorServer jmxConnectorServer = CustomSSLSocketFactoryTest.startSSL(port);
 //        jmxConnectorServer.start();
 //        JMXServiceURL serviceUrl = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:"+port+"/jmxrmi");
-////        System.setProperty("javax.net.ssl.trustStore", "/Users/vishaka.sekar/AppDynamics/client/kafka.client.truststore.jks");
-////        System.setProperty("javax.net.ssl.trustStorePassword", "test1234");
-//        String truststore = "/Users/vishaka.sekar/AppDynamics/client/kafka.client.truststore.jks";
-//        char truststorepass[] = "test1234".toCharArray();
+////        System.setProperty("javax.net.ssl.trustStore", "");
+////        System.setProperty("javax.net.ssl.trustStorePassword", "");
+//        String truststore = "";
+//        char truststorepass[] = "".toCharArray();
 //        KeyStore ks = KeyStore.getInstance("JKS");
 //        ks.load(new FileInputStream(truststore), truststorepass);
 //        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());

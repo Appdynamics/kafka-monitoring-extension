@@ -73,7 +73,7 @@ public class KafkaMonitor extends ABaseMonitor {
 
         KafkaMonitor monitor = new KafkaMonitor();
         Map<String, String> taskArgs = new HashMap<String, String>();
-        taskArgs.put("config-file", "/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension/src/main/resources/conf/config.yml");
+        taskArgs.put("config-file", "/src/main/resources/conf/config.yml");
         monitor.execute(taskArgs, null);
     }
 
