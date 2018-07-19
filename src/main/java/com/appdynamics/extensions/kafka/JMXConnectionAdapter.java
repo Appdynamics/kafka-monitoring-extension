@@ -41,6 +41,7 @@ public class JMXConnectionAdapter {
     private final String password;
 
     private JMXConnectionAdapter(Map<String, String> requestMap) throws MalformedURLException {
+        // TODO: read from config and conditional
         this.serviceUrl = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + requestMap.get(Constants.HOST) + ":" + requestMap.get(Constants.PORT) + "/jmxrmi");
         this.username = requestMap.get(Constants.USERNAME);
         this.password = requestMap.get(Constants.PASSWORD);
@@ -50,14 +51,15 @@ public class JMXConnectionAdapter {
         return new JMXConnectionAdapter(requestMap);
     }
 
+    //TODO:change according to config params
     JMXConnector open(boolean useDefaultSslFactory, boolean useSsl) throws IOException {
         JMXConnector jmxConnector;
         final Map<String, Object> env = new HashMap<String, Object>();
 
         if(useSsl) {
             if (useDefaultSslFactory) { //check if null:TODO
-                SslRMIClientSocketFactory csf = new SslRMIClientSocketFactory();
-                env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, csf);
+                SslRMIClientSocketFactory sslRMIClientSocketFactory = new SslRMIClientSocketFactory();
+                env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, sslRMIClientSocketFactory);
             } else if (!useDefaultSslFactory) {
                 CustomSSLSocketFactory customSSLSocketFactory = new CustomSSLSocketFactory();
                 env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, customSSLSocketFactory.createSocketFactory());

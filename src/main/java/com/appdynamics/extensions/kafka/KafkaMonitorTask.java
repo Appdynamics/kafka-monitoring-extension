@@ -55,13 +55,15 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
     }
 
     @SuppressWarnings("unchecked")
+    //TODO: Change return type
     private BigDecimal populateAndPrintMetrics() {
-        Phaser phaser;
+        Phaser phaser;//todo:no need of phasers in a non-threaded DomainProcessor task
         try{
             phaser = new Phaser();
             Map<String, String> requestMap;
             Map<String, String> connectionMap;
 
+            //TODO: //put in a diff method
             requestMap = buildRequestMap();
             jmxAdapter = JMXConnectionAdapter.create(requestMap);
             connectionMap = getConnectionParameters();
@@ -74,11 +76,12 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
             for (Map mbeanFromConfig : mbeansFromConfig) {
                 DomainMetricsProcessor domainMetricsProcessor = new DomainMetricsProcessor( configuration, jmxAdapter, jmxConnection, mbeanFromConfig, displayName,metricWriteHelper, phaser);
                 domainMetricsProcessor.populateMetricsForMBean();
+                //awaitadvannce
                 logger.debug("Registering phaser for " + displayName);
             }
         } catch (Exception e) {
             logger.error("Error while opening JMX connection {}{}" ,this.kafkaServer.get(Constants.DISPLAY_NAME), e.getMessage());
-            e.printStackTrace();
+
         } finally {
             try {
                 jmxAdapter.close(jmxConnection);
@@ -92,9 +95,10 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
     }
 
     @SuppressWarnings("unchecked")
+    //TODO: add a serviceurl field, explain in yaml
     private Map<String, String> buildRequestMap() {
         Map<String, String> requestMap = new HashMap<>();
-        requestMap.put("host", kafkaServer.get(Constants.HOST));
+        requestMap.put("host", kafkaServer.get(Constants.HOST));//TODO: move keys to constants
         requestMap.put("port", kafkaServer.get(Constants.PORT));
         requestMap.put("displayName", kafkaServer.get(Constants.DISPLAY_NAME));
         if(!Strings.isNullOrEmpty(kafkaServer.get(Constants.USERNAME))) {
@@ -105,8 +109,11 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
     }
 
     @SuppressWarnings("unchecked")
+    //change un -modified params to final
+    // use CryptoUtils
     private String getPassword(Map<String, String> server) {
-        String password = server.get(Constants.PASSWORD);
+        CryptoUtil.getPassword()
+         String password = server.get(Constants.PASSWORD);
         if(Strings.isNullOrEmpty(password)){
             logger.error("Password cannot be null");
         }

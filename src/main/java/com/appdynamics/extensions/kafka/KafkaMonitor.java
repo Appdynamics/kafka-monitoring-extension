@@ -28,10 +28,9 @@ public class KafkaMonitor extends ABaseMonitor {
     @Override
     @SuppressWarnings("unchecked")
     protected void initializeMoreStuff(Map<String, String> args) {
-        Map<String, String> connectionMapFromConfig;
-        connectionMapFromConfig = (Map<String, String>) this.getContextConfiguration().getConfigYml().get("connection");
-        Object useSsl = (connectionMapFromConfig.get("useSsl"));
-        if (Boolean.valueOf(useSsl.toString())) {
+
+        Map<String, String> connectionMapFromConfig = (Map<String, String>) this.getContextConfiguration().getConfigYml().get("connection");
+        if (Boolean.valueOf((connectionMapFromConfig.get("useSsl")))) {
             System.setProperty("javax.net.ssl.trustStore", connectionMapFromConfig.get("sslTrustStorePath"));
             System.setProperty("javax.net.ssl.trustStorePassword", connectionMapFromConfig.get("sslTrustStorePassword"));
         }
@@ -64,6 +63,8 @@ public class KafkaMonitor extends ABaseMonitor {
         return servers.size();
     }
 
+
+//    @TODO: to be removed
     public static void main(String[] args) throws TaskExecutionException {
         ConsoleAppender ca = new ConsoleAppender();
         ca.setWriter(new OutputStreamWriter(System.out));

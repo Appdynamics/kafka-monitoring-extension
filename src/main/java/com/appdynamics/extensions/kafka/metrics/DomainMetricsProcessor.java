@@ -48,32 +48,33 @@ public class DomainMetricsProcessor {
         this.displayName = displayName;
     }
 
-    @SuppressWarnings("unchecked")
+
     public void populateMetricsForMBean() {
-        phaser.arriveAndAwaitAdvance();
+//        phaser.arriveAndAwaitAdvance();//todo: phaser logic
         try {
+            //todo:change the names
             Map<String, ?> metricProperties = (Map<String, ?>) this.mbeanFromConfig.get(Constants.METRICS);
-            logger.debug(String.format("Processing metrics section from the conf file"));
-            logger.debug("Size of metric section {}",metricProperties.size());
             String mbeanName = (String) this.mbeanFromConfig.get(Constants.OBJECTNAME);
 
 
             logger.debug(String.format("Processing mbean %s from the conf file", mbeanName));
             List<Metric> finalMetricList = getNodeMetrics(jmxConnection,mbeanName,metricProperties);
+            //todo: move it one level up
             finalMetricList.add(new Metric("HeartBeat", String.valueOf(BigInteger.ONE), metricPrefix + "|HeartBeat", "AVG", "AVG", "IND"));
             logger.debug("Printing metrics for server {}", mbeanName);
             metricWriteHelper.transformAndPrintMetrics(finalMetricList);
 
         } catch (IntrospectionException | IOException | MalformedObjectNameException | InstanceNotFoundException | ReflectionException e) {
             logger.error("Kafka Monitor error: " + e.getMessage());
-            metricWriteHelper.printMetric(metricPrefix + "|HeartBeat", BigDecimal.ZERO, "AVG.AVG.IND");
+            //todo:avverage, average, individual
+//            metricWriteHelper.printMetric(metricPrefix + "|HeartBeat", BigDecimal.ZERO, "AVG.AVG.IND");
         } finally {
-            phaser.arriveAndDeregister();
+//            phaser.arriveAndDeregister();
             logger.debug("DomainProcessor Phaser arrived for {}", displayName);
         }
     }
 
-    @SuppressWarnings("unchecked")
+
     public   List<Metric> getNodeMetrics(JMXConnector jmxConnection, String objectName, Map<String, ?> metricProperties) throws IntrospectionException, ReflectionException, InstanceNotFoundException, IOException, MalformedObjectNameException {
         List<Metric> nodeMetrics = Lists.newArrayList();
         Set<ObjectInstance> objectInstances = this.jmxAdapter.queryMBeans(jmxConnection, ObjectName.getInstance(objectName));

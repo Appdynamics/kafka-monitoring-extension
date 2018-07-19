@@ -4,7 +4,7 @@
 
     <groupId>com.appdynamics.extensions</groupId>
     <artifactId>kafka-monitoring-extension</artifactId>
-    <version>1.0.3</version>
+    <version>2.0</version>
     <packaging>jar</packaging>
     <name>kafka-monitoring-extension</name>
     <url>http://maven.apache.org</url>
@@ -20,17 +20,11 @@
             <artifactId>appd-exts-commons</artifactId>
             <version>2.1.0</version>
         </dependency>
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.6</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.4</version>
-            <scope>provided</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>commons-lang</groupId>-->
+            <!--<artifactId>commons-lang</artifactId>-->
+            <!--<version>2.6</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>com.appdynamics</groupId>
             <artifactId>machine-agent</artifactId>
@@ -70,8 +64,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
-                    <source>7</source>
-                    <target>7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -135,7 +129,7 @@
                                     <fileset dir="${project.basedir}" includes="LICENSE.txt"/>
                                 </copy>
                                 <copy todir="${target.dir}">
-                                    <fileset dir="${project.basedir}" includes="Notice.txt"/>
+                                    <fileset dir="${project.basedir}" includes="NOTICE.txt"/>
                                 </copy>
                                 <zip destfile="${target.dir}-${project.version}.zip">
                                     <zipfileset dir="${target.dir}" filemode="755" prefix="KafkaMonitor/"/>

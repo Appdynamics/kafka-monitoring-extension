@@ -17,15 +17,17 @@ public class CustomSSLSocketFactory extends SslRMIClientSocketFactory {
 
     public SSLSocketFactory createSocketFactory() throws IOException {
 
-        String truststore = "";
-        char truststorepass[] = "".toCharArray();
+        //TODO:refactor this file
+        //TODO:re-name variables
+        String trustStorePath = "";
+        char trustStorePassword[] = "".toCharArray();//todo:check char-set
         SSLSocketFactory ssf = null;
         try {
                 KeyStore ks = KeyStore.getInstance("JKS");
                 ks.load(new FileInputStream(truststore), truststorepass);
                 TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
                 tmf.init(ks);
-                SSLContext ctx = SSLContext.getInstance("TLS");
+                SSLContext ctx = SSLContext.getInstance("TLS");//todo: take it from config
                 ctx.init(null, tmf.getTrustManagers(), new SecureRandom());
                 ssf = ctx.getSocketFactory();
             return ssf;
@@ -33,12 +35,10 @@ public class CustomSSLSocketFactory extends SslRMIClientSocketFactory {
         }catch(NoSuchAlgorithmException exception){
             logger.debug("No Such algorithm");
         } catch (CertificateException e) {
-            e.printStackTrace();
-        } catch (KeyStoreException e) {
-            e.printStackTrace();
-        } catch (KeyManagementException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            //todo: logger.error
         }
+
         return null;
     }
 

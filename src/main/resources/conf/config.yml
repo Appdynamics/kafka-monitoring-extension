@@ -1,14 +1,16 @@
 ### ANY CHANGES TO THIS FILE DOES NOT REQUIRE A RESTART ###
 
-#This will create this metric in all the tiers, under this path
 metricPrefix: "Server|Component:<Tier-ID>|Custom Metrics|Kafka"
-
+#
+#This will create this metric in all the tiers, under this path
+#default prefix--swap @todo
 #This will create it in specific Tier/Component.
 #Please make sure to replace <Tier-ID> with the appropriate one from your environment.
 #To find the <Tier-ID> in your environment, please follow the screenshot https://docs.appdynamics.com/display/PRO42/Build+a+Monitoring+Extension+Using+Java
 
 
 # List of Kafka Instances
+#@todo:remove localhost / port
 servers:
   - host: "localhost"
     port: "9999"
@@ -19,8 +21,9 @@ servers:
 
 encryptionKey: ""
 
+#configure these only if useSSL is true
 connection:
-  useSsl: true
+  useSsl: true #@todo: move it to servers section
   socketTimeout: 3000
   connectTimeout: 1000
   sslProtocols: ["TLSv1.2"]
@@ -37,13 +40,15 @@ connection:
 
 # number of concurrent tasks.
 # This doesn't need to be changed unless many instances are configured
+# @todo: explain this field
 numberOfThreads: 10
 
 # The configuration of different metrics from various mbeans of Kafka server
 # For most cases, the mbean configuration does not need to be changed.
 mbeans:
 
-
+#@todo: change metric qualifiers to uppercase
+#@todo: compare actual with output values
   - objectName: "kafka.server:type=BrokerTopicMetrics,*"
     metrics:
             Count:
@@ -289,7 +294,8 @@ mbeans:
                 timeRollUpType: "average"
                 clusterRollUpType: "individual"
 
-
+#@todo: qualifiers??
+#@todo:add non heap memory max
 #JVM Metrics
   - objectName: "java.lang:type=Memory"
     metrics:

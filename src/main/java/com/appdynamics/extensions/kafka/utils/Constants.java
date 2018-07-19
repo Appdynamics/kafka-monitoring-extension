@@ -6,17 +6,9 @@ public class Constants {
 
     public static final String METRIC_SEPARATOR  = "|";
 
-    public static final String MULTIPLIER = "multiplier";
-
-    public static final String METRIC_TYPE = "metricType";
-
-    public static final String AGGREGATION = "aggregation";
-
-    public static final String CONVERT = "convert";
-
     public static final String SERVERS = "servers";
 
-    public static final String SERVICE_URL = "serviceUrl";
+//    public static final String SERVICE_URL = "serviceUrl"; remove missing fields
 
     public static final String HOST = "host";
 
