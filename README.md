@@ -48,12 +48,10 @@ For eg.
     java -Dappdynamics.agent.maxMetrics=2500 -jar machineagent.jar
 ```
 
-
 ## Installation ##
 
 1. Run "mvn clean install" and find the KafkaMonitor.zip file in the "target" folder. You can also download the KafkaMonitor.zip from [AppDynamics Exchange][].
 2. Unzip as "KafkaMonitor" and copy the "KafkaMonitor" directory to `<MACHINE_AGENT_HOME>/monitors`
-
 
 # Configuration ##
 
@@ -67,61 +65,303 @@ Note : Please make sure to not use tab (\t) while editing yaml files. You may wa
 ### ANY CHANGES TO THIS FILE DOES NOT REQUIRE A RESTART ###
 
 #This will create this metric in all the tiers, under this path
-metricPrefix: Custom Metrics|Kafka
+metricPrefix: "Server|Component:<Tier-ID>|Custom Metrics|Kafka"
 
-#This will create it in specific Tier/Component. Make sure to replace <COMPONENT_ID> with the appropriate one from your environment.
-#To find the <COMPONENT_ID> in your environment, please follow the screenshot https://docs.appdynamics.com/display/PRO42/Build+a+Monitoring+Extension+Using+Java
-#metricPrefix: Server|Component:<COMPONENT_ID>|Custom Metrics|Kafka
+#This will create it in specific Tier/Component.
+#Please make sure to replace <Tier-ID> with the appropriate one from your environment.
+#To find the <Tier-ID> in your environment, please follow the screenshot https://docs.appdynamics.com/display/PRO42/Build+a+Monitoring+Extension+Using+Java
+
 
 # List of Kafka Instances
-instances:
+servers:
   - host: "localhost"
-    port: 9999
-    username:
-    password:
-    #encryptedPassword:
-    #encryptionKey:
+    port: "9999"
+    username: ""
+    password: ""
+    encryptedPassword: ""
     displayName: "Local Kafka Server"  #displayName is a REQUIRED field for level metrics.
 
+encryptionKey: ""
+
+connection:
+  useSsl: true
+  socketTimeout: 3000
+  connectTimeout: 1000
+  sslProtocols: ["TLSv1.2"]
+  sslCertCheckEnabled: false
+  sslVerifyHostname: false
+
+  sslCipherSuites: ""
+  sslTrustStorePath: ""
+  sslTrustStorePassword: ""
+  sslTrustStoreEncryptedPassword: ""
+  sslKeyStorePath: ""
+  sslKeyStorePassword: ""
+  useDefaultSslConnectionFactory: true
 
 # number of concurrent tasks.
 # This doesn't need to be changed unless many instances are configured
 numberOfThreads: 10
 
-
 # The configuration of different metrics from various mbeans of Kafka server
 # For most cases, the mbean configuration does not need to be changed.
 mbeans:
 
-#All MBeans which have attributes Count and MeanRate
-  - mbeanFullPath: ["kafka.server:type=BrokerTopicMetrics,*",
-                    "kafka.server:type=DelayedFetchMetrics,*",
-                    "kafka.server:type=KafkaRequestHandlerPool,*",
-                    "kafka.server:type=ReplicaManager,name=IsrExpandsPerSec",
-                    "kafka.server:type=ReplicaManager,name=IsrShrinksPerSec",
-                    "kafka.server:type=SessionExpireListener,*",
-                    "kafka.network:type=RequestMetrics,*",
-                    "kafka.controller:type=ControllerStats,*"
-                  ]
-    metrics:
-       include:
-          - Count: "Count"
-          - MeanRate: "MeanRate"
 
-#All MBeans which have attributes Value
-  - mbeanFullPath: ["kafka.server:type=DelayedOperationPurgatory,*",
-                    "kafka.server:type=KafkaServer,name=BrokerState",
-                    "kafka.server:type=ReplicaFetcherManager,*",
-                    "kafka.server:type=ReplicaManager,name=LeaderCount",
-                    "kafka.server:type=ReplicaManager,name=PartitionCount",
-                    "kafka.server:type=ReplicaManager,name=UnderReplicatedPartitions",
-                    "kafka.network:type=Processor,*",
-                    "kafka.network:type=RequestChannel,*",
-                    "kafka.network:type=SocketServer,*"
-                   ]
+  - objectName: "kafka.server:type=BrokerTopicMetrics,*"
     metrics:
-       include:
-          - Value: "Value"
+            Count:
+                alias: "Count"
+                multiplier: ""
+                delta: "false"
+                aggregationType: "average"
+                timeRollUpType: "average"
+                clusterRollUpType: "individual"
+
+            MeanRate:
+                alias: "MeanRate"
+                multiplier: ""
+                delta: "false"
+                aggregationType: "average"
+                timeRollUpType: "average"
+                clusterRollUpType: "individual"
+
+  - objectName: "kafka.server:type=DelayedFetchMetrics,*"
+    metrics:
+            Count:
+                alias: "Count"
+                multiplier: ""
+                delta: "false"
+                aggregationType: "average"
+                timeRollUpType: "average"
+                clusterRollUpType: "individual"
+
+            MeanRate:
+                alias: "MeanRate"
+                multiplier: ""
+                delta: "false"
+                aggregationType: "average"
+                timeRollUpType: "average"
+                clusterRollUpType: "individual"
+  - objectName: "kafka.server:type=KafkaRequestHandlerPool,*"
+    metrics:
+            Count:
+                alias: "Count"
+                multiplier: ""
+                delta: "false"
+                aggregationType: "average"
+                timeRollUpType: "average"
+                clusterRollUpType: "individual"
+
+            MeanRate:
+                alias: "MeanRate"
+                multiplier: ""
+                delta: "false"
+                aggregationType: "average"
+                timeRollUpType: "average"
+                clusterRollUpType: "individual"
+  - objectName: "kafka.server:type=ReplicaManager,name=IsrExpandsPerSec"
+    metrics:
+            Count:
+                alias: "Count"
+                multiplier: ""
+                delta: "false"
+                aggregationType: "average"
+                timeRollUpType: "average"
+                clusterRollUpType: "individual"
+
+            MeanRate:
+                alias: "MeanRate"
+                multiplier: ""
+                delta: "false"
+                aggregationType: "average"
+                timeRollUpType: "average"
+                clusterRollUpType: "individual"
+  - objectName: "kafka.server:type=ReplicaManager,name=IsrShrinksPerSec"
+    metrics:
+            Count:
+                alias: "Count"
+                multiplier: ""
+                delta: "false"
+                aggregationType: "average"
+                timeRollUpType: "average"
+                clusterRollUpType: "individual"
+
+            MeanRate:
+                alias: "MeanRate"
+                multiplier: ""
+                delta: "false"
+                aggregationType: "average"
+                timeRollUpType: "average"
+                clusterRollUpType: "individual"
+  - objectName: "kafka.server:type=SessionExpireListener,*"
+    metrics:
+            Count:
+                alias: "Count"
+                multiplier: ""
+                delta: "false"
+                aggregationType: "average"
+                timeRollUpType: "average"
+                clusterRollUpType: "individual"
+
+            MeanRate:
+                alias: "MeanRate"
+                multiplier: ""
+                delta: "false"
+                aggregationType: "average"
+                timeRollUpType: "average"
+                clusterRollUpType: "individual"
+  - objectName: "kafka.network:type=RequestMetrics,*"
+    metrics:
+            Count:
+                alias: "Count"
+                multiplier: ""
+                delta: "false"
+                aggregationType: "average"
+                timeRollUpType: "average"
+                clusterRollUpType: "individual"
+
+            MeanRate:
+                alias: "MeanRate"
+                multiplier: ""
+                delta: "false"
+                aggregationType: "average"
+                timeRollUpType: "average"
+                clusterRollUpType: "individual"
+
+  - objectName: "kafka.controller:type=ControllerStats,*"
+    metrics:
+            Count:
+                alias: "Count"
+                multiplier: ""
+                delta: "false"
+                aggregationType: "average"
+                timeRollUpType: "average"
+                clusterRollUpType: "individual"
+
+            MeanRate:
+                alias: "MeanRate"
+                multiplier: ""
+                delta: "false"
+                aggregationType: "average"
+                timeRollUpType: "average"
+                clusterRollUpType: "individual"
+
+
+
+  - objectName: "kafka.server:type=DelayedOperationPurgatory,*"
+    metrics:
+            Value:
+                alias: "Value"
+                multiplier: ""
+                delta: "false"
+                aggregationType: "average"
+                timeRollUpType: "average"
+                clusterRollUpType: "individual"
+
+
+  - objectName: "kafka.server:type=KafkaServer,name=BrokerState"
+    metrics:
+            Value:
+                alias: "Value"
+                multiplier: ""
+                delta: "false"
+                aggregationType: "average"
+                timeRollUpType: "average"
+                clusterRollUpType: "individual"
+
+  - objectName: "kafka.server:type=ReplicaFetcherManager,*"
+    metrics:
+            Value:
+                alias: "Value"
+                multiplier: ""
+                delta: "false"
+                aggregationType: "average"
+                timeRollUpType: "average"
+                clusterRollUpType: "individual"
+
+
+  - objectName: "kafka.server:type=ReplicaManager,name=LeaderCount"
+    metrics:
+            Value:
+                alias: "Value"
+                multiplier: ""
+                delta: "false"
+                aggregationType: "average"
+                timeRollUpType: "average"
+                clusterRollUpType: "individual"
+
+  - objectName: "kafka.server:type=ReplicaManager,name=PartitionCount"
+    metrics:
+            Value:
+                alias: "Value"
+                multiplier: ""
+                delta: "false"
+                aggregationType: "average"
+                timeRollUpType: "average"
+                clusterRollUpType: "individual"
+
+  - objectName: "kafka.server:type=ReplicaManager,name=UnderReplicatedPartitions"
+    metrics:
+            Value:
+                alias: "Value"
+                multiplier: ""
+                delta: "false"
+                aggregationType: "average"
+                timeRollUpType: "average"
+                clusterRollUpType: "individual"
+
+  - objectName: "kafka.network:type=Processor,*"
+    metrics:
+            Value:
+                alias: "Value"
+                multiplier: ""
+                delta: "false"
+                aggregationType: "average"
+                timeRollUpType: "average"
+                clusterRollUpType: "individual"
+
+  - objectName: "kafka.network:type=Processor,*"
+    metrics:
+            Value:
+                alias: "Value"
+                multiplier: ""
+                delta: "false"
+                aggregationType: "average"
+                timeRollUpType: "average"
+                clusterRollUpType: "individual"
+
+
+  - objectName: "kafka.network:type=RequestChannel,*"
+    metrics:
+            Value:
+                alias: "Value"
+                multiplier: ""
+                delta: "false"
+                aggregationType: "average"
+                timeRollUpType: "average"
+                clusterRollUpType: "individual"
+
+
+  - objectName: "kafka.network:type=SocketServer,*"
+    metrics:
+            Value:
+                alias: "Value"
+                multiplier: ""
+                delta: "false"
+                aggregationType: "average"
+                timeRollUpType: "average"
+                clusterRollUpType: "individual"
+
+
+#JVM Metrics
+  - objectName: "java.lang:type=Memory"
+    metrics:
+          HeapMemoryUsage.committed: "Heap Memory Usage | Committed"
+          HeapMemoryUsage.max: "Heap Memory Usage | Max"
+          HeapMemoryUsage.used: "Heap Memory Usage | Used"
+          NonHeapMemoryUsage.committed: "Heap Memory Usage | Committed"
+          NonHeapMemoryUsage.used: "Heap Memory Usage | Used"
 ```
 
 3. Configure the path to the config.yml file by editing the <task-arguments> in the monitor.xml file in the `<MACHINE_AGENT_HOME>/monitors/KafkaMonitor/` directory. Below is the sample
@@ -133,14 +373,7 @@ mbeans:
           ....
      </task-arguments>
 ```
-    
-## Password Encryption Support
-To avoid setting the clear text password in the config.yaml, please follow the process below to encrypt the password
 
-1. Download the util jar to encrypt the password from [https://github.com/Appdynamics/maven-repo/blob/master/releases/com/appdynamics/appd-exts-commons/1.1.2/appd-exts-commons-1.1.2.jar](https://github.com/Appdynamics/maven-repo/blob/master/releases/com/appdynamics/appd-exts-commons/1.1.2/appd-exts-commons-1.1.2.jar) and navigate to the downloaded directory
-2. Encrypt password from the commandline
-`java -cp appd-exts-commons-1.1.2.jar com.appdynamics.extensions.crypto.Encryptor encryptionKey myPassword`
-3. Specify the passwordEncrypted and encryptionKey in config.yaml
 
 ## Custom Dashboard ##
 ![](https://github.com/Appdynamics/kafka-monitoring-extension/blob/master/Kafka_CustomDashboard.png?raw=true)
@@ -156,25 +389,45 @@ KAFKA_JMX_OPTS="-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremo
 Add below line in kafka-server-start.sh
 
 ```
-export JMX_PORT=${JMX_PORT:-9999}
+    export JMX_PORT=${JMX_PORT:-9999}
 ```
 
-## Contributing ##
+## Credentials Encryption
+Please visit [this](https://community.appdynamics.com/t5/Knowledge-Base/How-to-use-Password-Encryption-with-Extensions/ta-p/29397) page to get detailed instructions on password encryption. The steps in this document will guide you through the whole process.
 
-Always feel free to fork and contribute any changes directly via [GitHub][].
+## Extensions Workbench
+Workbench is an inbuilt feature provided with each extension in order to assist you to fine tune the extension setup before you actually deploy it on the controller. Please review the following [document](https://community.appdynamics.com/t5/Knowledge-Base/How-to-use-the-Extensions-WorkBench/ta-p/30130) for how to use the Extensions WorkBench
 
-## Community ##
+## Troubleshooting
+Please follow the steps listed in the [extensions troubleshooting document](https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695) in order to troubleshoot your issue. These are a set of common issues that customers might have faced during the installation of the extension. If these don't solve your issue, please follow the last step on the troubleshooting-document to contact the support team.
 
-Find out more in the [AppDynamics Exchange][].
+## Support Tickets
+If after going through the Troubleshooting Document you have not been able to get your extension working, please file a ticket and add the following information.
 
-## Support ##
+Please provide the following in order for us to assist you better.  
 
-For any questions or feature request, please contact [AppDynamics Center of Excellence][].
+1. Stop the running machine agent .
+2. Delete all existing logs under <MachineAgent>/logs .
+3. Please enable debug logging by editing the file <MachineAgent>/conf/logging/log4j.xml. Change the level value of the following <logger> elements to debug. 
+   ```
+   <logger name="com.singularity">
+   <logger name="com.appdynamics">
+     ```
+4. Start the machine agent and please let it run for 10 mins. Then zip and upload all the logs in the directory <MachineAgent>/logs/*.
+5. Attach the zipped <MachineAgent>/conf/* directory here.
+ 6. Attach the zipped <MachineAgent>/monitors/<ExtensionMonitor> directory here .
 
-**Version:** 1.0.0
-**Controller Compatibility:** 3.7+
-**Kafka Versions Tested On:** 2.11-0.9.0.0 and 2.11-0.10.1.0
+For any support related questions, you can also contact help@appdynamics.com.
 
-[Github]: https://github.com/Appdynamics/kafka-monitoring-extension
-[AppDynamics Exchange]: https://www.appdynamics.com/community/exchange/kafka-monitoring-extension/
-[AppDynamics Center of Excellence]: mailto:help@appdynamics.com
+## Contributing
+Always feel free to fork and contribute any changes directly via [GitHub](https://github.com/Appdynamics/activemq-monitoring-extension).
+
+## Version
+|          Name            |  Version   |
+|--------------------------|------------|
+|Extension Version         |2.1.0       |
+|Controller Compatibility  |4.4 or Later|
+|Product Tested On         |Kafka 2.11. |
+|Last Update               |07/18/2018 |
+|List of Changes           |[Change log](https://github.com/Appdynamics/kafka-monitoring-extension/blob/master/Changelog.md) |
+

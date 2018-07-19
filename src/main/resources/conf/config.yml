@@ -43,7 +43,7 @@ numberOfThreads: 10
 # For most cases, the mbean configuration does not need to be changed.
 mbeans:
 
-#All MBeans which have attributes Count and MeanRate
+
   - objectName: "kafka.server:type=BrokerTopicMetrics,*"
     metrics:
             Count:
@@ -183,7 +183,7 @@ mbeans:
                 timeRollUpType: "average"
                 clusterRollUpType: "individual"
 
-                ###
+
 
   - objectName: "kafka.server:type=DelayedOperationPurgatory,*"
     metrics:
