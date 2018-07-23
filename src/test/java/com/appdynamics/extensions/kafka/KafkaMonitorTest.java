@@ -39,52 +39,47 @@ public class KafkaMonitorTest {
     public static final String CONFIG_ARG = "config-file";
     MonitorContextConfiguration contextConfiguration = new MonitorContextConfiguration("Kafka", "Custom Metrics|Kafka|", PathResolver.resolveDirectory(AManagedMonitor.class), Mockito.mock(AMonitorJob.class));
 
-    @Test
-    public void testKafkaMonitorExtension() throws TaskExecutionException {
-        KafkaMonitor kafkaMonitor = new KafkaMonitor();
-        Map<String, String> taskArgs = Maps.newHashMap();
-        taskArgs.put(CONFIG_ARG, "/conf/config.yml");
-        kafkaMonitor.execute(taskArgs, null);
 
+
+    //@todo:move it to the customsslfactorytest file
+    @Test(expected = Exception.class)
+    public void testConfigureSSL() throws Exception {
+        int port = 8745;
+        JMXConnectorServer jmxConnectorServer = CustomSSLSocketFactoryTest.startSSL(port);
+        jmxConnectorServer.start();
+        JMXServiceURL serviceUrl = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:"+port+"/jmxrmi");
+        Map env = new HashMap();
+//        env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE,new CustomSSLSocketFactory());
+        JMXConnector jmxConnector = JMXConnectorFactory.connect(serviceUrl, env);
+        jmxConnectorServer.stop();
     }
 
-//    @Test(expected = Exception.class)
-//    public void testConfigureSSL() throws Exception {
-//        int port = 8745;
-//        JMXConnectorServer jmxConnectorServer = CustomSSLSocketFactoryTest.startSSL(port);
-//        jmxConnectorServer.start();
-//        JMXServiceURL serviceUrl = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:"+port+"/jmxrmi");
-//        Map env = new HashMap();
-////        env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE,new CustomSSLSocketFactory());
-//        JMXConnector jmxConnector = JMXConnectorFactory.connect(serviceUrl, env);
-//        jmxConnectorServer.stop();
-//    }
+    @Test
+    public void testConfigureSSLWithKeys() throws Exception {
+        int port = 8745;
+        JMXConnectorServer jmxConnectorServer = CustomSSLSocketFactoryTest.startSSL(port);
+        jmxConnectorServer.start();
+        JMXServiceURL serviceUrl = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:"+port+"/jmxrmi");
+//        System.setProperty("javax.net.ssl.trustStore", "");
+//        System.setProperty("javax.net.ssl.trustStorePassword", "");
+        String truststore = "";
+        char truststorepass[] = "".toCharArray();
+        KeyStore ks = KeyStore.getInstance("JKS");
+        ks.load(new FileInputStream(truststore), truststorepass);
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        tmf.init(ks);
+        SSLContext ctx = SSLContext.getInstance("TLS");
+        ctx.init(null, tmf.getTrustManagers(), new SecureRandom());
 
-//    @Test
-//    public void testConfigureSSLwithKeys() throws Exception {
-//        int port = 8745;
-//        JMXConnectorServer jmxConnectorServer = CustomSSLSocketFactoryTest.startSSL(port);
-//        jmxConnectorServer.start();
-//        JMXServiceURL serviceUrl = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:"+port+"/jmxrmi");
-////        System.setProperty("javax.net.ssl.trustStore", "");
-////        System.setProperty("javax.net.ssl.trustStorePassword", "");
-//        String truststore = "";
-//        char truststorepass[] = "".toCharArray();
-//        KeyStore ks = KeyStore.getInstance("JKS");
-//        ks.load(new FileInputStream(truststore), truststorepass);
-//        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-//        tmf.init(ks);
-//        SSLContext ctx = SSLContext.getInstance("TLS");
-//        ctx.init(null, tmf.getTrustManagers(), new SecureRandom());
-//
-//        Map env = new HashMap();
-//        CustomSSLSocketFactory  customSSLSocketFactory = new CustomSSLSocketFactory();
-//        SslRMIServerSocketFactory ssf = new SslRMIServerSocketFactory();
-//        env.put(RMIConnectorServer.RMI_SERVER_SOCKET_FACTORY_ATTRIBUTE,ctx.getSocketFactory());
-//        env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE,   customSSLSocketFactory);
-//        JMXConnector jmxConnector = JMXConnectorFactory.connect(serviceUrl, env);
-//        jmxConnectorServer.stop();
-//    }
+        Map env = new HashMap();
+        CustomSSLSocketFactory  customSSLSocketFactory = new CustomSSLSocketFactory();
+        SslRMIServerSocketFactory ssf = new SslRMIServerSocketFactory();
+        env.put(RMIConnectorServer.RMI_SERVER_SOCKET_FACTORY_ATTRIBUTE,ctx.getSocketFactory());
+        env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE,   customSSLSocketFactory);
+        JMXConnector jmxConnector = JMXConnectorFactory.connect(serviceUrl, env);
+        jmxConnectorServer.stop();
+    }
 
+    //todo: test for default ssl factory
 
 }

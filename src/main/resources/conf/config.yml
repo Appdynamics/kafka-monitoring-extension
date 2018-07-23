@@ -1,42 +1,40 @@
-### ANY CHANGES TO THIS FILE DOES NOT REQUIRE A RESTART ###
+metricPrefix: "Server|Component:<<Tier-Name>[or]<Tier-ID>>|Custom Metrics|Kafka"
 
-metricPrefix: "Server|Component:<Tier-ID>|Custom Metrics|Kafka"
-#
-#This will create this metric in all the tiers, under this path
-#default prefix--swap @todo
-#This will create it in specific Tier/Component.
-#Please make sure to replace <Tier-ID> with the appropriate one from your environment.
-#To find the <Tier-ID> in your environment, please follow the screenshot https://docs.appdynamics.com/display/PRO42/Build+a+Monitoring+Extension+Using+Java
-
-
-# List of Kafka Instances
-#@todo:remove localhost / port
+ # Add your Kafka Instances below:
+ #@todo:remove localhost / port
 servers:
-  - host: "localhost"
-    port: "9999"
-    username: ""
-    password: ""
-    encryptedPassword: ""
-    displayName: "Local Kafka Server"  #displayName is a REQUIRED field for level metrics.
+    - host: "localhost"
+      port: "9999"
+      username: ""
+      password: ""
+      encryptedPassword: ""
+      displayName: "Local Kafka Server"
+      useSsl: true
 
+ #Provide the encryption key for the password
 encryptionKey: ""
 
-#configure these only if useSSL is true
+ #Configure this section only if useSSL is true.
 connection:
-  useSsl: true #@todo: move it to servers section
-  socketTimeout: 3000
-  connectTimeout: 1000
-  sslProtocols: ["TLSv1.2"]
-  sslCertCheckEnabled: false
-  sslVerifyHostname: false
+    socketTimeout: 3000
+    connectTimeout: 1000
+    sslProtocols: ["TLSv1.2"]
+    sslCertCheckEnabled: false
+    sslVerifyHostname: false
+    sslCipherSuites: "[]"
+    sslTrustStorePath: ""
+    sslTrustStorePassword: ""
+    sslTrustStoreEncryptedPassword: ""
 
-  sslCipherSuites: ""
-  sslTrustStorePath: ""
-  sslTrustStorePassword: ""
-  sslTrustStoreEncryptedPassword: ""
-  sslKeyStorePath: ""
-  sslKeyStorePassword: ""
-  useDefaultSslConnectionFactory: true
+
+  #key store details for mutual auth on ssl
+    sslKeyStorePath: ""
+    sslKeyStorePassword: ""
+    sslKeyStoreEncryptedPassword: ""
+
+# Set the following flag to true if you want to use the certs in the JDK
+# Set this to false if you want to use your own certs
+    useDefaultSslConnectionFactory: true
 
 # number of concurrent tasks.
 # This doesn't need to be changed unless many instances are configured
@@ -49,262 +47,271 @@ mbeans:
 
 #@todo: change metric qualifiers to uppercase
 #@todo: compare actual with output values
-  - objectName: "kafka.server:type=BrokerTopicMetrics,*"
-    metrics:
-            Count:
-                alias: "Count"
-                multiplier: ""
-                delta: "false"
-                aggregationType: "average"
-                timeRollUpType: "average"
-                clusterRollUpType: "individual"
+    - objectName: "kafka.server:type=BrokerTopicMetrics,*"
+      metrics:
+          - Count: "Count"
+            multiplier: ""
+            delta: "false"
+            aggregationType: "AVERAGE"
+            timeRollUpType: "AVERAGE"
+            clusterRollUpType: "INDIVIDUAL"
 
-            MeanRate:
-                alias: "MeanRate"
-                multiplier: ""
-                delta: "false"
-                aggregationType: "average"
-                timeRollUpType: "average"
-                clusterRollUpType: "individual"
+          - MeanRate: "MeanRate"
+            multiplier: ""
+            delta: "false"
+            aggregationType: "AVERAGE"
+            timeRollUpType: "AVERAGE"
+            clusterRollUpType: "INDIVIDUAL"
 
-  - objectName: "kafka.server:type=DelayedFetchMetrics,*"
-    metrics:
-            Count:
-                alias: "Count"
-                multiplier: ""
-                delta: "false"
-                aggregationType: "average"
-                timeRollUpType: "average"
-                clusterRollUpType: "individual"
+    - objectName: "kafka.server:type=DelayedFetchMetrics,*"
+      metrics:
+          - Count: "Count"
+            multiplier: ""
+            delta: "false"
+            aggregationType: "AVERAGE"
+            timeRollUpType: "AVERAGE"
+            clusterRollUpType: "INDIVIDUAL"
 
-            MeanRate:
-                alias: "MeanRate"
-                multiplier: ""
-                delta: "false"
-                aggregationType: "average"
-                timeRollUpType: "average"
-                clusterRollUpType: "individual"
-  - objectName: "kafka.server:type=KafkaRequestHandlerPool,*"
-    metrics:
-            Count:
-                alias: "Count"
-                multiplier: ""
-                delta: "false"
-                aggregationType: "average"
-                timeRollUpType: "average"
-                clusterRollUpType: "individual"
+          - MeanRate: "MeanRate"
+            multiplier: ""
+            delta: "false"
+            aggregationType: "AVERAGE"
+            timeRollUpType: "AVERAGE"
+            clusterRollUpType: "INDIVIDUAL"
+    - objectName: "kafka.server:type=KafkaRequestHandlerPool,*"
+      metrics:
+          - Count: "Count"
+            multiplier: ""
+            delta: "false"
+            aggregationType: "AVERAGE"
+            timeRollUpType: "AVERAGE"
+            clusterRollUpType: "INDIVIDUAL"
 
-            MeanRate:
-                alias: "MeanRate"
-                multiplier: ""
-                delta: "false"
-                aggregationType: "average"
-                timeRollUpType: "average"
-                clusterRollUpType: "individual"
-  - objectName: "kafka.server:type=ReplicaManager,name=IsrExpandsPerSec"
-    metrics:
-            Count:
-                alias: "Count"
-                multiplier: ""
-                delta: "false"
-                aggregationType: "average"
-                timeRollUpType: "average"
-                clusterRollUpType: "individual"
+          - MeanRate: "MeanRate"
+            multiplier: ""
+            delta: "false"
+            aggregationType: "AVERAGE"
+            timeRollUpType: "AVERAGE"
+            clusterRollUpType: "INDIVIDUAL"
+    - objectName: "kafka.server:type=ReplicaManager,name=IsrExpandsPerSec"
+      metrics:
+          - Count: "Count"
+            multiplier: ""
+            delta: "false"
+            aggregationType: "AVERAGE"
+            timeRollUpType: "AVERAGE"
+            clusterRollUpType: "INDIVIDUAL"
 
-            MeanRate:
-                alias: "MeanRate"
-                multiplier: ""
-                delta: "false"
-                aggregationType: "average"
-                timeRollUpType: "average"
-                clusterRollUpType: "individual"
-  - objectName: "kafka.server:type=ReplicaManager,name=IsrShrinksPerSec"
-    metrics:
-            Count:
-                alias: "Count"
-                multiplier: ""
-                delta: "false"
-                aggregationType: "average"
-                timeRollUpType: "average"
-                clusterRollUpType: "individual"
+          - MeanRate: "MeanRate"
+            multiplier: ""
+            delta: "false"
+            aggregationType: "AVERAGE"
+            timeRollUpType: "AVERAGE"
+            clusterRollUpType: "INDIVIDUAL"
+    - objectName: "kafka.server:type=ReplicaManager,name=IsrShrinksPerSec"
+      metrics:
+          - Count: "Count"
+            multiplier: ""
+            delta: "false"
+            aggregationType: "AVERAGE"
+            timeRollUpType: "AVERAGE"
+            clusterRollUpType: "INDIVIDUAL"
 
-            MeanRate:
-                alias: "MeanRate"
-                multiplier: ""
-                delta: "false"
-                aggregationType: "average"
-                timeRollUpType: "average"
-                clusterRollUpType: "individual"
-  - objectName: "kafka.server:type=SessionExpireListener,*"
-    metrics:
-            Count:
-                alias: "Count"
-                multiplier: ""
-                delta: "false"
-                aggregationType: "average"
-                timeRollUpType: "average"
-                clusterRollUpType: "individual"
+          - MeanRate: "MeanRate"
+            multiplier: ""
+            delta: "false"
+            aggregationType: "AVERAGE"
+            timeRollUpType: "AVERAGE"
+            clusterRollUpType: "INDIVIDUAL"
+    - objectName: "kafka.server:type=SessionExpireListener,*"
+      metrics:
+          - Count: "Count"
+            multiplier: ""
+            delta: "false"
+            aggregationType: "AVERAGE"
+            timeRollUpType: "AVERAGE"
+            clusterRollUpType: "INDIVIDUAL"
 
-            MeanRate:
-                alias: "MeanRate"
-                multiplier: ""
-                delta: "false"
-                aggregationType: "average"
-                timeRollUpType: "average"
-                clusterRollUpType: "individual"
-  - objectName: "kafka.network:type=RequestMetrics,*"
-    metrics:
-            Count:
-                alias: "Count"
-                multiplier: ""
-                delta: "false"
-                aggregationType: "average"
-                timeRollUpType: "average"
-                clusterRollUpType: "individual"
+          - MeanRate: "MeanRate"
+            multiplier: ""
+            delta: "false"
+            aggregationType: "AVERAGE"
+            timeRollUpType: "AVERAGE"
+            clusterRollUpType: "INDIVIDUAL"
+    - objectName: "kafka.network:type=RequestMetrics,*"
+      metrics:
+          - Count: "Count"
+            multiplier: ""
+            delta: "false"
+            aggregationType: "AVERAGE"
+            timeRollUpType: "AVERAGE"
+            clusterRollUpType: "INDIVIDUAL"
 
-            MeanRate:
-                alias: "MeanRate"
-                multiplier: ""
-                delta: "false"
-                aggregationType: "average"
-                timeRollUpType: "average"
-                clusterRollUpType: "individual"
+          - MeanRate: "MeanRate"
+            multiplier: ""
+            delta: "false"
+            aggregationType: "AVERAGE"
+            timeRollUpType: "AVERAGE"
+            clusterRollUpType: "INDIVIDUAL"
+    - objectName: "kafka.controller:type=ControllerStats,*"
+      metrics:
+          - Count: "Count"
+            multiplier: ""
+            delta: "false"
+            aggregationType: "AVERAGE"
+            timeRollUpType: "AVERAGE"
+            clusterRollUpType: "INDIVIDUAL"
 
-  - objectName: "kafka.controller:type=ControllerStats,*"
-    metrics:
-            Count:
-                alias: "Count"
-                multiplier: ""
-                delta: "false"
-                aggregationType: "average"
-                timeRollUpType: "average"
-                clusterRollUpType: "individual"
+          - MeanRate: "MeanRate"
+            multiplier: ""
+            delta: "false"
+            aggregationType: "AVERAGE"
+            timeRollUpType: "AVERAGE"
+            clusterRollUpType: "INDIVIDUAL"
+    - objectName: "kafka.server:type=DelayedOperationPurgatory,*"
+      metrics:
+          - Value: "Value"
+            multiplier: ""
+            delta: "false"
+            aggregationType: "AVERAGE"
+            timeRollUpType: "AVERAGE"
+            clusterRollUpType: "INDIVIDUAL"
+    - objectName: "kafka.server:type=ReplicaFetcherManager,*"
+      metrics:
+          - Value: "Value"
+            multiplier: ""
+            delta: "false"
+            aggregationType: "AVERAGE"
+            timeRollUpType: "AVERAGE"
+            clusterRollUpType: "INDIVIDUAL"
+    - objectName: "kafka.server:type=ReplicaManager,name=LeaderCount"
+      metrics:
+          - Value: "Value"
+            multiplier: ""
+            delta: "false"
+            aggregationType: "AVERAGE"
+            timeRollUpType: "AVERAGE"
+            clusterRollUpType: "INDIVIDUAL"
+    - objectName: "kafka.server:type=ReplicaManager,name=PartitionCount"
+      metrics:
+          - Value: "Value"
+            multiplier: ""
+            delta: "false"
+            aggregationType: "AVERAGE"
+            timeRollUpType: "AVERAGE"
+            clusterRollUpType: "INDIVIDUAL"
+    - objectName: "kafka.server:type=ReplicaManager,name=UnderReplicatedPartitions"
+      metrics:
+          - Value: "Value"
+            multiplier: ""
+            delta: "false"
+            aggregationType: "AVERAGE"
+            timeRollUpType: "AVERAGE"
+            clusterRollUpType: "INDIVIDUAL"
+    - objectName: "kafka.network:type=Processor,*"
+      metrics:
+          - Value: "Value"
+            multiplier: ""
+            delta: "false"
+            aggregationType: "AVERAGE"
+            timeRollUpType: "AVERAGE"
+            clusterRollUpType: "INDIVIDUAL"
+    - objectName: "kafka.network:type=RequestChannel,*"
+      metrics:
+          - Value: "Value"
+            multiplier: ""
+            delta: "false"
+            aggregationType: "AVERAGE"
+            timeRollUpType: "AVERAGE"
+            clusterRollUpType: "INDIVIDUAL"
+    - objectName: "kafka.network:type=SocketServer,*"
+      metrics:
+          - Value: "Value"
+            multiplier: ""
+            delta: "false"
+            aggregationType: "AVERAGE"
+            timeRollUpType: "AVERAGE"
+            clusterRollUpType: "INDIVIDUAL"
+    - objectName: "kafka.server:type=KafkaServer,name=BrokerState"
+      metrics:
+          - Value: "Value"
+            multiplier: ""
+            delta: "false"
+            aggregationType: "AVERAGE"
+            timeRollUpType: "AVERAGE"
+            clusterRollUpType: "INDIVIDUAL"
+    # - objectName: "kafka.server:type=BrokerTopicMetrics,*"
+    #   metrics:
+    #       - Count: "Count"
+    #         multiplier: ""
+    #         delta: "false"
+    #         aggregationType: "AVERAGE"
+    #         timeRollUpType: "AVERAGE"
+    #         clusterRollUpType: "INDIVIDUAL"
 
-            MeanRate:
-                alias: "MeanRate"
-                multiplier: ""
-                delta: "false"
-                aggregationType: "average"
-                timeRollUpType: "average"
-                clusterRollUpType: "individual"
+    #       - MeanRate: "MeanRate"
+    #         multiplier: ""
+    #         delta: "false"
+    #         aggregationType: "AVERAGE"
+    #         timeRollUpType: "AVERAGE"
+    #         clusterRollUpType: "INDIVIDUAL"
+    # - objectName: "kafka.server:type=BrokerTopicMetrics,*"
+    #   metrics:
+    #       - Count: "Count"
+    #         multiplier: ""
+    #         delta: "false"
+    #         aggregationType: "AVERAGE"
+    #         timeRollUpType: "AVERAGE"
+    #         clusterRollUpType: "INDIVIDUAL"
 
+    #       - MeanRate: "MeanRate"
+    #         multiplier: ""
+    #         delta: "false"
+    #         aggregationType: "AVERAGE"
+    #         timeRollUpType: "AVERAGE"
+    #         clusterRollUpType: "INDIVIDUAL"
+    # - objectName: "kafka.server:type=BrokerTopicMetrics,*"
+    #   metrics:
+    #       - Count: "Count"
+    #         multiplier: ""
+    #         delta: "false"
+    #         aggregationType: "AVERAGE"
+    #         timeRollUpType: "AVERAGE"
+    #         clusterRollUpType: "INDIVIDUAL"
 
+    #       - MeanRate: "MeanRate"
+    #         multiplier: ""
+    #         delta: "false"
+    #         aggregationType: "AVERAGE"
+    #         timeRollUpType: "AVERAGE"
+    #         clusterRollUpType: "INDIVIDUAL"
+    # - objectName: "kafka.server:type=BrokerTopicMetrics,*"
+    #   metrics:
+    #       - Count: "Count"
+    #         multiplier: ""
+    #         delta: "false"
+    #         aggregationType: "AVERAGE"
+    #         timeRollUpType: "AVERAGE"
+    #         clusterRollUpType: "INDIVIDUAL"
 
-  - objectName: "kafka.server:type=DelayedOperationPurgatory,*"
-    metrics:
-            Value:
-                alias: "Value"
-                multiplier: ""
-                delta: "false"
-                aggregationType: "average"
-                timeRollUpType: "average"
-                clusterRollUpType: "individual"
+    #       - MeanRate: "MeanRate"
+    #         multiplier: ""
+    #         delta: "false"
+    #         aggregationType: "AVERAGE"
+    #         timeRollUpType: "AVERAGE"
+    #         clusterRollUpType: "INDIVIDUAL"
+    # - objectName: "kafka.server:type=BrokerTopicMetrics,*"
+    #   metrics:
+    #       - Count: "Count"
+    #         multiplier: ""
+    #         delta: "false"
+    #         aggregationType: "AVERAGE"
+    #         timeRollUpType: "AVERAGE"
+    #         clusterRollUpType: "INDIVIDUAL"
 
-
-  - objectName: "kafka.server:type=KafkaServer,name=BrokerState"
-    metrics:
-            Value:
-                alias: "Value"
-                multiplier: ""
-                delta: "false"
-                aggregationType: "average"
-                timeRollUpType: "average"
-                clusterRollUpType: "individual"
-
-  - objectName: "kafka.server:type=ReplicaFetcherManager,*"
-    metrics:
-            Value:
-                alias: "Value"
-                multiplier: ""
-                delta: "false"
-                aggregationType: "average"
-                timeRollUpType: "average"
-                clusterRollUpType: "individual"
-
-
-  - objectName: "kafka.server:type=ReplicaManager,name=LeaderCount"
-    metrics:
-            Value:
-                alias: "Value"
-                multiplier: ""
-                delta: "false"
-                aggregationType: "average"
-                timeRollUpType: "average"
-                clusterRollUpType: "individual"
-
-  - objectName: "kafka.server:type=ReplicaManager,name=PartitionCount"
-    metrics:
-            Value:
-                alias: "Value"
-                multiplier: ""
-                delta: "false"
-                aggregationType: "average"
-                timeRollUpType: "average"
-                clusterRollUpType: "individual"
-
-  - objectName: "kafka.server:type=ReplicaManager,name=UnderReplicatedPartitions"
-    metrics:
-            Value:
-                alias: "Value"
-                multiplier: ""
-                delta: "false"
-                aggregationType: "average"
-                timeRollUpType: "average"
-                clusterRollUpType: "individual"
-
-  - objectName: "kafka.network:type=Processor,*"
-    metrics:
-            Value:
-                alias: "Value"
-                multiplier: ""
-                delta: "false"
-                aggregationType: "average"
-                timeRollUpType: "average"
-                clusterRollUpType: "individual"
-
-  - objectName: "kafka.network:type=Processor,*"
-    metrics:
-            Value:
-                alias: "Value"
-                multiplier: ""
-                delta: "false"
-                aggregationType: "average"
-                timeRollUpType: "average"
-                clusterRollUpType: "individual"
-
-
-  - objectName: "kafka.network:type=RequestChannel,*"
-    metrics:
-            Value:
-                alias: "Value"
-                multiplier: ""
-                delta: "false"
-                aggregationType: "average"
-                timeRollUpType: "average"
-                clusterRollUpType: "individual"
-
-
-  - objectName: "kafka.network:type=SocketServer,*"
-    metrics:
-            Value:
-                alias: "Value"
-                multiplier: ""
-                delta: "false"
-                aggregationType: "average"
-                timeRollUpType: "average"
-                clusterRollUpType: "individual"
-
-#@todo: qualifiers??
-#@todo:add non heap memory max
-#JVM Metrics
-  - objectName: "java.lang:type=Memory"
-    metrics:
-          HeapMemoryUsage.committed: "Heap Memory Usage | Committed"
-          HeapMemoryUsage.max: "Heap Memory Usage | Max"
-          HeapMemoryUsage.used: "Heap Memory Usage | Used"
-          NonHeapMemoryUsage.committed: "Heap Memory Usage | Committed"
-          NonHeapMemoryUsage.used: "Heap Memory Usage | Used"
-
-
-
-
+    #       - MeanRate: "MeanRate"
+    #         multiplier: ""
+    #         delta: "false"
+    #         aggregationType: "AVERAGE"
+    #         timeRollUpType: "AVERAGE"
+    #         clusterRollUpType: "INDIVIDUAL"

@@ -27,19 +27,21 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class DomainMetricsProcessorTest {
+    //todo:make access private
     JMXConnector jmxConnector = mock(JMXConnector.class);
     JMXConnectionAdapter jmxConnectionAdapter = mock(JMXConnectionAdapter.class);
     MetricWriteHelper metricWriteHelper = mock(MetricWriteHelper.class);
-    MonitorContextConfiguration contextConfiguration = new MonitorContextConfiguration("Kafka", "Custom Metrics|Kafka|", PathResolver.resolveDirectory(AManagedMonitor.class), Mockito.mock(AMonitorJob.class));
+    MonitorContextConfiguration contextConfiguration = new MonitorContextConfiguration("Kafka",
+            "Custom Metrics|Kafka|", PathResolver.resolveDirectory(AManagedMonitor.class), Mockito.mock(AMonitorJob.class));
 //    contextConfiguration.setConfigYml("/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension/src/test/resources/conf/config_for_non_composite_metrics.yml");
 
 
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void getNodeMetricsForNonCompositeMetrics() throws IOException,IntrospectionException,ReflectionException, InstanceNotFoundException,MalformedObjectNameException {
 
-        contextConfiguration.setConfigYml("/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension/src/test/resources/conf/config_for_non_composite_metrics.yml");
+    public void getNodeMetricsForNonCompositeAttributes() throws IOException,IntrospectionException,ReflectionException, InstanceNotFoundException,MalformedObjectNameException {
+        //todo:give relative path
+        contextConfiguration.setConfigYml("conf/config.yml");
         Map config = contextConfiguration.getConfigYml();
         List<Map> mBeans = (List) config.get("mbeans");
         Set<ObjectInstance> objectInstances = Sets.newHashSet();
@@ -59,19 +61,25 @@ public class DomainMetricsProcessorTest {
                 .class))).thenReturn(attributes);
 
         Map<String, String> server = Maps.newHashMap();
+        //@todo: pull values from config
         server.put("host", "localhost");
         server.put("port", "9999");
         server.put("displayName", "TestServer1");
 
         for(Map mBean : mBeans){
+            //@todo:remove phaser
             Phaser phaser = new Phaser();
             phaser.register();
             Map<String, ?> metricProperties = (Map<String, ?>) mBean.get("metrics");
             DomainMetricsProcessor domainMetricsProcessor = new DomainMetricsProcessor(contextConfiguration, jmxConnectionAdapter,
                     jmxConnector, mBean, server.get("displayName"), metricWriteHelper,phaser);
+            //@todo:call populateAndPrintMetrics(),
+            //@todo: mock metricWriterHelper
+            //@todo: argument capture the list of metrics passed to transformAndPrintMetric
             List<Metric> metrics = domainMetricsProcessor.getNodeMetrics(jmxConnector, mBean.get("objectName").toString(),metricProperties );
             Assert.assertEquals(metrics.get(0).getMetricName(),"Count");
             Assert.assertEquals(metrics.get(1).getMetricName(), "Value");
+            //@todo: test values and properties also
         }
 
     }
@@ -79,8 +87,11 @@ public class DomainMetricsProcessorTest {
 
 
     @Test
+    //todo: check the composite metrics, check Cassandra Test
     public void getNodeMetricsForCompositeMetrics() throws MalformedObjectNameException, ReflectionException, InstanceNotFoundException,IntrospectionException,IOException{
 
+
+        //@todo:change file
         contextConfiguration.setConfigYml("/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension/src/test/resources/conf/config_for_non_composite_metrics.yml");
         Map config = contextConfiguration.getConfigYml();
         List<Map> mBeans = (List) config.get("mbeans");

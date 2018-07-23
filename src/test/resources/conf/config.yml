@@ -37,6 +37,7 @@ mbeans:
     metrics:
           Count:
               alias: "Count"
+#              @todo: metric qualifiers
 
           MeanRate:
               alias: "MeanRate"

@@ -60,6 +60,7 @@ public class DomainMetricsProcessor {
             logger.debug(String.format("Processing mbean %s from the conf file", mbeanName));
             List<Metric> finalMetricList = getNodeMetrics(jmxConnection,mbeanName,metricProperties);
             //todo: move it one level up
+            //todo: use metric
             finalMetricList.add(new Metric("HeartBeat", String.valueOf(BigInteger.ONE), metricPrefix + "|HeartBeat", "AVG", "AVG", "IND"));
             logger.debug("Printing metrics for server {}", mbeanName);
             metricWriteHelper.transformAndPrintMetrics(finalMetricList);
@@ -68,14 +69,15 @@ public class DomainMetricsProcessor {
             logger.error("Kafka Monitor error: " + e.getMessage());
             //todo:avverage, average, individual
 //            metricWriteHelper.printMetric(metricPrefix + "|HeartBeat", BigDecimal.ZERO, "AVG.AVG.IND");
-        } finally {
-//            phaser.arriveAndDeregister();
-            logger.debug("DomainProcessor Phaser arrived for {}", displayName);
         }
+//        finally { @todo: remove finally block
+////            phaser.arriveAndDeregister();
+//            logger.debug("DomainProcessor Phaser arrived for {}", displayName);
+//        }
     }
 
 
-    public   List<Metric> getNodeMetrics(JMXConnector jmxConnection, String objectName, Map<String, ?> metricProperties) throws IntrospectionException, ReflectionException, InstanceNotFoundException, IOException, MalformedObjectNameException {
+    private List<Metric> getNodeMetrics(JMXConnector jmxConnection, String objectName, Map<String, ?> metricProperties) throws IntrospectionException, ReflectionException, InstanceNotFoundException, IOException, MalformedObjectNameException {
         List<Metric> nodeMetrics = Lists.newArrayList();
         Set<ObjectInstance> objectInstances = this.jmxAdapter.queryMBeans(jmxConnection, ObjectName.getInstance(objectName));
         for (ObjectInstance instance : objectInstances) {
@@ -116,6 +118,8 @@ public class DomainMetricsProcessor {
 
     private void setMetricDetails (String metricPrefix, String attributeName, Object attributeValue, ObjectInstance instance, Map<String, ?> metricPropertiesMap, List<Metric> nodeMetrics) {
         String metricPath = metricPrefix + Constants.METRIC_SEPARATOR + buildName(instance)+ attributeName;
+        //@todo:metric properties map should have only metric qualifiers
+        //@todo: change to metricproperties.get("");
         Metric metric = new Metric(attributeName,  attributeValue.toString(), metricPath, metricPropertiesMap);
         nodeMetrics.add(metric);
     }

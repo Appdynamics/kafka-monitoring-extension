@@ -50,8 +50,13 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
     }
 
     public void run() {
-        populateAndPrintMetrics();
-        logger.info("Completed the Kafka  Monitoring task");
+         try {
+             populateAndPrintMetrics();
+         }catch(Exception e ) {
+             //@todo: specify server
+             logger.info("Completed the Kafka  Monitoring task");
+
+         }
     }
 
     @SuppressWarnings("unchecked")
@@ -60,6 +65,7 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
         Phaser phaser;//todo:no need of phasers in a non-threaded DomainProcessor task
         try{
             phaser = new Phaser();
+            //@todo: combine declaration and usage
             Map<String, String> requestMap;
             Map<String, String> connectionMap;
 
@@ -77,17 +83,16 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
                 DomainMetricsProcessor domainMetricsProcessor = new DomainMetricsProcessor( configuration, jmxAdapter, jmxConnection, mbeanFromConfig, displayName,metricWriteHelper, phaser);
                 domainMetricsProcessor.populateMetricsForMBean();
                 //awaitadvannce
-                logger.debug("Registering phaser for " + displayName);
+//                logger.debug("Registering phaser for " + displayName);
             }
         } catch (Exception e) {
-            logger.error("Error while opening JMX connection {}{}" ,this.kafkaServer.get(Constants.DISPLAY_NAME), e.getMessage());
-
+            logger.error("Error while opening JMX connection {}{}" ,this.kafkaServer.get(Constants.DISPLAY_NAME), e);
         } finally {
             try {
                 jmxAdapter.close(jmxConnection);
                 logger.debug("JMX connection is closed");
             } catch (Exception ioe) {
-                logger.error("Unable to close the connection.");
+                logger.error("Unable to close the connection {} ", ioe);
                 return ERROR_VALUE;
             }
         }
