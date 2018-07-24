@@ -8,8 +8,6 @@ public class Constants {
 
     public static final String SERVERS = "servers";
 
-//    public static final String SERVICE_URL = "serviceUrl"; remove missing fields
-
     public static final String HOST = "host";
 
     public static final String PORT = "port";
@@ -30,5 +28,7 @@ public class Constants {
 
     public static final String OBJECTNAME = "objectName";
 
+    public static final String SERVICE_URL = "serviceUrl";
 
+    public static final String CONNECTION = "connection";
 }

@@ -25,46 +25,44 @@ import static com.appdynamics.extensions.kafka.utils.Constants.DEFAULT_METRIC_PR
 
 public class KafkaMonitor extends ABaseMonitor {
 
-    @Override
-    @SuppressWarnings("unchecked")
-    protected void initializeMoreStuff(Map<String, String> args) {
+//    @Override
+//    @SuppressWarnings("unchecked")
+//    protected void initializeMoreStuff(Map<String, String> args) {
+//
+//        Map<String, String> servers = (Map<String, String>) this.getContextConfiguration().getConfigYml().get(Constants.SERVERS);
+//        if (Boolean.valueOf((servers.get("useSsl")))) {
+//            System.setProperty("javax.net.ssl.trustStore", connectionMapFromConfig.get("sslTrustStorePath"));
+//            System.setProperty("javax.net.ssl.trustStorePassword", connectionMapFromConfig.get("sslTrustStorePassword"));
+//        }
+//    }
 
-        Map<String, String> connectionMapFromConfig = (Map<String, String>) this.getContextConfiguration().getConfigYml().get("connection");
-        if (Boolean.valueOf((connectionMapFromConfig.get("useSsl")))) {
-            System.setProperty("javax.net.ssl.trustStore", connectionMapFromConfig.get("sslTrustStorePath"));
-            System.setProperty("javax.net.ssl.trustStorePassword", connectionMapFromConfig.get("sslTrustStorePassword"));
-        }
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
     protected String getDefaultMetricPrefix() { return DEFAULT_METRIC_PREFIX; }
 
-    @Override
     public String getMonitorName() {
         return "Kafka Monitor";
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
     protected void doRun(TasksExecutionServiceProvider tasksExecutionServiceProvider) {
-        List<Map<String, String>> kafkaServers = (List<Map<String, String>>) this.getContextConfiguration().getConfigYml().get(Constants.SERVERS);
+        List<Map<String, String>> kafkaServers = (List<Map<String, String>>)
+                this.getContextConfiguration().getConfigYml().get(Constants.SERVERS);
         for (Map<String, String> kafkaServer : kafkaServers) {
-            KafkaMonitorTask task = new KafkaMonitorTask(tasksExecutionServiceProvider, this.getContextConfiguration(), kafkaServer);
-            AssertUtils.assertNotNull(kafkaServer.get(Constants.DISPLAY_NAME), "The displayName can not be null");
+            KafkaMonitorTask task = new KafkaMonitorTask(tasksExecutionServiceProvider,
+                                                this.getContextConfiguration(), kafkaServer);
+            AssertUtils.assertNotNull(kafkaServer.get(Constants.DISPLAY_NAME),
+                    "The displayName can not be null");
             tasksExecutionServiceProvider.submit(kafkaServer.get(Constants.DISPLAY_NAME), task);
         }
     }
 
-    @Override
     protected int getTaskCount() {
-        List<Map<String, String>> servers = (List<Map<String, String>>) getContextConfiguration().getConfigYml().get(Constants.SERVERS);
-        AssertUtils.assertNotNull(servers, "The 'servers' section in conf.yml is not initialised");
+        List<Map<String, String>> servers = (List<Map<String, String>>) getContextConfiguration().
+                getConfigYml().get(Constants.SERVERS);
+        AssertUtils.assertNotNull(servers, "The 'servers' section in config.yml is not initialised");
         return servers.size();
     }
 
 
-//    @TODO: to be removed
+//    @TODO: to be removed before publishing
     public static void main(String[] args) throws TaskExecutionException {
         ConsoleAppender ca = new ConsoleAppender();
         ca.setWriter(new OutputStreamWriter(System.out));
@@ -74,7 +72,8 @@ public class KafkaMonitor extends ABaseMonitor {
 
         KafkaMonitor monitor = new KafkaMonitor();
         Map<String, String> taskArgs = new HashMap<String, String>();
-        taskArgs.put("config-file", "/src/main/resources/conf/config.yml");
+        taskArgs.put("config-file",
+                "/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension/src/main/resources/conf/config.yml");
         monitor.execute(taskArgs, null);
     }
 

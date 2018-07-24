@@ -16,6 +16,7 @@ import com.appdynamics.extensions.kafka.utils.Constants;
 import com.appdynamics.extensions.metrics.Metric;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.primitives.Booleans;
 import org.slf4j.LoggerFactory;
 import javax.management.*;
 import javax.management.openmbean.CompositeData;
@@ -33,62 +34,65 @@ public class DomainMetricsProcessor {
     private final JMXConnector jmxConnection;
     private MetricWriteHelper metricWriteHelper;
     private String metricPrefix;
-    private Phaser phaser;
     private Map mbeanFromConfig;
     private String displayName;
+    private BigDecimal heartBeat;
 
-    public DomainMetricsProcessor(MonitorContextConfiguration configuration, JMXConnectionAdapter jmxAdapter, JMXConnector jmxConnection, Map mbeanFromConfig, String displayName, MetricWriteHelper metricWriteHelper, Phaser phaser) {
+    public DomainMetricsProcessor(MonitorContextConfiguration configuration, JMXConnectionAdapter jmxAdapter,
+          JMXConnector jmxConnection, Map mbeanFromConfig, String displayName, MetricWriteHelper metricWriteHelper,
+                                  BigDecimal heartBeat) {
         this.jmxAdapter = jmxAdapter;
         this.jmxConnection = jmxConnection;
         this.metricWriteHelper = metricWriteHelper;
         this.metricPrefix = configuration.getMetricPrefix() + Constants.METRIC_SEPARATOR + displayName;
-        this.phaser = phaser;
-        this.phaser.register();
         this.mbeanFromConfig = mbeanFromConfig;
         this.displayName = displayName;
+        this.heartBeat = heartBeat;
     }
-
 
     public void populateMetricsForMBean() {
-//        phaser.arriveAndAwaitAdvance();//todo: phaser logic
         try {
-            //todo:change the names
-            Map<String, ?> metricProperties = (Map<String, ?>) this.mbeanFromConfig.get(Constants.METRICS);
-            String mbeanName = (String) this.mbeanFromConfig.get(Constants.OBJECTNAME);
-
-
-            logger.debug(String.format("Processing mbean %s from the conf file", mbeanName));
-            List<Metric> finalMetricList = getNodeMetrics(jmxConnection,mbeanName,metricProperties);
-            //todo: move it one level up
-            //todo: use metric
-            finalMetricList.add(new Metric("HeartBeat", String.valueOf(BigInteger.ONE), metricPrefix + "|HeartBeat", "AVG", "AVG", "IND"));
-            logger.debug("Printing metrics for server {}", mbeanName);
+            List<Metric> finalMetricList = new ArrayList<>();
+            finalMetricList.add(new Metric("HeartBeat", heartBeat.toString(),
+                    this.displayName + "|HeartBeat",
+                    "AVERAGE", "AVERAGE", "INDIVIDUAL"));
             metricWriteHelper.transformAndPrintMetrics(finalMetricList);
 
-        } catch (IntrospectionException | IOException | MalformedObjectNameException | InstanceNotFoundException | ReflectionException e) {
-            logger.error("Kafka Monitor error: " + e.getMessage());
-            //todo:avverage, average, individual
-//            metricWriteHelper.printMetric(metricPrefix + "|HeartBeat", BigDecimal.ZERO, "AVG.AVG.IND");
+            String objectName = (String) this.mbeanFromConfig.get(Constants.OBJECTNAME);
+            List<Map<String, ?>> metricProperties = (List<Map<String, ?>>) this.mbeanFromConfig.get(Constants.METRICS);
+            logger.debug("Processing mbean {} ", objectName);
+
+            for (Map metricPropertiesPerMetric : metricProperties) {
+                finalMetricList = getNodeMetrics(jmxConnection, objectName, metricPropertiesPerMetric);
+                logger.debug("Printing metrics for server {}", this.displayName);
+                metricWriteHelper.transformAndPrintMetrics(finalMetricList);
+            }
+            logger.debug("Finished processing mbean {} ", objectName);
+
+            } catch (IntrospectionException | IOException | MalformedObjectNameException
+                | InstanceNotFoundException | ReflectionException e) {
+            logger.error("Kafka Monitor error: {} " ,e);
         }
-//        finally { @todo: remove finally block
-////            phaser.arriveAndDeregister();
-//            logger.debug("DomainProcessor Phaser arrived for {}", displayName);
-//        }
     }
 
+    private List<Metric> getNodeMetrics(JMXConnector jmxConnection, String objectName, Map<String, ?> metricProperties)
+            throws IntrospectionException, ReflectionException, InstanceNotFoundException,
+            IOException, MalformedObjectNameException {
 
-    private List<Metric> getNodeMetrics(JMXConnector jmxConnection, String objectName, Map<String, ?> metricProperties) throws IntrospectionException, ReflectionException, InstanceNotFoundException, IOException, MalformedObjectNameException {
-        List<Metric> nodeMetrics = Lists.newArrayList();
-        Set<ObjectInstance> objectInstances = this.jmxAdapter.queryMBeans(jmxConnection, ObjectName.getInstance(objectName));
-        for (ObjectInstance instance : objectInstances) {
-            List<String> metricNamesDictionary = this.jmxAdapter.getReadableAttributeNames(jmxConnection, instance);
-            List<Attribute> attributes =this.jmxAdapter.getAttributes(jmxConnection, instance.getObjectName(), metricNamesDictionary.toArray(new String[metricNamesDictionary.size()]));
-            collect(nodeMetrics, attributes, instance, metricProperties);
+            List<Metric> nodeMetrics = Lists.newArrayList();
+            Set<ObjectInstance> objectInstances = this.jmxAdapter.queryMBeans(jmxConnection,
+                    ObjectName.getInstance(objectName));
+            for (ObjectInstance instance : objectInstances) {
+                List<String> metricNamesDictionary = this.jmxAdapter.getReadableAttributeNames(jmxConnection, instance);
+                List<Attribute> attributes =this.jmxAdapter.getAttributes(jmxConnection,
+                        instance.getObjectName(), metricNamesDictionary.toArray(new String[metricNamesDictionary.size()]));
+                collect(nodeMetrics, attributes, instance, metricProperties);
         }
         return nodeMetrics;
     }
 
-    private void collect(List<Metric> nodeMetrics, List<Attribute> attributes, ObjectInstance instance, Map<String, ?> metricProperties) {
+    private void collect(List<Metric> nodeMetrics, List<Attribute> attributes, ObjectInstance instance,
+                         Map<String, ?> metricProperties) {
         for (Attribute attribute : attributes) {
             try {
                 if(isCompositeDataObject(attribute)){
@@ -97,13 +101,15 @@ public class DomainMetricsProcessor {
                         String key = attribute.getName()+ "."+ str;
                         Object attributeValue = ((CompositeDataSupport) attribute.getValue()).get(str);
                         if(metricProperties.containsKey(key)){
-                            setMetricDetails(metricPrefix, key, attributeValue.toString(), instance, metricProperties, nodeMetrics);
+                            setMetricDetails(metricPrefix, key, attributeValue.toString(), instance,
+                                    (Map<String, String>)metricProperties.get(key), nodeMetrics);
                         }
                     }
                 }
                 else{
                     if(metricProperties.containsKey(attribute.getName())) {
-                        setMetricDetails(metricPrefix, attribute.getName(), attribute.getValue(), instance, metricProperties, nodeMetrics);
+                        setMetricDetails(metricPrefix, attribute.getName(), attribute.getValue(), instance,
+                                (Map<String, String>)metricProperties.get(attribute.getName()), nodeMetrics);
                     }
                 }
             } catch (Exception e) {
@@ -116,10 +122,10 @@ public class DomainMetricsProcessor {
         return attribute.getValue().getClass().equals(CompositeDataSupport.class);
     }
 
-    private void setMetricDetails (String metricPrefix, String attributeName, Object attributeValue, ObjectInstance instance, Map<String, ?> metricPropertiesMap, List<Metric> nodeMetrics) {
+    private void setMetricDetails (String metricPrefix, String attributeName, Object attributeValue,
+                                   ObjectInstance instance, Map<String, ?> metricPropertiesMap,
+                                   List<Metric> nodeMetrics) {
         String metricPath = metricPrefix + Constants.METRIC_SEPARATOR + buildName(instance)+ attributeName;
-        //@todo:metric properties map should have only metric qualifiers
-        //@todo: change to metricproperties.get("");
         Metric metric = new Metric(attributeName,  attributeValue.toString(), metricPath, metricPropertiesMap);
         nodeMetrics.add(metric);
     }
@@ -144,7 +150,8 @@ public class DomainMetricsProcessor {
         keyPropertyList.remove("type");
         keyPropertyList.remove("name");
         for (Map.Entry<String, String> entry : keyPropertyList.entrySet()) {
-            sb.append(entry.getKey()).append(Constants.METRIC_SEPARATOR).append(entry.getValue()).append(Constants.METRIC_SEPARATOR);
+            sb.append(entry.getKey()).append(Constants.METRIC_SEPARATOR).append(entry.getValue())
+                    .append(Constants.METRIC_SEPARATOR);
         }
         return sb.toString();
     }

@@ -10,9 +10,9 @@ package com.appdynamics.extensions.kafka;
 
 
 import com.appdynamics.extensions.kafka.utils.Constants;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-
 import javax.management.Attribute;
 import javax.management.AttributeList;
 import javax.management.InstanceNotFoundException;
@@ -41,8 +41,11 @@ public class JMXConnectionAdapter {
     private final String password;
 
     private JMXConnectionAdapter(Map<String, String> requestMap) throws MalformedURLException {
-        // TODO: read from config and conditional
-        this.serviceUrl = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + requestMap.get(Constants.HOST) + ":" + requestMap.get(Constants.PORT) + "/jmxrmi");
+        if(!Strings.isNullOrEmpty(requestMap.get(Constants.SERVICE_URL)))
+            this.serviceUrl = new JMXServiceURL(requestMap.get(Constants.SERVICE_URL));
+        else
+            this.serviceUrl = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" +
+                    requestMap.get(Constants.HOST) + ":" + requestMap.get(Constants.PORT) + "/jmxrmi");
         this.username = requestMap.get(Constants.USERNAME);
         this.password = requestMap.get(Constants.PASSWORD);
     }
@@ -55,21 +58,20 @@ public class JMXConnectionAdapter {
     JMXConnector open(boolean useDefaultSslFactory, boolean useSsl) throws IOException {
         JMXConnector jmxConnector;
         final Map<String, Object> env = new HashMap<String, Object>();
-
         if(useSsl) {
-            if (useDefaultSslFactory) { //check if null:TODO
+            if (Preconditions.checkNotNull(useDefaultSslFactory) && useDefaultSslFactory){
                 SslRMIClientSocketFactory sslRMIClientSocketFactory = new SslRMIClientSocketFactory();
                 env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, sslRMIClientSocketFactory);
-            } else if (!useDefaultSslFactory) {
+            } else if (Preconditions.checkNotNull(useDefaultSslFactory) && !useDefaultSslFactory) {
                 CustomSSLSocketFactory customSSLSocketFactory = new CustomSSLSocketFactory();
-                env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, customSSLSocketFactory.createSocketFactory());
+                env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE
+                        , customSSLSocketFactory.createSocketFactory());
             }
-
         }
-        if (!Strings.isNullOrEmpty(username)) {
+        if (!Strings.isNullOrEmpty(this.username)) {
             env.put(JMXConnector.CREDENTIALS, new String[]{username, password});
         }
-        jmxConnector = JMXConnectorFactory.connect(serviceUrl, env);
+        jmxConnector = JMXConnectorFactory.connect(this.serviceUrl,env);
         if (jmxConnector == null) { throw new IOException("Unable to connect to Mbean server"); }
         return jmxConnector;
     }
@@ -85,19 +87,21 @@ public class JMXConnectionAdapter {
         return connection.queryMBeans(objectName, null);
     }
 
-    public List<String> getReadableAttributeNames(JMXConnector jmxConnection, ObjectInstance instance) throws IntrospectionException, ReflectionException, InstanceNotFoundException, IOException {
+    public List<String> getReadableAttributeNames(JMXConnector jmxConnection, ObjectInstance instance)
+            throws IntrospectionException, ReflectionException, InstanceNotFoundException, IOException {
         MBeanServerConnection connection = jmxConnection.getMBeanServerConnection();
-        List<String> attrNames = Lists.newArrayList();
+        List<String> attributeNames = Lists.newArrayList();
         MBeanAttributeInfo[] attributes = connection.getMBeanInfo(instance.getObjectName()).getAttributes();
-        for (MBeanAttributeInfo attr : attributes) {
-            if (attr.isReadable()) {
-                attrNames.add(attr.getName());
+        for (MBeanAttributeInfo attribute : attributes) {
+            if (attribute.isReadable()) {
+                attributeNames.add(attribute.getName());
             }
         }
-        return attrNames;
+        return attributeNames;
     }
 
-    public List<Attribute> getAttributes(JMXConnector jmxConnection, ObjectName objectName, String[] strings) throws IOException, ReflectionException, InstanceNotFoundException {
+    public List<Attribute> getAttributes(JMXConnector jmxConnection, ObjectName objectName, String[] strings)
+            throws IOException, ReflectionException, InstanceNotFoundException {
         MBeanServerConnection connection = jmxConnection.getMBeanServerConnection();
         AttributeList list = connection.getAttributes(objectName, strings);
         if (list != null) {
