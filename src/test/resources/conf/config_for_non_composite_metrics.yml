@@ -1,11 +1,31 @@
-metricPrefix: "Custom Metrics|Kafka|"
+metricPrefix: "Custom Metrics|Kafka"
+
+# List of Kafka Instances
+servers:
+  - host: "localhost"
+    port: "9999"
+    username: ""
+    password: ""
+    useSsl: false
+    displayName: "Test Kafka Server1"
+
 
 mbeans:
 
   - objectName: "kafka.server:type=ReplicaManager,name=IsrExpandsPerSec"
     metrics:
+      - Count:
+         alias: "Count"
+         multiplier: ""
+         delta: "false"
+         aggregationType: "AVERAGE"
+         timeRollUpType: "AVERAGE"
+         clusterRollUpType: "INDIVIDUAL"
+      - Mean Rate:
+         alias: "Mean Rate"
+         multiplier: ""
+         delta: "false"
+         aggregationType: "AVERAGE"
+         timeRollUpType: "AVERAGE"
+         clusterRollUpType: "INDIVIDUAL"
 
-      Count:
-          alias: "Min Latency"
-      Value:
-          alias: "Max Latency"

@@ -1,9 +1,17 @@
-/*
- * Copyright 2018. AppDynamics LLC and its affiliates.
- * All Rights Reserved.
- * This is unpublished proprietary source code of AppDynamics LLC and its affiliates.
- * The copyright notice above does not evidence any actual or intended publication of such source code.
+/**
+ * Copyright 2018 AppDynamics, Inc.
  *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.appdynamics.extensions.kafka;
@@ -54,7 +62,8 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
              logger.info("Completed Kafka Monitoring task for Kafka server: {}",
                      this.kafkaServer.get(Constants.DISPLAY_NAME));
          }catch(Exception e ) {
-             logger.error("Exception occurred while collecting metrics for: {} {}", this.kafkaServer.get(Constants.DISPLAY_NAME));
+             logger.error("Exception occurred while collecting metrics for: {} {}",
+                     this.kafkaServer.get(Constants.DISPLAY_NAME));
          }
     }
 
@@ -85,8 +94,13 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
             Map<String, String> requestMap = buildRequestMap();
             jmxAdapter = JMXConnectionAdapter.create(requestMap);
             Map<String, String> connectionMap = getConnectionParameters();
-            jmxConnection = jmxAdapter.open(YmlUtils.getBoolean(connectionMap.get("useDefaultSslConnectionFactory")),
-                    YmlUtils.getBoolean(this.kafkaServer.get("useSsl")));
+            if(configuration.getConfigYml().containsKey("encryptionKey") && !Strings.isNullOrEmpty( configuration.getConfigYml().get("encryptionKey").toString()) )
+                jmxConnection = jmxAdapter.open(YmlUtils.getBoolean(this.kafkaServer.get("useSsl")), configuration.getConfigYml().get("encryptionKey").toString(), connectionMap);
+
+            else
+                jmxConnection = jmxAdapter.open(YmlUtils.getBoolean(this.kafkaServer.get("useSsl")), connectionMap);
+
+
             logger.debug("JMX Connection is open to Kafka server: {}", this.kafkaServer.get(Constants.DISPLAY_NAME));
             return BigDecimal.ONE;
         } catch (IOException ioe) {
@@ -110,13 +124,17 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
     private String getPassword() {
             String password = this.kafkaServer.get(Constants.PASSWORD);
             if (!Strings.isNullOrEmpty(password)) { return password; }
-            String encryptionKey = configuration.getConfigYml().get(Constants.ENCRYPTION_KEY).toString();
-            String encryptedPassword = this.kafkaServer.get(Constants.ENCRYPTED_PASSWORD);
-            if (!Strings.isNullOrEmpty(encryptionKey) && !Strings.isNullOrEmpty(encryptedPassword)) {
-                java.util.Map<String, String> cryptoMap = Maps.newHashMap();
-                cryptoMap.put(TaskInputArgs.ENCRYPTED_PASSWORD, encryptedPassword);
-                cryptoMap.put(TaskInputArgs.ENCRYPTION_KEY, encryptionKey);
-                return CryptoUtil.getPassword(cryptoMap);
+
+            if(configuration.getConfigYml().containsKey(Constants.ENCRYPTION_KEY) &&
+                    configuration.getConfigYml().containsKey(Constants.ENCRYPTED_PASSWORD)) {
+                String encryptionKey = configuration.getConfigYml().get(Constants.ENCRYPTION_KEY).toString();
+                String encryptedPassword = this.kafkaServer.get(Constants.ENCRYPTED_PASSWORD);
+                if (!Strings.isNullOrEmpty(encryptionKey) && !Strings.isNullOrEmpty(encryptedPassword)) {
+                    java.util.Map<String, String> cryptoMap = Maps.newHashMap();
+                    cryptoMap.put(TaskInputArgs.ENCRYPTED_PASSWORD, encryptedPassword);
+                    cryptoMap.put(TaskInputArgs.ENCRYPTION_KEY, encryptionKey);
+                    return CryptoUtil.getPassword(cryptoMap);
+                }
             }
             return null;
     }

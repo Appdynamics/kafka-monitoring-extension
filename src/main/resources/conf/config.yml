@@ -1,7 +1,11 @@
-metricPrefix: "Server|Component:<<Tier-Name>[or]<Tier-ID>>|Custom Metrics|Kafka"
+#This will populate the metrics in all the tiers, under this path(not recommended)
+#metricPrefix: "Custom metrics|Kafka"
 
- # Add your Kafka Instances below:
+#The following prefix will populate the metrics under respective tiers
+metricPrefix: "Server|Component:<Tier-ID>|Custom Metrics|Kafka"
 
+
+# Add your Kafka Instances below:
 servers:
     - serviceUrl: "service:jmx:rmi:///jndi/rmi://localhost:9999/jmxrmi"
       host: ""
@@ -12,41 +16,39 @@ servers:
       displayName: "Local Kafka Server"
       useSsl: false
 
- #Provide the encryption key for the password
+
+ #Provide the encryption key for the encrypted password
 encryptionKey: ""
 
- #Configure this section only if useSSL is true.
+
+ #Configure this section only if useSsl is set to true in any of the servers in the above section
+
 connection:
     socketTimeout: 3000
     connectTimeout: 1000
-    sslProtocols: ["TLSv1.2"]
-    sslCertCheckEnabled: false
-    sslVerifyHostname: false
-    sslCipherSuites: "[]"
+    sslProtocol: "TLSv1.2"
     sslTrustStorePath: ""
     sslTrustStorePassword: ""
     sslTrustStoreEncryptedPassword: ""
-
 
   #key store details for mutual auth on ssl
     sslKeyStorePath: ""
     sslKeyStorePassword: ""
     sslKeyStoreEncryptedPassword: ""
 
-# Set the following flag to true if you want to use the certs in the JDK
-# Set this to false if you want to use your own certs
-    useDefaultSslConnectionFactory: true
+# Set the following flag to true if you want to use the certs that are provided by default JDK
+    useDefaultSslConnectionFactory: false
 
-# number of concurrent tasks.
-# This doesn't need to be changed unless many instances are configured
-# @todo: explain this field
+# Each Kafka server needs 1 thread each, so please configure this according to the number of servers you are monitoring
 numberOfThreads: 10
 
-# The configuration of different metrics from various mbeans of Kafka server
-# For most cases, the mbean configuration does not need to be changed.
+# The configuration of different metrics from all mbeans exposed by Kafka server
 mbeans:
 
-#@todo: compare actual with output values
+# Each "objectName" is fully qualified path of the object of the Kafka server
+# For example "kafka.server:type=ReplicaManager,*" will return all objects nested under ReplicaManager type
+# Each of the entries in the "metrics" section is an attribute of the objectName under which it's listed
+
     - objectName: "kafka.server:type=BrokerTopicMetrics,*"
       metrics:
           - Count:
@@ -300,14 +302,6 @@ mbeans:
               aggregationType: "AVERAGE"
               timeRollUpType: "AVERAGE"
               clusterRollUpType: "INDIVIDUAL"
-
-#           - NonHeapMemoryUsage.max:
-#              alias: " Non Heap Memory Usage | Max"
-#              multiplier: ""
-#              delta: "false"
-#              aggregationType: "AVERAGE"
-#              timeRollUpType: "AVERAGE"
-#              clusterRollUpType: "INDIVIDUAL"
 
            - NonHeapMemoryUsage.used:
               alias: "Non Heap Memory Usage | Used"

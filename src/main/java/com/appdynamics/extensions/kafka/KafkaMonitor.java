@@ -13,6 +13,8 @@ import com.appdynamics.extensions.ABaseMonitor;
 import com.appdynamics.extensions.TasksExecutionServiceProvider;
 import com.appdynamics.extensions.kafka.utils.Constants;
 import com.appdynamics.extensions.util.AssertUtils;
+import com.appdynamics.extensions.util.YmlUtils;
+import com.google.common.primitives.Booleans;
 import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
@@ -25,16 +27,28 @@ import static com.appdynamics.extensions.kafka.utils.Constants.DEFAULT_METRIC_PR
 
 public class KafkaMonitor extends ABaseMonitor {
 
-//    @Override
-//    @SuppressWarnings("unchecked")
-//    protected void initializeMoreStuff(Map<String, String> args) {
-//
-//        Map<String, String> servers = (Map<String, String>) this.getContextConfiguration().getConfigYml().get(Constants.SERVERS);
-//        if (Boolean.valueOf((servers.get("useSsl")))) {
-//            System.setProperty("javax.net.ssl.trustStore", connectionMapFromConfig.get("sslTrustStorePath"));
-//            System.setProperty("javax.net.ssl.trustStorePassword", connectionMapFromConfig.get("sslTrustStorePassword"));
-//        }
-//    }
+    @Override
+    protected void initializeMoreStuff(Map<String, String> args) {
+
+        List<Map<String, ?>> servers = (List<Map<String, ?>>) this.getContextConfiguration()
+                .getConfigYml().get(Constants.SERVERS);
+        Map<String, ?> connectionMap = (Map<String, ?>) this.getContextConfiguration()
+                .getConfigYml().get(Constants.CONNECTION);
+        boolean flag = false;
+
+            for (Map server : servers) {
+                if(!flag) {
+                if (YmlUtils.getBoolean((server.get("useSsl")))) {
+                    System.setProperty("javax.net.ssl.trustStore",
+                            connectionMap.get("sslTrustStorePath").toString());
+                    System.setProperty("javax.net.ssl.trustStorePassword",
+                            connectionMap.get("sslTrustStorePassword").toString());
+                    flag = true;
+                    break;
+                }
+            }
+        }
+    }
 
     protected String getDefaultMetricPrefix() { return DEFAULT_METRIC_PREFIX; }
 
@@ -48,6 +62,7 @@ public class KafkaMonitor extends ABaseMonitor {
         for (Map<String, String> kafkaServer : kafkaServers) {
             KafkaMonitorTask task = new KafkaMonitorTask(tasksExecutionServiceProvider,
                                                 this.getContextConfiguration(), kafkaServer);
+            //todo: do we need an assert for displayname
             AssertUtils.assertNotNull(kafkaServer.get(Constants.DISPLAY_NAME),
                     "The displayName can not be null");
             tasksExecutionServiceProvider.submit(kafkaServer.get(Constants.DISPLAY_NAME), task);
@@ -62,19 +77,5 @@ public class KafkaMonitor extends ABaseMonitor {
     }
 
 
-//    @TODO: to be removed before publishing
-    public static void main(String[] args) throws TaskExecutionException {
-        ConsoleAppender ca = new ConsoleAppender();
-        ca.setWriter(new OutputStreamWriter(System.out));
-        ca.setLayout(new PatternLayout("%-5p [%t]: %m%n"));
-        ca.setThreshold(Level.DEBUG);
-        org.apache.log4j.Logger.getRootLogger().addAppender(ca);
-
-        KafkaMonitor monitor = new KafkaMonitor();
-        Map<String, String> taskArgs = new HashMap<String, String>();
-        taskArgs.put("config-file",
-                "/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension/src/main/resources/conf/config.yml");
-        monitor.execute(taskArgs, null);
-    }
 
 }

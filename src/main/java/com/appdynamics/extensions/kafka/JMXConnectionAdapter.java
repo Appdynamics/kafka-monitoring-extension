@@ -1,15 +1,23 @@
-/*
- * Copyright 2018. AppDynamics LLC and its affiliates.
- * All Rights Reserved.
- * This is unpublished proprietary source code of AppDynamics LLC and its affiliates.
- * The copyright notice above does not evidence any actual or intended publication of such source code.
+/**
+ * Copyright 2018 AppDynamics, Inc.
  *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package com.appdynamics.extensions.kafka;
 
 
 import com.appdynamics.extensions.kafka.utils.Constants;
+import com.appdynamics.extensions.util.YmlUtils;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -50,14 +58,15 @@ public class JMXConnectionAdapter {
         this.password = requestMap.get(Constants.PASSWORD);
     }
 
-    static JMXConnectionAdapter create(Map<String, String> requestMap) throws MalformedURLException {
+    static JMXConnectionAdapter create(final Map<String, String> requestMap) throws MalformedURLException {
         return new JMXConnectionAdapter(requestMap);
     }
 
-    //TODO:change according to config params
-    JMXConnector open(boolean useDefaultSslFactory, boolean useSsl) throws IOException {
+    JMXConnector open(boolean useSsl, String encryptionKey, Map<String, ?> connectionMap) throws IOException {
         JMXConnector jmxConnector;
         final Map<String, Object> env = new HashMap<String, Object>();
+        boolean useDefaultSslFactory= YmlUtils.getBoolean(connectionMap.get("useDefaultSslConnectionFactory"));
+
         if(useSsl) {
             if (Preconditions.checkNotNull(useDefaultSslFactory) && useDefaultSslFactory){
                 SslRMIClientSocketFactory sslRMIClientSocketFactory = new SslRMIClientSocketFactory();
@@ -65,7 +74,31 @@ public class JMXConnectionAdapter {
             } else if (Preconditions.checkNotNull(useDefaultSslFactory) && !useDefaultSslFactory) {
                 CustomSSLSocketFactory customSSLSocketFactory = new CustomSSLSocketFactory();
                 env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE
-                        , customSSLSocketFactory.createSocketFactory());
+                        ,customSSLSocketFactory.createSocketFactory( encryptionKey, connectionMap));
+            }
+        }
+        if (!Strings.isNullOrEmpty(this.username)) {
+            env.put(JMXConnector.CREDENTIALS, new String[]{username, password});
+        }
+        jmxConnector = JMXConnectorFactory.connect(this.serviceUrl,env);
+        if (jmxConnector == null) { throw new IOException("Unable to connect to Mbean server"); }
+        return jmxConnector;
+    }
+
+
+    JMXConnector open(boolean useSsl, Map<String, ?> connectionMap) throws IOException {
+        JMXConnector jmxConnector;
+        final Map<String, Object> env = new HashMap<String, Object>();
+        boolean useDefaultSslFactory= YmlUtils.getBoolean(connectionMap.get("useDefaultSslConnectionFactory"));
+
+        if(useSsl) {
+            if (Preconditions.checkNotNull(useDefaultSslFactory) && useDefaultSslFactory){
+                SslRMIClientSocketFactory sslRMIClientSocketFactory = new SslRMIClientSocketFactory();
+                env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, sslRMIClientSocketFactory);
+            } else if (Preconditions.checkNotNull(useDefaultSslFactory) && !useDefaultSslFactory) {
+                CustomSSLSocketFactory customSSLSocketFactory = new CustomSSLSocketFactory();
+                env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE
+                        ,customSSLSocketFactory.createSocketFactory(connectionMap));
             }
         }
         if (!Strings.isNullOrEmpty(this.username)) {
@@ -82,12 +115,13 @@ public class JMXConnectionAdapter {
         }
     }
 
-    public Set<ObjectInstance> queryMBeans(JMXConnector jmxConnection, ObjectName objectName) throws IOException {
+    public Set<ObjectInstance> queryMBeans(final JMXConnector jmxConnection, final ObjectName objectName)
+            throws IOException {
         MBeanServerConnection connection = jmxConnection.getMBeanServerConnection();
         return connection.queryMBeans(objectName, null);
     }
 
-    public List<String> getReadableAttributeNames(JMXConnector jmxConnection, ObjectInstance instance)
+    public List<String> getReadableAttributeNames(final JMXConnector jmxConnection, final ObjectInstance instance)
             throws IntrospectionException, ReflectionException, InstanceNotFoundException, IOException {
         MBeanServerConnection connection = jmxConnection.getMBeanServerConnection();
         List<String> attributeNames = Lists.newArrayList();
@@ -100,8 +134,9 @@ public class JMXConnectionAdapter {
         return attributeNames;
     }
 
-    public List<Attribute> getAttributes(JMXConnector jmxConnection, ObjectName objectName, String[] strings)
-            throws IOException, ReflectionException, InstanceNotFoundException {
+    public List<Attribute> getAttributes(final JMXConnector jmxConnection, final ObjectName objectName,
+                                         final String[] strings) throws IOException, ReflectionException,
+            InstanceNotFoundException {
         MBeanServerConnection connection = jmxConnection.getMBeanServerConnection();
         AttributeList list = connection.getAttributes(objectName, strings);
         if (list != null) {
