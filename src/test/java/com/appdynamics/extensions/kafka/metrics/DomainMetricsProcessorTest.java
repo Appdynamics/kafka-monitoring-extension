@@ -104,7 +104,7 @@ public class DomainMetricsProcessorTest {
         attributes.add(new Attribute("Count", 100));
         attributes.add(new Attribute("Mean Rate", 200 ));
         List<String> metricNames = Lists.newArrayList();
-        metricNames.add("metric1");
+        metricNames.add("metric1");//todo:remove this if not needed
         metricNames.add("metric2");
         doReturn(objectInstances).when(jmxConnectionAdapter).queryMBeans(eq(jmxConnector),Mockito.any(ObjectName.class) );
         doReturn(metricNames).when(jmxConnectionAdapter).getReadableAttributeNames(eq(jmxConnector), Mockito.any(ObjectInstance.class));

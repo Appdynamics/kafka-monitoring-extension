@@ -35,18 +35,18 @@ public class KafkaMonitor extends ABaseMonitor {
         Map<String, ?> connectionMap = (Map<String, ?>) this.getContextConfiguration()
                 .getConfigYml().get(Constants.CONNECTION);
         boolean flag = false;
+//todo: take params from connection section
+// todo: useDefault ssl is false only then set properties
+//todo:move it to onConfigReload
 
-            for (Map server : servers) {
-                if(!flag) {
-                if (YmlUtils.getBoolean((server.get("useSsl")))) {
-                    System.setProperty("javax.net.ssl.trustStore",
-                            connectionMap.get("sslTrustStorePath").toString());
-                    System.setProperty("javax.net.ssl.trustStorePassword",
-                            connectionMap.get("sslTrustStorePassword").toString());
-                    flag = true;
-                    break;
-                }
-            }
+//                if (YmlUtils.getBoolean((server.get("useSsl")))) {
+//                    System.setProperty("javax.net.ssl.trustStore",
+//                            connectionMap.get("sslTrustStorePath").toString());
+//                    System.setProperty("javax.net.ssl.trustStorePassword",
+//                            connectionMap.get("sslTrustStorePassword").toString());
+//
+//                }
+
         }
     }
 
@@ -54,7 +54,7 @@ public class KafkaMonitor extends ABaseMonitor {
 
     public String getMonitorName() {
         return "Kafka Monitor";
-    }
+    } //todo:move to constants
 
     protected void doRun(TasksExecutionServiceProvider tasksExecutionServiceProvider) {
         List<Map<String, String>> kafkaServers = (List<Map<String, String>>)
@@ -62,7 +62,6 @@ public class KafkaMonitor extends ABaseMonitor {
         for (Map<String, String> kafkaServer : kafkaServers) {
             KafkaMonitorTask task = new KafkaMonitorTask(tasksExecutionServiceProvider,
                                                 this.getContextConfiguration(), kafkaServer);
-            //todo: do we need an assert for displayname
             AssertUtils.assertNotNull(kafkaServer.get(Constants.DISPLAY_NAME),
                     "The displayName can not be null");
             tasksExecutionServiceProvider.submit(kafkaServer.get(Constants.DISPLAY_NAME), task);

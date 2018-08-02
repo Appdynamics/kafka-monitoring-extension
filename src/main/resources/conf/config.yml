@@ -22,7 +22,7 @@ encryptionKey: ""
 
 
  #Configure this section only if useSsl is set to true in any of the servers in the above section
-
+#todo:refactor this path
 connection:
     socketTimeout: 3000
     connectTimeout: 1000
@@ -31,13 +31,14 @@ connection:
     sslTrustStorePassword: ""
     sslTrustStoreEncryptedPassword: ""
 
+#todo: mutual auth removal
   #key store details for mutual auth on ssl
     sslKeyStorePath: ""
     sslKeyStorePassword: ""
     sslKeyStoreEncryptedPassword: ""
 
 # Set the following flag to true if you want to use the certs that are provided by default JDK
-    useDefaultSslConnectionFactory: false
+    useDefaultSslConnectionFactory: true
 
 # Each Kafka server needs 1 thread each, so please configure this according to the number of servers you are monitoring
 numberOfThreads: 10
@@ -48,7 +49,8 @@ mbeans:
 # Each "objectName" is fully qualified path of the object of the Kafka server
 # For example "kafka.server:type=ReplicaManager,*" will return all objects nested under ReplicaManager type
 # Each of the entries in the "metrics" section is an attribute of the objectName under which it's listed
-
+#todo:change delta to boolean
+#TODO: UNITS
     - objectName: "kafka.server:type=BrokerTopicMetrics,*"
       metrics:
           - Count:

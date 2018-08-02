@@ -94,12 +94,13 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
             Map<String, String> requestMap = buildRequestMap();
             jmxAdapter = JMXConnectionAdapter.create(requestMap);
             Map<String, String> connectionMap = getConnectionParameters();
-            if(configuration.getConfigYml().containsKey("encryptionKey") && !Strings.isNullOrEmpty( configuration.getConfigYml().get("encryptionKey").toString()) )
+            if(configuration.getConfigYml().containsKey("encryptionKey") && !Strings.isNullOrEmpty( configuration.getConfigYml().get("encryptionKey").toString()) ) {
                 jmxConnection = jmxAdapter.open(YmlUtils.getBoolean(this.kafkaServer.get("useSsl")), configuration.getConfigYml().get("encryptionKey").toString(), connectionMap);
+            }
 
-            else
+            else {
                 jmxConnection = jmxAdapter.open(YmlUtils.getBoolean(this.kafkaServer.get("useSsl")), connectionMap);
-
+            }
 
             logger.debug("JMX Connection is open to Kafka server: {}", this.kafkaServer.get(Constants.DISPLAY_NAME));
             return BigDecimal.ONE;
@@ -112,7 +113,7 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
 
     private Map<String, String> buildRequestMap() {
         Map<String, String> requestMap = new HashMap<>();
-        requestMap.put(Constants.HOST, this. kafkaServer.get(Constants.HOST));
+        requestMap.put(Constants.HOST, this.kafkaServer.get(Constants.HOST));
         requestMap.put(Constants.PORT, this.kafkaServer.get(Constants.PORT));
         requestMap.put(Constants.DISPLAY_NAME, this.kafkaServer.get(Constants.DISPLAY_NAME));
         requestMap.put(Constants.SERVICE_URL, this.kafkaServer.get(Constants.SERVICE_URL));
@@ -121,6 +122,7 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
         return requestMap;
     }
 
+    //todo: refactor method to remove redundancy
     private String getPassword() {
             String password = this.kafkaServer.get(Constants.PASSWORD);
             if (!Strings.isNullOrEmpty(password)) { return password; }
@@ -140,8 +142,7 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
     }
 
     private Map<String,String> getConnectionParameters(){
-        Map<String, String> connectionMap = (Map<String, String>) configuration.getConfigYml().get(Constants.CONNECTION);
-        return  connectionMap;
+        return (Map<String, String>) configuration.getConfigYml().get(Constants.CONNECTION);
     }
 
 }

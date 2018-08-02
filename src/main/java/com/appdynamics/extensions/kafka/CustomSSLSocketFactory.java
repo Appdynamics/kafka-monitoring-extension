@@ -33,7 +33,8 @@ import java.util.Map;
 
 public class CustomSSLSocketFactory extends SslRMIClientSocketFactory {
     private static final Logger logger = LoggerFactory.getLogger(CustomSSLSocketFactory.class);
-
+//todo: access specifiers
+//todo: remove redundant method
     public SSLSocketFactory createSocketFactory(String encryptionKey, Map<String, ?> connectionMap) throws IOException {
         String trustStorePath = resolveTrustStorePath(connectionMap);
         char[] trustStorePassword = getTrustStorePassword(encryptionKey, connectionMap);
@@ -54,6 +55,7 @@ public class CustomSSLSocketFactory extends SslRMIClientSocketFactory {
                 TrustManagerFactory trustManagerFactory = TrustManagerFactory
                         .getInstance(TrustManagerFactory.getDefaultAlgorithm());
                 trustManagerFactory.init(trustStore);
+
                 SSLContext sslContext = SSLContext.getInstance(connectionMap.get("sslProtocol").toString());
                 sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), new SecureRandom());
                 return sslContext.getSocketFactory();
@@ -73,7 +75,7 @@ public class CustomSSLSocketFactory extends SslRMIClientSocketFactory {
         return null;
     }
 
-
+    //todo: refactor this code to remove redundant methods
     SSLSocketFactory createSocketFactory(Map<String, ?> connectionMap) throws IOException {
         String trustStorePath = resolveTrustStorePath(connectionMap);
         char[] trustStorePassword = getTrustStorePassword("", connectionMap);
@@ -106,13 +108,13 @@ public class CustomSSLSocketFactory extends SslRMIClientSocketFactory {
         } catch (KeyStoreException e) {
             logger.error("KeyStore exception {}", e);
         } catch (KeyManagementException e) {
-            logger.error("KeyManagement Exception {}" , e);
-        }catch(UnrecoverableKeyException e){
+            logger.error("KeyManagemena){
             logger.error("Unrecoverable Key {}",e);
         }
         return null;
     }
 
+    //todo:chk path resolver if certs need to be in socketfactory directory
     String resolveTrustStorePath(Map<String, ?> connectionMap) {
         File installDir = PathResolver.resolveDirectory(CustomSSLSocketFactory.class);
         String sslTrustStorePath = (String) connectionMap.get("sslTrustStorePath");
@@ -157,6 +159,7 @@ public class CustomSSLSocketFactory extends SslRMIClientSocketFactory {
         return getPath(file).toString();
     }
 
+    //todo:change access specifiers to private
     protected static char[] getKeyStorePassword(String encryptionKey, Map<String, ?> connection) {
         String sslTrustStorePassword = (String) connection.get("sslKeyStorePassword");
         if (!Strings.isNullOrEmpty(sslTrustStorePassword)) {

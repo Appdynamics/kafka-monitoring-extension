@@ -66,7 +66,7 @@ public class JMXConnectionAdapter {
         JMXConnector jmxConnector;
         final Map<String, Object> env = new HashMap<String, Object>();
         boolean useDefaultSslFactory= YmlUtils.getBoolean(connectionMap.get("useDefaultSslConnectionFactory"));
-
+        //todo: pass configurations\ instead of Yml Utils
         if(useSsl) {
             if (Preconditions.checkNotNull(useDefaultSslFactory) && useDefaultSslFactory){
                 SslRMIClientSocketFactory sslRMIClientSocketFactory = new SslRMIClientSocketFactory();
@@ -74,6 +74,7 @@ public class JMXConnectionAdapter {
             } else if (Preconditions.checkNotNull(useDefaultSslFactory) && !useDefaultSslFactory) {
                 CustomSSLSocketFactory customSSLSocketFactory = new CustomSSLSocketFactory();
                 env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE
+                        //todo: handle null
                         ,customSSLSocketFactory.createSocketFactory( encryptionKey, connectionMap));
             }
         }
@@ -88,7 +89,7 @@ public class JMXConnectionAdapter {
 
     JMXConnector open(boolean useSsl, Map<String, ?> connectionMap) throws IOException {
         JMXConnector jmxConnector;
-        final Map<String, Object> env = new HashMap<String, Object>();
+                final Map<String, Object> env = new HashMap<String, Object>();
         boolean useDefaultSslFactory= YmlUtils.getBoolean(connectionMap.get("useDefaultSslConnectionFactory"));
 
         if(useSsl) {
@@ -100,7 +101,7 @@ public class JMXConnectionAdapter {
                 env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE
                         ,customSSLSocketFactory.createSocketFactory(connectionMap));
             }
-        }
+        }//todo: remove redundant calls to same method
         if (!Strings.isNullOrEmpty(this.username)) {
             env.put(JMXConnector.CREDENTIALS, new String[]{username, password});
         }

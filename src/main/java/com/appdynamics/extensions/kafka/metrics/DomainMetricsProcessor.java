@@ -34,6 +34,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 public class DomainMetricsProcessor {
+    //todo:access modifiers
     static final org.slf4j.Logger logger = LoggerFactory.getLogger(DomainMetricsProcessor.class);
     private final JMXConnectionAdapter jmxAdapter;
     private final JMXConnector jmxConnection;
@@ -56,6 +57,7 @@ public class DomainMetricsProcessor {
     }
 
     public void populateMetricsForMBean() {
+        //todo:metric apth for heartbeat
         try {
             String objectName = (String) this.mbeanFromConfig.get(Constants.OBJECTNAME);
             List<Map<String, ?>> metricsList = (List<Map<String, ?>>) this.mbeanFromConfig.get(Constants.METRICS);
@@ -75,7 +77,6 @@ public class DomainMetricsProcessor {
 
     private List<Metric> getNodeMetrics(JMXConnector jmxConnection, String objectName,
                                         List<Map<String, ?>> metricProperties)
-
             throws IntrospectionException, ReflectionException, InstanceNotFoundException,
             IOException, MalformedObjectNameException {
         List<Metric> nodeMetrics = Lists.newArrayList();
