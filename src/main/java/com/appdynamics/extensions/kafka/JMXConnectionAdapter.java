@@ -17,10 +17,11 @@ package com.appdynamics.extensions.kafka;
 
 
 import com.appdynamics.extensions.kafka.utils.Constants;
-import com.appdynamics.extensions.util.YmlUtils;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.management.Attribute;
 import javax.management.AttributeList;
 import javax.management.InstanceNotFoundException;
@@ -34,6 +35,7 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 import javax.management.remote.rmi.RMIConnectorServer;
+import javax.net.ssl.SSLSocketFactory;
 import javax.rmi.ssl.SslRMIClientSocketFactory;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -47,6 +49,7 @@ public class JMXConnectionAdapter {
     private final JMXServiceURL serviceUrl;
     private final String username;
     private final String password;
+    private static final Logger logger = LoggerFactory.getLogger(JMXConnectionAdapter.class);
 
     private JMXConnectionAdapter(Map<String, String> requestMap) throws MalformedURLException {
         if(!Strings.isNullOrEmpty(requestMap.get(Constants.SERVICE_URL)))
@@ -62,46 +65,25 @@ public class JMXConnectionAdapter {
         return new JMXConnectionAdapter(requestMap);
     }
 
-    JMXConnector open(boolean useSsl, String encryptionKey, Map<String, ?> connectionMap) throws IOException {
+    JMXConnector open(Map<String, Object> connectionMap) throws IOException {
+
         JMXConnector jmxConnector;
         final Map<String, Object> env = new HashMap<String, Object>();
-        boolean useDefaultSslFactory= YmlUtils.getBoolean(connectionMap.get("useDefaultSslConnectionFactory"));
-        //todo: pass configurations\ instead of Yml Utils
-        if(useSsl) {
-            if (Preconditions.checkNotNull(useDefaultSslFactory) && useDefaultSslFactory){
+
+        if(Boolean.valueOf(connectionMap.get("useSsl").toString())) {
+            if (!connectionMap.containsKey("sslTrustStorePath")){ //using default jre truststore
                 SslRMIClientSocketFactory sslRMIClientSocketFactory = new SslRMIClientSocketFactory();
                 env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, sslRMIClientSocketFactory);
-            } else if (Preconditions.checkNotNull(useDefaultSslFactory) && !useDefaultSslFactory) {
+            } else{
                 CustomSSLSocketFactory customSSLSocketFactory = new CustomSSLSocketFactory();
-                env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE
-                        //todo: handle null
-                        ,customSSLSocketFactory.createSocketFactory( encryptionKey, connectionMap));
+                SSLSocketFactory customSslSocketFactoryObject = customSSLSocketFactory.createSocketFactory(connectionMap);
+                if(null!= customSslSocketFactoryObject) {
+                    env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, customSslSocketFactoryObject);
+                }
+                else
+                {logger.debug("customSslSocketFactoryObject cannot be null");}
             }
         }
-        if (!Strings.isNullOrEmpty(this.username)) {
-            env.put(JMXConnector.CREDENTIALS, new String[]{username, password});
-        }
-        jmxConnector = JMXConnectorFactory.connect(this.serviceUrl,env);
-        if (jmxConnector == null) { throw new IOException("Unable to connect to Mbean server"); }
-        return jmxConnector;
-    }
-
-
-    JMXConnector open(boolean useSsl, Map<String, ?> connectionMap) throws IOException {
-        JMXConnector jmxConnector;
-                final Map<String, Object> env = new HashMap<String, Object>();
-        boolean useDefaultSslFactory= YmlUtils.getBoolean(connectionMap.get("useDefaultSslConnectionFactory"));
-
-        if(useSsl) {
-            if (Preconditions.checkNotNull(useDefaultSslFactory) && useDefaultSslFactory){
-                SslRMIClientSocketFactory sslRMIClientSocketFactory = new SslRMIClientSocketFactory();
-                env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, sslRMIClientSocketFactory);
-            } else if (Preconditions.checkNotNull(useDefaultSslFactory) && !useDefaultSslFactory) {
-                CustomSSLSocketFactory customSSLSocketFactory = new CustomSSLSocketFactory();
-                env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE
-                        ,customSSLSocketFactory.createSocketFactory(connectionMap));
-            }
-        }//todo: remove redundant calls to same method
         if (!Strings.isNullOrEmpty(this.username)) {
             env.put(JMXConnector.CREDENTIALS, new String[]{username, password});
         }

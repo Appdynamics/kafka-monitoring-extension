@@ -5,40 +5,37 @@
 metricPrefix: "Server|Component:<Tier-ID>|Custom Metrics|Kafka"
 
 
-# Add your Kafka Instances below:
+# Add your Kafka Instances below
 servers:
     - serviceUrl: "service:jmx:rmi:///jndi/rmi://localhost:9999/jmxrmi"
       host: ""
       port: ""
-      username: ""
-      password: ""
+      username: "monitorRole"
+      password: "QED"
       encryptedPassword: ""
       displayName: "Local Kafka Server"
-      useSsl: false
+      useSsl: true
 
 
  #Provide the encryption key for the encrypted password
 encryptionKey: ""
 
 
- #Configure this section only if useSsl is set to true in any of the servers in the above section
-#todo:refactor this path
-connection:
-    socketTimeout: 3000
-    connectTimeout: 1000
-    sslProtocol: "TLSv1.2"
-    sslTrustStorePath: ""
-    sslTrustStorePassword: ""
-    sslTrustStoreEncryptedPassword: ""
+# Configure the following connection section ONLY if:
+#  1. the config property [useSsl] is set to true in any of the servers in the above section AND
+#  2. you want to use your own custom SSL certs
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#  Please REMOVE the connection section below if:
+#  1.You are not using SSL for any of the Kafka servers listed in the server section OR
+#  2.You are using SSL for any of the servers([useSsl : true]), but you want to use default truststore of the JRE
 
-#todo: mutual auth removal
-  #key store details for mutual auth on ssl
-    sslKeyStorePath: ""
-    sslKeyStorePassword: ""
-    sslKeyStoreEncryptedPassword: ""
-
-# Set the following flag to true if you want to use the certs that are provided by default JDK
-    useDefaultSslConnectionFactory: true
+#connection:
+#    socketTimeout: 3000
+#    connectTimeout: 1000
+#    sslProtocol: "TLSv1.2"
+#    sslTrustStorePath: "path/to/custom/truststore" #defaults to conf/cacerts.jks
+#    sslTrustStorePassword: "changeit" # defaults to empty
+#    sslTrustStoreEncryptedPassword: ""
 
 # Each Kafka server needs 1 thread each, so please configure this according to the number of servers you are monitoring
 numberOfThreads: 10
@@ -49,14 +46,14 @@ mbeans:
 # Each "objectName" is fully qualified path of the object of the Kafka server
 # For example "kafka.server:type=ReplicaManager,*" will return all objects nested under ReplicaManager type
 # Each of the entries in the "metrics" section is an attribute of the objectName under which it's listed
-#todo:change delta to boolean
-#TODO: UNITS
+
+
     - objectName: "kafka.server:type=BrokerTopicMetrics,*"
       metrics:
           - Count:
              alias: "Count"
              multiplier: ""
-             delta: "false"
+             delta: false
              aggregationType: "AVERAGE"
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"
@@ -64,34 +61,17 @@ mbeans:
           - MeanRate:
              alias: "Mean Rate"
              multiplier: ""
-             delta: "false"
+             delta: false
              aggregationType: "AVERAGE"
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"
 
-    - objectName: "kafka.server:type=DelayedFetchMetrics,*"
-      metrics:
-          - Count:
-             alias: "Count"
-             multiplier: ""
-             delta: "false"
-             aggregationType: "AVERAGE"
-             timeRollUpType: "AVERAGE"
-             clusterRollUpType: "INDIVIDUAL"
-
-          - MeanRate:
-             alias: "Mean Rate"
-             multiplier: ""
-             delta: "false"
-             aggregationType: "AVERAGE"
-             timeRollUpType: "AVERAGE"
-             clusterRollUpType: "INDIVIDUAL"
     - objectName: "kafka.server:type=KafkaRequestHandlerPool,*"
       metrics:
           - Count:
              alias: "Count"
              multiplier: ""
-             delta: "false"
+             delta: false
              aggregationType: "AVERAGE"
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"
@@ -99,7 +79,7 @@ mbeans:
           - MeanRate:
              alias: "Mean Rate"
              multiplier: ""
-             delta: "false"
+             delta: false
              aggregationType: "AVERAGE"
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"
@@ -108,7 +88,7 @@ mbeans:
           - Count:
              alias: "Count"
              multiplier: ""
-             delta: "false"
+             delta: false
              aggregationType: "AVERAGE"
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"
@@ -116,7 +96,7 @@ mbeans:
           - MeanRate:
              alias: "Mean Rate"
              multiplier: ""
-             delta: "false"
+             delta: false
              aggregationType: "AVERAGE"
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"
@@ -125,7 +105,7 @@ mbeans:
           - Count:
              alias: "Count"
              multiplier: ""
-             delta: "false"
+             delta: false
              aggregationType: "AVERAGE"
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"
@@ -133,7 +113,7 @@ mbeans:
           - MeanRate:
              alias: "Mean Rate"
              multiplier: ""
-             delta: "false"
+             delta: false
              aggregationType: "AVERAGE"
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"
@@ -142,7 +122,7 @@ mbeans:
           - Count:
              alias: "Count"
              multiplier: ""
-             delta: "false"
+             delta: false
              aggregationType: "AVERAGE"
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"
@@ -150,7 +130,7 @@ mbeans:
           - MeanRate:
              alias: "Mean Rate"
              multiplier: ""
-             delta: "false"
+             delta: false
              aggregationType: "AVERAGE"
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"
@@ -159,7 +139,7 @@ mbeans:
           - Count:
              alias: "Count"
              multiplier: ""
-             delta: "false"
+             delta: false
              aggregationType: "AVERAGE"
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"
@@ -167,7 +147,7 @@ mbeans:
           - MeanRate:
              alias: "Mean Rate"
              multiplier: ""
-             delta: "false"
+             delta: false
              aggregationType: "AVERAGE"
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"
@@ -176,7 +156,7 @@ mbeans:
           - Count:
              alias: "Count"
              multiplier: ""
-             delta: "false"
+             delta: false
              aggregationType: "AVERAGE"
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"
@@ -184,7 +164,7 @@ mbeans:
           - MeanRate:
              alias: "Mean Rate"
              multiplier: ""
-             delta: "false"
+             delta: false
              aggregationType: "AVERAGE"
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"
@@ -193,7 +173,7 @@ mbeans:
           - Value:
              alias: "Value"
              multiplier: ""
-             delta: "false"
+             delta: false
              aggregationType: "AVERAGE"
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"
@@ -202,7 +182,7 @@ mbeans:
           - Value:
              alias: "Value"
              multiplier: ""
-             delta: "false"
+             delta: false
              aggregationType: "AVERAGE"
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"
@@ -211,7 +191,7 @@ mbeans:
           - Value:
              alias: "Value"
              multiplier: ""
-             delta: "false"
+             delta: false
              aggregationType: "AVERAGE"
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"
@@ -220,7 +200,7 @@ mbeans:
           - Value:
              alias: "Value"
              multiplier: ""
-             delta: "false"
+             delta: false
              aggregationType: "AVERAGE"
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"
@@ -229,7 +209,7 @@ mbeans:
           - Value:
              alias: "Value"
              multiplier: ""
-             delta: "false"
+             delta: false
              aggregationType: "AVERAGE"
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"
@@ -238,7 +218,7 @@ mbeans:
           - Value:
              alias: "Value"
              multiplier: ""
-             delta: "false"
+             delta: false
              aggregationType: "AVERAGE"
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"
@@ -247,7 +227,7 @@ mbeans:
           - Value:
              alias: "Value"
              multiplier: ""
-             delta: "false"
+             delta: false
              aggregationType: "AVERAGE"
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"
@@ -256,7 +236,7 @@ mbeans:
           - Value:
              alias: "Value"
              multiplier: ""
-             delta: "false"
+             delta: false
              aggregationType: "AVERAGE"
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"
@@ -265,7 +245,7 @@ mbeans:
           - Value:
              alias: "Value"
              multiplier: ""
-             delta: "false"
+             delta: false
              aggregationType: "AVERAGE"
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"
@@ -274,41 +254,34 @@ mbeans:
     - objectName: "java.lang:type=Memory"
       metrics:
            - HeapMemoryUsage.committed:
-              alias: "Heap Memory Usage | Committed"
+              alias: "Heap Memory Usage | Committed (bytes)"
               multiplier: ""
-              delta: "false"
+              delta: false
               aggregationType: "AVERAGE"
               timeRollUpType: "AVERAGE"
               clusterRollUpType: "INDIVIDUAL"
 
            - HeapMemoryUsage.max:
-              alias: "Heap Memory Usage | Max"
+              alias: "Heap Memory Usage | Max (bytes)"
               multiplier: ""
-              delta: "false"
+              delta: false
               aggregationType: "AVERAGE"
               timeRollUpType: "AVERAGE"
               clusterRollUpType: "INDIVIDUAL"
 
            - HeapMemoryUsage.used:
-              alias: "Non Heap Memory Usage | Used"
+              alias: "Non Heap Memory Usage | Used (bytes)"
               multiplier: ""
-              delta: "false"
+              delta: false
               aggregationType: "AVERAGE"
               timeRollUpType: "AVERAGE"
               clusterRollUpType: "INDIVIDUAL"
 
            - NonHeapMemoryUsage.committed:
-              alias: "Non Heap Memory Usage | Committed"
+              alias: "Non Heap Memory Usage | Committed (bytes)"
               multiplier: ""
-              delta: "false"
+              delta: false
               aggregationType: "AVERAGE"
               timeRollUpType: "AVERAGE"
               clusterRollUpType: "INDIVIDUAL"
 
-           - NonHeapMemoryUsage.used:
-              alias: "Non Heap Memory Usage | Used"
-              multiplier: ""
-              delta: "false"
-              aggregationType: "AVERAGE"
-              timeRollUpType: "AVERAGE"
-              clusterRollUpType: "INDIVIDUAL"

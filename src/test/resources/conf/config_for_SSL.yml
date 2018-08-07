@@ -13,13 +13,13 @@ servers:
  #Provide the encryption key for the password
 encryptionKey: ""
 
- #Configure this section only if useSSL is set to true.
+# Configure this section only if useSSL is set to true.
 connection:
     socketTimeout: 3000
     connectTimeout: 1000
     sslProtocol: "TLSv1.2"
-    sslTrustStorePath: ""
-    sslTrustStorePassword: ""
+    sslTrustStorePath: "/Users/vishaka.sekar/AppDynamics/client/kafka.client.truststore.jks"
+    sslTrustStorePassword: "test1234"
     sslTrustStoreEncryptedPassword: ""
 
   #key store details for mutual auth on ssl

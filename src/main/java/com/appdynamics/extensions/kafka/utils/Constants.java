@@ -4,6 +4,8 @@ package com.appdynamics.extensions.kafka.utils;
 public class Constants {
     public static final String DEFAULT_METRIC_PREFIX = "Custom Metrics|Kafka";
 
+    public static final String KAFKA_MONITOR = "Kafka Monitor";
+
     public static final String METRIC_SEPARATOR  = "|";
 
     public static final String SERVERS = "servers";
@@ -31,4 +33,12 @@ public class Constants {
     public static final String SERVICE_URL = "serviceUrl";
 
     public static final String CONNECTION = "connection";
+
+    public static final String AVERAGE = "AVERAGE";
+
+    public static final String INDIVIDUAL = "INDIVIDUAL";
+
+    public static final String TRUST_STORE_PATH = "sslTrustStorePath";
+
+    public static final String TRUST_STORE_PASSWORD = "sslTrustStorePassword";
 }
