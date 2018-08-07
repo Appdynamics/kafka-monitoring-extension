@@ -4,17 +4,21 @@
 #The following prefix will populate the metrics under respective tiers
 metricPrefix: "Server|Component:<Tier-ID>|Custom Metrics|Kafka"
 
+# To know your Tier-ID, Please refer the link
+# https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695
+
 
 # Add your Kafka Instances below
+
 servers:
-    - serviceUrl: "service:jmx:rmi:///jndi/rmi://localhost:9999/jmxrmi"
+    - serviceUrl: "service:jmx:rmi:///jndi/rmi://localhost:9999/jmxrmi" #provide service URL or the host/port pair
       host: ""
       port: ""
-      username: "monitorRole"
-      password: "QED"
+      username: "<jmxuserRole>"
+      password: "<yourPassword>"
       encryptedPassword: ""
       displayName: "Local Kafka Server"
-      useSsl: true
+      useSsl: false # set to true if you're using SSL for this server
 
 
  #Provide the encryption key for the encrypted password
@@ -33,8 +37,8 @@ encryptionKey: ""
 #    socketTimeout: 3000
 #    connectTimeout: 1000
 #    sslProtocol: "TLSv1.2"
-#    sslTrustStorePath: "path/to/custom/truststore" #defaults to conf/cacerts.jks
-#    sslTrustStorePassword: "changeit" # defaults to empty
+#    sslTrustStorePath: "path/to/your/truststore" #defaults to <MA home>conf/cacerts.jks
+#    sslTrustStorePassword: "your/truststore/password" # defaults to empty
 #    sslTrustStoreEncryptedPassword: ""
 
 # Each Kafka server needs 1 thread each, so please configure this according to the number of servers you are monitoring

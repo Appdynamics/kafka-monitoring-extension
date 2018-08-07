@@ -37,7 +37,7 @@ public class KafkaMonitor extends ABaseMonitor {
                 .getConfigYml();
         //if the config yaml contains the field sslTrustStorePath then the keys are set
         // if the field is not present, default jre truststore is used
-        //field cannot be left blank
+        //if left blank, defaults to <MAhome>/conf/cacerts
         if(configMap.containsKey("connection")) {
             Map<String, ?> connectionMap = (Map<String, ?>) configMap.get("connection");
             if (connectionMap.containsKey(Constants.TRUST_STORE_PATH) &&
@@ -71,21 +71,6 @@ public class KafkaMonitor extends ABaseMonitor {
                 getConfigYml().get(Constants.SERVERS);
         AssertUtils.assertNotNull(servers, "The 'servers' section in config.yml is not initialised");
         return servers.size();
-    }
-
-    //    @TODO: to be removed before publishing
-    public static void main(String[] args) throws TaskExecutionException {
-        ConsoleAppender ca = new ConsoleAppender();
-        ca.setWriter(new OutputStreamWriter(System.out));
-        ca.setLayout(new PatternLayout("%-5p [%t]: %m%n"));
-        ca.setThreshold(Level.DEBUG);
-        org.apache.log4j.Logger.getRootLogger().addAppender(ca);
-
-        KafkaMonitor monitor = new KafkaMonitor();
-        Map<String, String> taskArgs = new HashMap<String, String>();
-        taskArgs.put("config-file",
-                "/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension/src/main/resources/conf/config.yml");
-        monitor.execute(taskArgs, null);
     }
 
 }
