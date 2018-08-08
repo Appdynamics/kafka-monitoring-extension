@@ -99,14 +99,18 @@ In case you want to use the default JRE trust store, please replace the `kafka.c
 <br/>To know more on how to set the credentials, please see section below(username/password auth)
 
 ## Configuring the extension using config.yml
-Configure the Redis monitoring extension by editing the config.yml file in `<MACHINE_AGENT_HOME>/monitors/KafkaMonitor/`
+Configure the Kafka monitoring extension by editing the config.yml file in `<MACHINE_AGENT_HOME>/monitors/KafkaMonitor/
+
+Please copy all the contents of the config.yml file and go to http://www.yamllint.com/ . <br>
+On reaching the website, paste the contents and press the “Go” button on the bottom left.<br>
+If you get a valid output, that means your formatting is correct and you may move on to the next step.
 
   1. Configure the "tier" under which the metrics need to be reported. This can be done by changing the value of `<TIER ID>` in
      metricPrefix: "Server|Component:`<TIER ID>`|Custom Metrics|Kafka".Please refer [how to find component ID](https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695)
 
      For example,
      ```
-     metricPrefix: "Server|Component:19|Custom Metrics|Redis"
+     metricPrefix: "Server|Component:19|Custom Metrics|Kafka"
      ```
   2. Configure the Kafka servers by specifying either Service URL or <host,port(usually 9999)> of all Kafka servers, 
         username & password (only if authentication enabled),encryptedPassword(only if password encryption required).
@@ -223,15 +227,6 @@ For eg.
 2.  Unzip as "KafkaMonitor" and copy the "KafkaMonitor" directory to `<MACHINE_AGENT_HOME>/monitors`
     Please place the extension in the "monitors" directory of your Machine Agent installation directory.
     Do not place the extension in the "extensions" directory of your Machine Agent installation directory.
-
-## Configuration ##
-
-Config.yml
-
-Please copy all the contents of the config.yml file and go to http://www.yamllint.com/ . <br>
-On reaching the website, paste the contents and press the “Go” button on the bottom left.<br>
-If you get a valid output, that means your formatting is correct and you may move on to the next step.
-
 
 ## Credentials Encryption
 Please visit [this](https://community.appdynamics.com/t5/Knowledge-Base/How-to-use-Password-Encryption-with-Extensions/ta-p/29397) page to get detailed instructions on password encryption. The steps in this document will guide you through the whole process.
