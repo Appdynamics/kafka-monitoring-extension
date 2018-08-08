@@ -96,7 +96,7 @@ In case you want to use the default JRE trust store, please replace the `kafka.c
 
 
 #### Password Settings ####
-<br/>To know more on how to set the credentials, please see section below(username/password auth)
+<br/>To know more on how to set the credentials, please see section "Using Password and Access Files" in [this](https://docs.oracle.com/javase/8/docs/technotes/guides/management/agent.html).
 
 ## Configuring the extension using config.yml
 Configure the Kafka monitoring extension by editing the config.yml file in `<MACHINE_AGENT_HOME>/monitors/KafkaMonitor/
