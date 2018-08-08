@@ -10,10 +10,10 @@ real-time.
 ## Prerequisites ##
 
 1.  This extension extracts the metrics from Kafka using the JMX protocol.
-    Please ensure JMX is enabled <link to jmx section>
+    Please ensure JMX is enabled.<link to JMX>
 2.  Please ensure Kafka is up and running and is accessible from the the machine on which machine agent is installed.
 3.  In order to use this extension, you do need a Standalone JAVA Machine Agent
-    (https://docs.appdynamics.com/display/PRO44/Standalone+Machine+Agents)
+    (https://docs.appdynamics.com/display/PRO44/Standalone+Machine+Agents).
     or SIM Agent (https://docs.appdynamics.com/display/PRO44/Server+Visibility).<br>
     For more details on downloading these products, please  visit https://download.appdynamics.com/.<br>
     The extension needs to be able to connect to the Kafka instance(s) in order to collect and send metrics.<br>
@@ -22,9 +22,14 @@ real-time.
 
 ## Enabling JMX
 Before configuring the extension, please make sure to run the below steps to check if the set up is correct.
-1. Test connection to the port
+1. Test connection to the port from the machine where the extension is installed. 
    ```
-   nc -v localhost 9999
+    nc -v KafkaHostIP port
+    
+    For example, connecting to the localhost on port 9999.
+  
+    nc -v localhost 9999
+    
    ```   
   
     If you get ```Connection to localhost port 9999 [tcp/distinct] succeeded!```,it confirms the access to the Kafka server. 
@@ -60,24 +65,148 @@ Before configuring the extension, please make sure to run the below steps to che
 
 ## SSL and password authentication ###
 
-If you need to monitor your Kafka servers securely via SSL , please enable the flags mentioned below.
-<br/>Edit `<Kafka Installation Folder>/bin/kafka-run-class.sh` and modify `KAFKA_JMX_OPTS` variable like below<br>
+  If you need to monitor your Kafka servers securely via SSL, please enable the flags mentioned below.
+  <br/>Edit `<Kafka Installation Folder>/bin/kafka-run-class.sh` and modify `KAFKA_JMX_OPTS` variable like below<br>
 
     KAFKA_JMX_OPTS="-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=true -Djavax.net.ssl.keyStore=/Absolute/path/to/keystore -Djavax.net.ssl.keyStorePassword=password -Dcom.sun.management.jmxremote.registry.ssl=false"
     
-If you also need username/password authentication, please set the flag `-Dcom.sun.management.jmxremote.authenticate=true`
-in the `KAFKA_JMX_OPTS` variable.
+  If you also need username/password authentication, please set the flag`-Dcom.sun.management.jmxremote.authenticate=true`
+  in the `KAFKA_JMX_OPTS` variable.
 
 #### Keys ####
+
+To generate your keystore and truststore please follow the steps:
+Creating a keystore is mandatory for SSL. However, creating a truststore is optional. You can create
+the truststore `kafka.client.truststore.jks`, or you can use the default truststore that comes with the 
+JRE.
+
+In case you want to use the default JRE trust store, please replace the `kafka.client.truststore.jks` with 
+`<PATH/TO/JAVA_HOME>jre/lib/security/cacerts`
+
+ ```
+ #Step #1
+ keytool -keystore kafka.server.keystore.jks -alias localhost -validity 365 -genkey
+ Step #2 
+ openssl req -new -x509 -keyout ca-key -out ca-cert -days 365
+ keytool -keystore kafka.client.truststore.jks -alias CARoot -import -file ca-cert
+ keytool -keystore kafka.server.truststore.jks -alias CARoot -import -file ca-cert
+
+``` 
+ Additional info about creating SSL keys is listed [here](https://docs.confluent.io/current/tutorials/security_tutorial.html#creating-ssl-keys-and-certificates)
+
 
 #### Password Settings ####
 <br/>To know more on how to set the credentials, please see section below(username/password auth)
 
+## Configuring the extension using config.yml
+Configure the Redis monitoring extension by editing the config.yml file in `<MACHINE_AGENT_HOME>/monitors/KafkaMonitor/`
 
+  1. Configure the "tier" under which the metrics need to be reported. This can be done by changing the value of `<TIER ID>` in
+     metricPrefix: "Server|Component:`<TIER ID>`|Custom Metrics|Kafka".Please refer [how to find component ID](https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695)
 
+     For example,
+     ```
+     metricPrefix: "Server|Component:19|Custom Metrics|Redis"
+     ```
+  2. Configure the Kafka servers by specifying either Service URL or <host,port(usually 9999)> of all Kafka servers, 
+        username & password (only if authentication enabled),encryptedPassword(only if password encryption required).
+        If you are using SSL to securely monitor your Kafka servers, please set useSsl is true.
+     
+          For example,
+          ```
+          - serviceUrl: "service:jmx:rmi:///jndi/rmi://localhost:9999/jmxrmi" #provide service URL or the <host,port> pair
+                host: ""
+                port: ""
+                username: "monitorRole"
+                password: "QED"
+                encryptedPassword: ""
+                displayName: "Local Kafka Server"
+                useSsl: true # set to true if you're using SSL for this server
+               
+          ```
+  3. Configure the encyptionKey for encryptionPasswords(only if password encryption required).
+     
+          For example,
+          #Encryption key for Encrypted password.
+          encryptionKey: "axcdde43535hdhdgfiniyy576"
+          
+  4. Configure the connection section only if you are using monitoring over SSL for <b>ANY</b> Kafka server(s), AND you want to use your own custom
+     truststore. 
+     Please remove this section if you are using SSL, but yu want to use the default JRE truststore. 
+     Please also remove this section if you are not using SSL for any of your servers.
 
+       ```
+       connection:
+         socketTimeout: 3000
+         connectTimeout: 1000
+         sslProtocol: "TLSv1.2"
+         sslTrustStorePath: "/path/to/truststore/client/kafka.client.truststore.jks" #defaults to <MA home>conf/cacerts.jks
+         sslTrustStorePassword: "test1234" # defaults to empty
+         sslTrustStoreEncryptedPassword: ""
+        ```
+    
+  5. Configure the numberOfThreads according to the number of Kafka instances you are monitoring on one extension.
+     Each server needs one thread.
+     
+          For example,
+          
+          If number Kafka servers that need to be monitored by one extension is 10, then number of threads is 10
+       
+          numberOfThreads: 30
+          
+  6. Configure the metrics section.
+  
+       For configuring the metrics, the following properties can be used:
+  
+       | Metric Property   |   Default value |         Possible values         |                                              Description                                                                                                |
+       | :---------------- | :-------------- | :------------------------------ | :------------------------------------------------------------------------------------------------------------- |
+       | alias             | metric name     | Any string                      | The substitute name to be used in the metric browser instead of metric name.                                   |
+       | aggregationType   | "AVERAGE"       | "AVERAGE", "SUM", "OBSERVATION" | [Aggregation qualifier](https://docs.appdynamics.com/display/PRO44/Build+a+Monitoring+Extension+Using+Java)    |
+       | timeRollUpType    | "AVERAGE"       | "AVERAGE", "SUM", "CURRENT"     | [Time roll-up qualifier](https://docs.appdynamics.com/display/PRO44/Build+a+Monitoring+Extension+Using+Java)   |
+       | clusterRollUpType | "INDIVIDUAL"    | "INDIVIDUAL", "COLLECTIVE"      | [Cluster roll-up qualifier](https://docs.appdynamics.com/display/PRO44/Build+a+Monitoring+Extension+Using+Java)|
+       | multiplier        | 1               | Any number                      | Value with which the metric needs to be multiplied.                                                            |
+       | convert           | null            | Any key value map               | Set of key value pairs that indicates the value to which the metrics need to be transformed. eg: UP:0, DOWN:1  |
+       | delta             | false           | true, false                     | If enabled, gives the delta values of metrics instead of actual values.                                        |
 
+          
+  
+   For example,
+   objectName: "kafka.server:type=BrokerTopicMetrics,* will fetch metrics of all objects nested under
+   `BrokerTopicMetrics`
+            
+             ```
+             - objectName: "kafka.server:type=BrokerTopicMetrics,*"
+                  metrics:
+                      - Count:
+                         alias: "Count"
+                         multiplier: ""
+                         delta: false
+                         aggregationType: "OBSERVATION"
+                         timeRollUpType: "AVERAGE"
+                         clusterRollUpType: "INDIVIDUAL"
+            
+                      - MeanRate:
+                         alias: "Mean Rate"
+                         multiplier: ""
+                         delta: false
+                         aggregationType: "AVERAGE"
+                         timeRollUpType: "AVERAGE"
+                         clusterRollUpType: "INDIVIDUAL"
+             ```
+     **All these metric properties are optional, and the default value shown in the table is applied to the metric(if a property has not been specified) by default.**
+      
+   If you need a metric from a specific object under an mBean,<br>
+   `objectName: kafka.server:type=ReplicaManager,name=IsrExpandsPerSec`  
+   will return only those metrics corresponding to the `IsrExpandsPerSec` object.  
+   
 ## Metrics Provided ##
+
+This extension collects metrics via JMX and can be configured to report any of the metrics that Kafka exposes. It provides metrics on 
+Kafka server, controller and the network. 
+
+In addition, it also provides the JVM metrics:HeapMemoryUsage.committed, HeapMemoryUsage.max etc
+NonHeapMemoryUsage.committed, NonHeapMemoryUsage.max
+There is also a HearBeat metric which denotes whether the connection from the extension to the Kafka server was successful.
 
 Note : By default, a Machine agent or a AppServer agent can send a fixed number of metrics to the controller.
 To change this limit, please follow the instructions mentioned [here](http://docs.appdynamics.com/display/PRO14S/Metrics+Limits).
