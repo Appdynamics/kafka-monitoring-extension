@@ -18,7 +18,7 @@ connection:
     socketTimeout: 3000
     connectTimeout: 1000
     sslProtocol: "TLSv1.2"
-    sslTrustStorePath: "/Users/vishaka.sekar/AppDynamics/client/kafka.client.truststore.jks"
-    sslTrustStorePassword: "test1234"
+    sslKeyStorePath: "/Users/vishaka.sekar/AppDynamics/server/kafka.server.truststore.jks"
+    sslKeyStorePassword: "test1234"
     sslTrustStoreEncryptedPassword: ""
 

@@ -51,7 +51,7 @@ public class DomainMetricsProcessor {
         this.displayName = displayName;
     }
 
-    public void populateMetricsForMBean(Map mbeanFromConfig) {
+    public void populateMetricsForMBean(JMXConnector jmxConnection, Map mbeanFromConfig) {
 
         try {
                 String objectName = (String) mbeanFromConfig.get(Constants.OBJECTNAME);

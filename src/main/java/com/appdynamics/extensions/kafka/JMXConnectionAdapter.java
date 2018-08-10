@@ -17,10 +17,12 @@ package com.appdynamics.extensions.kafka;
 
 
 import com.appdynamics.extensions.kafka.utils.Constants;
+import com.appdynamics.extensions.kafka.utils.CustomSSLServerSocketFactory;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.management.jmxremote.ConnectorBootstrap;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -34,11 +36,29 @@ import javax.management.ReflectionException;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
+import javax.management.remote.rmi.RMIConnector;
 import javax.management.remote.rmi.RMIConnectorServer;
+import javax.naming.Context;
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 import javax.rmi.ssl.SslRMIClientSocketFactory;
+import javax.rmi.ssl.SslRMIServerSocketFactory;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.rmi.NotBoundException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.RMISocketFactory;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,34 +81,34 @@ public class JMXConnectionAdapter {
         this.password = requestMap.get(Constants.PASSWORD);
     }
 
-    static JMXConnectionAdapter create(final Map<String, String> requestMap) throws MalformedURLException {
+    static JMXConnectionAdapter create( Map<String, String> requestMap) throws MalformedURLException {
         return new JMXConnectionAdapter(requestMap);
     }
 
     JMXConnector open(Map<String, Object> connectionMap) throws IOException {
 
         JMXConnector jmxConnector;
-        final Map<String, Object> env = new HashMap<String, Object>();
+        final Map<String, Object> env = new HashMap<>();
 
         if(Boolean.valueOf(connectionMap.get("useSsl").toString())) {
-            if (!connectionMap.containsKey("sslTrustStorePath")){ //using default jre truststore
+            env.put(Context.SECURITY_PROTOCOL, "ssl");
+            if (!connectionMap.containsKey(Constants.TRUST_STORE_PATH)){ //using default jre truststore
                 SslRMIClientSocketFactory sslRMIClientSocketFactory = new SslRMIClientSocketFactory();
                 env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, sslRMIClientSocketFactory);
+                env.put("com.sun.jndi.rmi.factory.socket", sslRMIClientSocketFactory);
             } else{
-                CustomSSLSocketFactory customSSLSocketFactory = new CustomSSLSocketFactory();
-                SSLSocketFactory customSslSocketFactoryObject = customSSLSocketFactory.createSocketFactory(connectionMap);
-                if(null!= customSslSocketFactoryObject) {
-                    env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, customSslSocketFactoryObject);
-                }
-                else
-                {logger.debug("customSslSocketFactoryObject cannot be null");}
+
+                CustomSSLSocketFactory customSSLSocketFactory = new CustomSSLSocketFactory(connectionMap);
+                env.put("com.sun.jndi.rmi.factory.socket", customSSLSocketFactory);////  secure RMI connector as well
+                env.put("jmx.remote.rmi.client.socket.factory", customSSLSocketFactory);
+                env.put(RMIConnectorServer.RMI_SERVER_SOCKET_FACTORY_ATTRIBUTE, new CustomSSLServerSocketFactory(connectionMap).getServerSocketFactory());
             }
         }
-        if (!Strings.isNullOrEmpty(this.username)) {
-            env.put(JMXConnector.CREDENTIALS, new String[]{username, password});
-        }
+
+        if (!Strings.isNullOrEmpty(this.username)) {env.put(JMXConnector.CREDENTIALS, new String[]{username, password});}
         jmxConnector = JMXConnectorFactory.connect(this.serviceUrl,env);
         if (jmxConnector == null) { throw new IOException("Unable to connect to Mbean server"); }
+        jmxConnector = JMXConnectorFactory.connect(this.serviceUrl,env);
         return jmxConnector;
     }
 
@@ -98,13 +118,13 @@ public class JMXConnectionAdapter {
         }
     }
 
-    public Set<ObjectInstance> queryMBeans(final JMXConnector jmxConnection, final ObjectName objectName)
+    public Set<ObjectInstance> queryMBeans( JMXConnector jmxConnection,  ObjectName objectName)
             throws IOException {
         MBeanServerConnection connection = jmxConnection.getMBeanServerConnection();
         return connection.queryMBeans(objectName, null);
     }
 
-    public List<String> getReadableAttributeNames(final JMXConnector jmxConnection, final ObjectInstance instance)
+    public List<String> getReadableAttributeNames( JMXConnector jmxConnection,  ObjectInstance instance)
             throws IntrospectionException, ReflectionException, InstanceNotFoundException, IOException {
         MBeanServerConnection connection = jmxConnection.getMBeanServerConnection();
         List<String> attributeNames = Lists.newArrayList();
@@ -117,8 +137,8 @@ public class JMXConnectionAdapter {
         return attributeNames;
     }
 
-    public List<Attribute> getAttributes(final JMXConnector jmxConnection, final ObjectName objectName,
-                                         final String[] strings) throws IOException, ReflectionException,
+    public List<Attribute> getAttributes( JMXConnector jmxConnection,  ObjectName objectName,
+                                          String[] strings) throws IOException, ReflectionException,
             InstanceNotFoundException {
         MBeanServerConnection connection = jmxConnection.getMBeanServerConnection();
         AttributeList list = connection.getAttributes(objectName, strings);

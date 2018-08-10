@@ -23,6 +23,7 @@ import org.apache.log4j.PatternLayout;
 
 import java.io.File;
 import java.io.OutputStreamWriter;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,15 +39,16 @@ public class KafkaMonitor extends ABaseMonitor {
         //if the config yaml contains the field sslTrustStorePath then the keys are set
         // if the field is not present, default jre truststore is used
         //if left blank, defaults to <MAhome>/conf/cacerts
-        if(configMap.containsKey("connection")) {
-            Map<String, ?> connectionMap = (Map<String, ?>) configMap.get("connection");
-            if (connectionMap.containsKey(Constants.TRUST_STORE_PATH) &&
-                    !Strings.isNullOrEmpty(connectionMap.get(Constants.TRUST_STORE_PATH).toString())) {
-                System.setProperty("javax.net.ssl.trustStore", connectionMap.get(Constants.TRUST_STORE_PATH).toString());
-                System.setProperty("javax.net.ssl.trustStorePassword", connectionMap.get(Constants.TRUST_STORE_PASSWORD).toString());
-            }
+       if(configMap.containsKey("connection")) {
+//            Map<String, ?> connectionMap = (Map<String, ?>) configMap.get("connection");
+//            if (connectionMap.containsKey(Constants.TRUST_STORE_PATH) &&
+//                    !Strings.isNullOrEmpty(connectionMap.get(Constants.TRUST_STORE_PATH).toString())) {
+//                System.setProperty("javax.net.ssl.trustStore", connectionMap.get(Constants.TRUST_STORE_PATH).toString());
+//                System.setProperty("javax.net.ssl.trustStorePassword", connectionMap.get(Constants.TRUST_STORE_PASSWORD).toString());
+//            }
         }
     }
+
 
     protected String getDefaultMetricPrefix() { return DEFAULT_METRIC_PREFIX; }
 
@@ -71,6 +73,20 @@ public class KafkaMonitor extends ABaseMonitor {
                 getConfigYml().get(Constants.SERVERS);
         AssertUtils.assertNotNull(servers, "The 'servers' section in config.yml is not initialised");
         return servers.size();
+    }
+
+    //TODO: remove before publishing
+    public static void main(String[] args) throws TaskExecutionException {
+        ConsoleAppender ca = new ConsoleAppender();
+        ca.setWriter(new OutputStreamWriter(System.out));
+        ca.setLayout(new PatternLayout("%-5p [%t]: %m%n"));
+        ca.setThreshold(Level.DEBUG);
+        org.apache.log4j.Logger.getRootLogger().addAppender(ca);
+
+        KafkaMonitor monitor = new KafkaMonitor();
+        Map<String, String> taskArgs = new HashMap<String, String>();
+        taskArgs.put("config-file", "/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension/src/main/resources/conf/config.yml");
+        monitor.execute(taskArgs, null);
     }
 
 }
