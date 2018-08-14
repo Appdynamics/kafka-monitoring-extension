@@ -31,25 +31,6 @@ import static com.appdynamics.extensions.kafka.utils.Constants.DEFAULT_METRIC_PR
 
 public class KafkaMonitor extends ABaseMonitor {
 
-    @Override
-    protected void onConfigReload(File file) {
-        //todo: needs restart for system props to reflect
-        Map<String, ?> configMap = (Map<String, String>) this.getContextConfiguration()
-                .getConfigYml();
-        //if the config yaml contains the field sslTrustStorePath then the keys are set
-        // if the field is not present, default jre truststore is used
-        //if left blank, defaults to <MAhome>/conf/cacerts
-       if(configMap.containsKey("connection")) {
-//            Map<String, ?> connectionMap = (Map<String, ?>) configMap.get("connection");
-//            if (connectionMap.containsKey(Constants.TRUST_STORE_PATH) &&
-//                    !Strings.isNullOrEmpty(connectionMap.get(Constants.TRUST_STORE_PATH).toString())) {
-//                System.setProperty("javax.net.ssl.trustStore", connectionMap.get(Constants.TRUST_STORE_PATH).toString());
-//                System.setProperty("javax.net.ssl.trustStorePassword", connectionMap.get(Constants.TRUST_STORE_PASSWORD).toString());
-//            }
-        }
-    }
-
-
     protected String getDefaultMetricPrefix() { return DEFAULT_METRIC_PREFIX; }
 
     public String getMonitorName() {

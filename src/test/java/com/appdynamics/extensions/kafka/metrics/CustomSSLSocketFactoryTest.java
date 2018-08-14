@@ -19,7 +19,7 @@ package com.appdynamics.extensions.kafka.metrics;
 
 import com.appdynamics.extensions.AMonitorJob;
 import com.appdynamics.extensions.conf.MonitorContextConfiguration;
-import com.appdynamics.extensions.kafka.CustomSSLSocketFactory;
+
 import com.appdynamics.extensions.util.PathResolver;
 import com.singularity.ee.agent.systemagent.api.AManagedMonitor;
 import org.junit.Test;

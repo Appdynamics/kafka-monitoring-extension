@@ -33,7 +33,7 @@ encryptionKey: ""
 #  1.You are not using SSL for any of the Kafka servers listed in the server section OR
 #  2.You are using SSL for any of the servers([useSsl : true]), but you want to use default truststore of the JRE
 
-#connection:
+connection:
 #    socketTimeout: 3000
 #    connectTimeout: 1000
 #    sslProtocols: "TLSv1.2"
