@@ -42,8 +42,7 @@ public class DomainMetricsProcessor {
     private List<Metric> nodeMetrics = new ArrayList<>();
 
     public DomainMetricsProcessor(MonitorContextConfiguration configuration, JMXConnectionAdapter jmxAdapter,
-          JMXConnector jmxConnection, String displayName, MetricWriteHelper metricWriteHelper
-                                 ) {
+                                  JMXConnector jmxConnection, String displayName, MetricWriteHelper metricWriteHelper) {
         this.jmxAdapter = jmxAdapter;
         this.jmxConnection = jmxConnection;
         this.metricWriteHelper = metricWriteHelper;
@@ -51,8 +50,7 @@ public class DomainMetricsProcessor {
         this.displayName = displayName;
     }
 
-    public void populateMetricsForMBean(JMXConnector jmxConnection, Map mbeanFromConfig) {
-
+    public void populateMetricsForMBean(Map mbeanFromConfig) {
         try {
                 String objectName = (String) mbeanFromConfig.get(Constants.OBJECTNAME);
                 List<Map<String, ?>> metricsList = (List<Map<String, ?>>) mbeanFromConfig.get(Constants.METRICS);

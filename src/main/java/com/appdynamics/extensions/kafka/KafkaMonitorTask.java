@@ -24,11 +24,10 @@ import com.appdynamics.extensions.conf.MonitorContextConfiguration;
 import com.appdynamics.extensions.crypto.CryptoUtil;
 import com.appdynamics.extensions.kafka.metrics.DomainMetricsProcessor;
 import com.appdynamics.extensions.kafka.utils.Constants;
-import com.appdynamics.extensions.metrics.Metric;
-import com.appdynamics.extensions.util.YmlUtils;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import org.slf4j.LoggerFactory;
+
 import javax.management.remote.JMXConnector;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -43,6 +42,7 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
     private MetricWriteHelper metricWriteHelper;
     private String displayName;
     private JMXConnectionAdapter jmxAdapter;
+    private JMXConnector jmxConnector;
 
     KafkaMonitorTask(TasksExecutionServiceProvider serviceProvider, MonitorContextConfiguration configuration,
                      Map kafkaServer) {
@@ -68,17 +68,14 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
     }
 
     public void populateAndPrintMetrics() {
-        JMXConnector jmxConnector = null;
         try{
-            BigDecimal connectionStatus = BigDecimal.ONE;
-            jmxConnector = openJMXConnection();
+            BigDecimal connectionStatus = openJMXConnection();
             List<Map<String, ?>> mbeansFromConfig = (List<Map<String, ?>>) configuration.getConfigYml()
                     .get(Constants.MBEANS);
-
             DomainMetricsProcessor domainMetricsProcessor = new DomainMetricsProcessor(configuration, jmxAdapter,
                         jmxConnector,displayName, metricWriteHelper);
             for (Map mbeanFromConfig : mbeansFromConfig) {
-                domainMetricsProcessor.populateMetricsForMBean(jmxConnector, mbeanFromConfig);
+                domainMetricsProcessor.populateMetricsForMBean(mbeanFromConfig);
             }
             metricWriteHelper.printMetric(this.configuration.getMetricPrefix() +
                             Constants.METRIC_SEPARATOR + this.displayName + Constants.METRIC_SEPARATOR+ "kafka.server" +
@@ -97,24 +94,27 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
         }
     }
 
-    private JMXConnector openJMXConnection() {
+    private BigDecimal openJMXConnection() {
         try {
             Map<String, String> requestMap = buildRequestMap();
             jmxAdapter = JMXConnectionAdapter.create(requestMap);
             Map<String, Object> connectionMap =(Map<String, Object>) getConnectionParameters();
             connectionMap.put("useSsl", this.kafkaServer.get("useSsl") );
+            logger.debug("[useSsl] is set [{}] for server [{}]", connectionMap.get("useSsl"),
+                    this.kafkaServer.get(Constants.DISPLAY_NAME));
 
             if(configuration.getConfigYml().containsKey("encryptionKey") &&
                     !Strings.isNullOrEmpty( configuration.getConfigYml().get("encryptionKey").toString()) ) {
                 connectionMap.put("encryptionKey",configuration.getConfigYml().get("encryptionKey").toString());
             }
-
             else { connectionMap.put("encryptionKey" ,""); }
+            jmxConnector = jmxAdapter.open(connectionMap);
 
-            JMXConnector jmxConnection = jmxAdapter.open(connectionMap);
-            if(jmxConnection == null) {logger.error("Connection object is null");}
-            logger.debug("JMX Connection is open to Kafka server: {}", this.kafkaServer.get(Constants.DISPLAY_NAME));
-            return jmxConnection;
+            if(jmxConnector != null) {
+                logger.debug("JMX Connection is open to Kafka server: {}", this.kafkaServer.get(Constants.DISPLAY_NAME));
+                return BigDecimal.ONE;
+            }
+            return BigDecimal.ZERO;
         } catch (IOException ioe) {
             logger.error("Unable to open a JMX Connection Kafka server: {} {} "
                     , this.kafkaServer.get(Constants.DISPLAY_NAME), ioe);
@@ -138,9 +138,7 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
         Map<String, ?> configMap =  configuration.getConfigYml();
 
         if (!Strings.isNullOrEmpty(password)) { return password; }
-        if(configMap.containsKey(Constants.ENCRYPTION_KEY) &&
-                configMap.containsKey(Constants.ENCRYPTED_PASSWORD)) {
-
+        if(configMap.containsKey(Constants.ENCRYPTION_KEY)) {
             String encryptionKey = configMap.get(Constants.ENCRYPTION_KEY).toString();
             String encryptedPassword = this.kafkaServer.get(Constants.ENCRYPTED_PASSWORD);
 
@@ -162,5 +160,3 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
     }
 
 }
-
-

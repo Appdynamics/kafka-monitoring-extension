@@ -12,43 +12,33 @@ package com.appdynamics.extensions.kafka;
 import com.appdynamics.extensions.ABaseMonitor;
 import com.appdynamics.extensions.TasksExecutionServiceProvider;
 import com.appdynamics.extensions.kafka.utils.Constants;
+import com.appdynamics.extensions.kafka.utils.SslUtils;
 import com.appdynamics.extensions.util.AssertUtils;
-import com.appdynamics.extensions.util.YmlUtils;
-import com.google.common.base.Strings;
-import com.google.common.primitives.Booleans;
 import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.PatternLayout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.OutputStreamWriter;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import static com.appdynamics.extensions.kafka.utils.Constants.DEFAULT_METRIC_PREFIX;
 
 public class KafkaMonitor extends ABaseMonitor {
+    private static final Logger logger = LoggerFactory.getLogger(KafkaMonitor.class);
 
     @Override
     protected void onConfigReload(File file) {
-        //todo: needs restart for system props to reflect
-        Map<String, ?> configMap = (Map<String, String>) this.getContextConfiguration()
+        Map<String, ?> configMap = this.getContextConfiguration()
                 .getConfigYml();
-        //if the config yaml contains the field sslTrustStorePath then the keys are set
-        // if the field is not present, default jre truststore is used
-        //if left blank, defaults to <MAhome>/conf/cacerts
-       if(configMap.containsKey("connection")) {
-//            Map<String, ?> connectionMap = (Map<String, ?>) configMap.get("connection");
-//            if (connectionMap.containsKey(Constants.TRUST_STORE_PATH) &&
-//                    !Strings.isNullOrEmpty(connectionMap.get(Constants.TRUST_STORE_PATH).toString())) {
-//                System.setProperty("javax.net.ssl.trustStore", connectionMap.get(Constants.TRUST_STORE_PATH).toString());
-//                System.setProperty("javax.net.ssl.trustStorePassword", connectionMap.get(Constants.TRUST_STORE_PASSWORD).toString());
-//            }
-        }
+        SslUtils sslUtils = new SslUtils();
+        sslUtils.setSslProperties(configMap);
     }
-
 
     protected String getDefaultMetricPrefix() { return DEFAULT_METRIC_PREFIX; }
 
