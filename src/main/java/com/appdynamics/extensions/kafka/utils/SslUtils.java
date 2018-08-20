@@ -36,7 +36,8 @@ public class SslUtils {
             else if (connectionMap.containsKey(Constants.TRUST_STORE_PATH) &&
                     Strings.isNullOrEmpty(connectionMap.get(Constants.TRUST_STORE_PATH).toString())){
                 //getting path of machine agent home
-                File installDir = PathResolver.resolveDirectory(AManagedMonitor.class);
+               // File installDir = PathResolver.resolveDirectory(AManagedMonitor.class);
+                File installDir = new File("/Users/vishaka.sekar/AppDynamics/machineagent/");//for test only todo:remove before publishing
                 File defaultTrustStoreFile = PathResolver.getFile("conf/cacerts.jks", installDir);
                 if (defaultTrustStoreFile == null || !defaultTrustStoreFile.exists()) {
                     logger.debug("The file [{}] doesn't exist", installDir+"/conf/cacerts.jks");

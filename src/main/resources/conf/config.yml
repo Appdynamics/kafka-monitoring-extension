@@ -28,12 +28,14 @@ encryptionKey: ""
 #  1. the config property [useSsl] is set to true in any of the servers in the above section AND
 #  2. you want to use your own custom SSL certs
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#  Please REMOVE the connection section below if:
+#  Please REMOVE/COMMENT OUT the connection section below if:
 #  1.You are not using SSL for any of the Kafka servers listed in the server section OR
 #  2.You are using SSL for any of the servers([useSsl : true]), but you want to use default truststore of the JRE
+
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#If you are using the conenction section,
+#If you are using the connection section,
 #any change to the connection section below requires a machine agent restart for the changes to reflect
 connection:
     socketTimeout: 3000
@@ -41,7 +43,7 @@ connection:
     sslProtocols: "TLSv1.2"
     sslCipherSuites: ""
     sslTrustStorePath: "" #if [sslTrustStorePath: ""] empty, it defaults to MA home/conf/cacerts.jks
-    sslTrustStorePassword: "" # [sslTrustStorePassword: ""] defaults to ""
+    sslTrustStorePassword: "test1234" # [sslTrustStorePassword: ""] defaults to ""
     sslTrustStoreEncryptedPassword: "" #provide encrypted Password if encryption is needed
 
 # Each Kafka server needs 1 thread each, so please configure this according to the number of servers you are monitoring
@@ -62,7 +64,7 @@ mbeans:
              alias: "Count"
              multiplier: ""
              delta: false
-             aggregationType: "OBSERVATION"
+             aggregationType: "AVERAGE"
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"
 

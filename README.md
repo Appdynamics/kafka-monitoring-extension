@@ -1,79 +1,80 @@
-AppDynamics Monitoring Extension for use with Kafka
+Kafka Monitoring Extension for AppDynamics
 ===================================================
-An AppDynamics extension to be used with a stand alone machine agent to provide metrics for Apache Kafka.
-
 
 ## Use Case ##
 Apache Kafka® is a distributed, fault-tolerant streaming platform. It can be used to process streams of data in
-real-time.
+real-time.The Kafka Monitoring extension can be used with a stand alone machine agent to provide metrics for multiple 
+Apache Kafka .
+
 
 ## Prerequisites ##
 
 1.  This extension extracts the metrics from Kafka using the JMX protocol.
-    Please ensure JMX is enabled.<link to JMX>
+    Please ensure JMX is enabled.
 2.  Please ensure Kafka is up and running and is accessible from the the machine on which machine agent is installed.
-3.  In order to use this extension, you do need a Standalone JAVA Machine Agent
-    (https://docs.appdynamics.com/display/PRO44/Standalone+Machine+Agents).
-    or SIM Agent (https://docs.appdynamics.com/display/PRO44/Server+Visibility).<br>
-    For more details on downloading these products, please  visit https://download.appdynamics.com/.<br>
-    The extension needs to be able to connect to the Kafka instance(s) in order to collect and send metrics.<br>
-    To do this, you will have to either establish a remote connection in between the extension and Kafka,
-    or have an agent on the same machine running the product in order for the extension to collect and send the metrics.
+3.  In order to use this extension, you do need a [Standalone JAVA Machine Agent](https://docs.appdynamics.com/display/PRO44/Standalone+Machine+Agents).
+    or [SIM Agent](https://docs.appdynamics.com/display/PRO44/Server+Visibility).<br>
+    For more details on downloading these products, please  visit [Downloads](https://download.appdynamics.com/).<br>
+    
 
-## Enabling JMX
-Before configuring the extension, please make sure to run the below steps to check if the set up is correct.
-1. Test connection to the port from the machine where the extension is installed. 
-   ```
-    nc -v KafkaHostIP port
-    
+## Installation ##
+
+ Unzip as "KafkaMonitor" and copy the "KafkaMonitor" directory to `<MACHINE_AGENT_HOME>/monitors`
+ Please place the extension in the <b>`monitors`</b> directory of your Machine Agent installation directory.
+ 
+## Configuration
+
+##### 1. Configuring ports
+   Test connection to the Kafka host/port from the machine where the extension is installed. 
+   ``` nc -v KafkaServerIP port ```
     For example, connecting to the localhost on port 9999.
-  
-    nc -v localhost 9999
-    
-   ```   
-  
-    If you get ```Connection to localhost port 9999 [tcp/distinct] succeeded!```,it confirms the access to the Kafka server. 
-    <br>If not the JMX port needs to be enabled.
-  
-2.  <b>JMX configuration:</b>
-    <br/>To enable JMX monitoring for Kafka broker, port 9999 has to be configured to allow monitoring on that port.
+   ``` nc -v localhost 9999 ```.
+   <br/>If you get ```Connection to localhost port 9999 [tcp/distinct] succeeded!```,it confirms the access to the Kafka server. 
+
+##### 2. Enabling JMX
+
+   To enable JMX monitoring for Kafka broker, port 9999 has to be configured to allow monitoring on that port.
     <br>Edit the Kafka start-up script `<Kafka Installation Folder>/bin/kafka-server-start.sh` to include
 
-       ```export JMX_PORT=${JMX_PORT:-9999}```
-    Please note, that the Kafka server needs to be restarted once the JMX port is added.
+       export JMX_PORT=${JMX_PORT:-9999}
+   
+   Please note, that the Kafka server needs to be restarted once the JMX port is added.
 
-3. <b>Start jConsole</b>:
-   <br>jConsole comes as a utility with installed Java JDK.
-   In your terminal, please type ```jconsole```.<br>
-   In the remote connection text-box, please put in the service url :
-
-   ```service:jmx:rmi:///jndi/rmi://<ip of the Kafka node>:9999/jmxrmi```
-
-   In the left pane of the jConsole, the list of mbeans exposed by Kafka is displayed.
-   It is a good idea to match the mbean configuration in the config.yml against the jconsole.
-   JMX is case sensitive so make sure the config matches the names listed.
-     
-## Configuring Kafka Start-up scripts ##
+##### 3. Configuring Kafka 
 
    Edit `<Kafka Installation Folder>/bin/kafka-run-class.sh` and modify `KAFKA_JMX_OPTS` variable like below<br>
    
     KAFKA_JMX_OPTS="-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
     
-   Also, the changes to `kafka-run-class.sh` has to be made on all the Kafka servers that you wish to monitor.
-   Please note, that any changes to  `kafka-run-class.sh` needs the Kafka server to be restarted for the changes to 
+   - Also, the changes to `kafka-run-class.sh` has to be made on all the Kafka servers that you wish to monitor.
+   - Please note, that any changes to  `kafka-run-class.sh` needs the Kafka server to be restarted for the changes to 
    take effect. 
 
-## SSL and password authentication ###
+##### 4. Setting up SSL and Password Authentication in Kafka###
 
-  If you need to monitor your Kafka servers securely via SSL, please enable the flags mentioned below.
-  <br/>Edit `<Kafka Installation Folder>/bin/kafka-run-class.sh` and modify `KAFKA_JMX_OPTS` variable like below<br>
+  If you need to monitor your Kafka servers securely via SSL, please follow the following steps:
+   1. Enable the flags mentioned below:
+      <br/>Edit `<Kafka Installation Folder>/bin/kafka-run-class.sh` and modify `KAFKA_JMX_OPTS` variable like below<br>
 
-    KAFKA_JMX_OPTS="-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=true -Djavax.net.ssl.keyStore=/Absolute/path/to/keystore -Djavax.net.ssl.keyStorePassword=password -Dcom.sun.management.jmxremote.registry.ssl=false"
+        `KAFKA_JMX_OPTS="-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=true -Djavax.net.ssl.keyStore=/Absolute/path/to/keystore -Djavax.net.ssl.keyStorePassword=password -Dcom.sun.management.jmxremote.registry.ssl=false"
+        `
     
-  If you also need username/password authentication, please set the flag`-Dcom.sun.management.jmxremote.authenticate=true`
-  in the `KAFKA_JMX_OPTS` variable.
+   2. The extension also needs to be configured to use SSL. In the config.yml of the Kafka Extension, uncomment the `connection` section.
+      </br>             
+         ```
+             connection:
+               socketTimeout: 3000
+               connectTimeout: 1000
+               sslProtocol: "TLSv1.2"
+               sslTrustStorePath: "/path/to/truststore/client/kafka.client.truststore.jks" #defaults to <MA home>conf/cacerts.jks
+               sslTrustStorePassword: "test1234" # defaults to empty
+               sslTrustStoreEncryptedPassword: ""
+         ```
+               
+  3. If you  need username/password authentication, please set the flag<br/>`-Dcom.sun.management.jmxremote.authenticate=true`
+  in the `KAFKA_JMX_OPTS` variable.Please refer to section [here](#passwordsettings) for further steps.
 
-#### Keys ####
+##### Generating SSL Keys  ####
 
 To generate your keystore and truststore please follow the steps:
 Creating a keystore is mandatory for SSL. However, creating a truststore is optional. You can create
@@ -95,26 +96,28 @@ In case you want to use the default JRE trust store, please replace the `kafka.c
  Additional info about creating SSL keys is listed [here](https://docs.confluent.io/current/tutorials/security_tutorial.html#creating-ssl-keys-and-certificates)
 
 
-#### Password Settings ####
-<br/>To know more on how to set the credentials, please see section "Using Password and Access Files" in [this](https://docs.oracle.com/javase/8/docs/technotes/guides/management/agent.html).
+###### <a name = "passwordsettings"></a> Password Settings 
+If you need password authentication, you need to set-up the password in the JVM of the Kafka server 
+To know more on how to set the credentials, please see section `Using Password and Access Files` in [this](https://docs.oracle.com/javase/8/docs/technotes/guides/management/agent.html).
 
-## Configuring the extension using config.yml
+###### Config.yml 
 Configure the Kafka monitoring extension by editing the config.yml file in `<MACHINE_AGENT_HOME>/monitors/KafkaMonitor/
 
-Please copy all the contents of the config.yml file and go to http://www.yamllint.com/ . <br>
-On reaching the website, paste the contents and press the “Go” button on the bottom left.<br>
-If you get a valid output, that means your formatting is correct and you may move on to the next step.
-
-  1. Configure the "tier" under which the metrics need to be reported. This can be done by changing the value of `<TIER ID>` in
-     metricPrefix: "Server|Component:`<TIER ID>`|Custom Metrics|Kafka".Please refer [how to find component ID](https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695)
-
+  1. Configure the "tier" under which the metrics need to be reported. This can be done by changing the value of `<Component-ID>` in
+     <br>`metricPrefix: "Server|Component:<Component-ID>|Custom Metrics|Kafka"`.<br>
+     Please refer 
+     [How to find Component ID](https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695) of your tiers.
+     
      For example,
      ```
      metricPrefix: "Server|Component:19|Custom Metrics|Kafka"
      ```
-  2. Configure the Kafka servers by specifying either Service URL or <host,port(usually 9999)> of all Kafka servers, 
-        username & password (only if authentication enabled),encryptedPassword(only if password encryption required).
-        If you are using SSL to securely monitor your Kafka servers, please set useSsl is true.
+  2. Configure the Kafka servers by specifying <b>either</b> `serviceUrl` or `<host,port>` of all Kafka servers.
+     - Here, `host` is the IP address 
+     of the Kafka server to be monitored, and `port` is the JMX port of the Kafka server.
+     - Please provide `username` & `password` (only if authentication enabled)
+     - `encryptedPassword`(only if password encryption required).
+     - If you are using SSL to securely monitor your Kafka servers, please set `useSsl` as `true`.
      
           For example,
           ```
@@ -156,7 +159,7 @@ If you get a valid output, that means your formatting is correct and you may mov
           
           If number Kafka servers that need to be monitored by one extension is 10, then number of threads is 10
        
-          numberOfThreads: 30
+          numberOfThreads: 10
           
   6. Configure the metrics section.
   
@@ -203,8 +206,12 @@ If you get a valid output, that means your formatting is correct and you may mov
    `objectName: kafka.server:type=ReplicaManager,name=IsrExpandsPerSec`  
    will return only those metrics corresponding to the `IsrExpandsPerSec` object.  
    
-## Metrics Provided ##
-
+ ###### Validating config.yml: 
+ Please copy all the contents of the config.yml file and go to [YamlLint](http://www.yamllint.com/). <br>
+ On reaching the website, paste the contents and press the “Go” button on the bottom left.<br>
+ If you get a valid output, that means your formatting is correct and you may move on to the next step.
+   
+## Metrics
 This extension collects metrics via JMX and can be configured to report any of the metrics that Kafka exposes. It provides metrics on 
 Kafka server, controller and the network. 
 
@@ -219,23 +226,19 @@ For eg.
     java -Dappdynamics.agent.maxMetrics=2500 -jar machineagent.jar
 ```
 
-## Installation ##
-
-1.  Run "mvn clean install" and find the KafkaMonitor.zip file in the "target" folder. You can also download the
-    KafkaMonitor.zip from [AppDynamics Exchange][https://www.appdynamics.com/community/exchange/].
-
-2.  Unzip as "KafkaMonitor" and copy the "KafkaMonitor" directory to `<MACHINE_AGENT_HOME>/monitors`
-    Please place the extension in the "monitors" directory of your Machine Agent installation directory.
-    Do not place the extension in the "extensions" directory of your Machine Agent installation directory.
-
 ## Credentials Encryption
-Please visit [this](https://community.appdynamics.com/t5/Knowledge-Base/How-to-use-Password-Encryption-with-Extensions/ta-p/29397) page to get detailed instructions on password encryption. The steps in this document will guide you through the whole process.
+Please visit [this](https://community.appdynamics.com/t5/Knowledge-Base/How-to-use-Password-Encryption-with-Extensions/ta-p/29397) 
+page to get detailed instructions on password encryption. The steps in this document will guide you through the whole process.
 
 ## Extensions Workbench
-Workbench is an inbuilt feature provided with each extension in order to assist you to fine tune the extension setup before you actually deploy it on the controller. Please review the following [document](https://community.appdynamics.com/t5/Knowledge-Base/How-to-use-the-Extensions-WorkBench/ta-p/30130) for how to use the Extensions WorkBench
+Workbench is an inbuilt feature provided with each extension in order to assist you to fine tune the extension setup 
+before you actually deploy it on the controller. Please review the following 
+[document](https://community.appdynamics.com/t5/Knowledge-Base/How-to-use-the-Extensions-WorkBench/ta-p/30130) for 
+how to use the Extensions WorkBench
 
 ## Troubleshooting
-Please follow the steps listed in the [extensions troubleshooting document](https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695) in order to troubleshoot your issue. These are a set of common issues that customers might have faced during the installation of the extension. If these don't solve your issue, please follow the last step on the troubleshooting-document to contact the support team.
+Please follow the steps listed in the [extensions troubleshooting document](https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695) in order to troubleshoot your issue. 
+These are a set of common issues that customers might have faced during the installation of the extension. If these don't solve your issue, please follow the last step on the troubleshooting-document to contact the support team.
 
 ## Support Tickets
 If after going through the Troubleshooting Document you have not been able to get your extension working, please file a ticket and add the following information.
@@ -259,10 +262,13 @@ For any support related questions, you can also contact help@appdynamics.com.
 Always feel free to fork and contribute any changes directly via [GitHub](https://github.com/Appdynamics/kafka-monitoring-extension).
 
 ## Version
-
-Extension Version: 2.0.0
-<br>Controller Compatibility: 4.0 or Later
-<br>Tested On: Apache Kafka 2.11
-<br>Operating System Tested On:  Mac OS
-<br>Last updated On: Aug 08, 2018
-<br>List of Changes to this extension [Change log](https://github.com/Appdynamics/kafka-monitoring-extension/blob/master/Changelog.md)
+    |______Name___________________|_______Version_____|
+    | Extension Version:          | 2.0.0             |
+    | Controller Compatibility:   | 4.0 or Later      |
+    | Tested On:                  | Apache Kafka 2.11 |
+    | Operating System Tested On: | Mac OS            |
+    | Last updated On:            | Aug 08, 2018      |
+    | List of changes             | [Change log](https://github.com/Appdynamics/kafka-monitoring-extension/blob/master/Changelog.md)
+    | to this extension           |                   |
+    | ____________________________|___________________| 
+ 
