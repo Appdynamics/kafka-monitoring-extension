@@ -11,7 +11,7 @@ Apache Kafka.
 - In order to use this extension, you do need a [Standalone JAVA Machine Agent](https://docs.appdynamics.com/display/PRO44/Standalone+Machine+Agents).
   or [SIM Agent](https://docs.appdynamics.com/display/PRO44/Server+Visibility).For more details on downloading these products, please  visit [Downloads](https://download.appdynamics.com/).<br>
 
-- You also need a [Kafka](#https://kafka.apache.org/quickstart) server installed.
+- You also need a [Kafka](https://kafka.apache.org/quickstart) server installed.
     
 ## Installation ##
 
@@ -21,7 +21,7 @@ Please place the extension in the <b>`monitors`</b> directory of your Machine Ag
 ## Configuration
 
 ##### 1. Configuring ports
-   - According to [Oracle's explanation](#https://bugs.java.com/bugdatabase/view_bug.do?bug_id=8035404),JMX opens 3 
+   - According to [Oracle's explanation](https://bugs.java.com/bugdatabase/view_bug.do?bug_id=8035404),JMX opens 3 
      different ports:one is the JMX connector port (the one in config.yml),one for the RMIRegistry and,
      the third one is an ephemeral port is RMI registry of the local only server.
        
@@ -85,7 +85,7 @@ Please place the extension in the <b>`monitors`</b> directory of your Machine Ag
             # Step #3b: or if you are using Machine Agent truststore 
             keytool -keystore /path/to/MachineAgentHome/conf/cacerts.jks -alias CARoot -import -file ca-cert
                       
-   - Additional info about creating SSL keys is listed [here].(https://docs.confluent.io/current/tutorials/security_tutorial.html#creating-ssl-keys-and-certificates)
+   - Additional info about creating SSL keys is listed [here](https://docs.confluent.io/current/tutorials/security_tutorial.html#creating-ssl-keys-and-certificates).
   
     
    ##### 2. Configuring Kafka for monitoring over SSL  ####
@@ -115,12 +115,10 @@ If you need password authentication, you need to set-up the password in the JVM 
 To know more on how to set the credentials, please see section `Using Password and Access Files` in [this link](https://docs.oracle.com/javase/8/docs/technotes/guides/management/agent.html).
 
 ##### 6. Config.yml 
-Configure the Kafka monitoring extension by editing the config.yml file in `<MACHINE_AGENT_HOME>/monitors/KafkaMonitor/
+Configure the Kafka monitoring extension by editing the config.yml file in `<MACHINE_AGENT_HOME>/monitors/KafkaMonitor/`
 
   1. Configure the "tier" under which the metrics need to be reported. This can be done by changing the value of `<Component-ID>` in
-     <br>`metricPrefix: "Server|Component:<Component-ID>|Custom Metrics|Kafka"`.<br>
-     Please refer 
-     [How to find Component ID](https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695) of your tiers.
+     `metricPrefix: "Server|Component:<Component-ID>|Custom Metrics|Kafka"`.<br/>Please refer this [link](https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695) to find Component-ID of your tiers.
      
      For example,
      ```
@@ -280,4 +278,4 @@ Always feel free to fork and contribute any changes directly via [GitHub](https:
 | Tested On:                  | Apache Kafka 2.11           |
 | Operating System Tested On: | Mac OS                      |
 | Last updated On:            | Aug 21, 2018                |
-| List of changes to this extension| [Change log](#https://github.com/Appdynamics/kafka-monitoring-extension/blob/master/Changelog.md) 
+| List of changes to this extension| [Change log](https://github.com/Appdynamics/kafka-monitoring-extension/blob/master/Changelog.md) 
