@@ -159,7 +159,6 @@ public  class SSLUtilsTest {
         JMXServiceURL serviceUrl = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://127.0.0.1:6789/jmxrmi");
         Map env = new HashMap();
         env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, new SslRMIClientSocketFactory());
-        env.put(RMIConnectorServer.RMI_SERVER_SOCKET_FACTORY_ATTRIBUTE, new SslRMIServerSocketFactory());
         JMXConnector jmxConnector = JMXConnectorFactory.connect(serviceUrl, env);
         Assert.assertNotNull(jmxConnector);
     }

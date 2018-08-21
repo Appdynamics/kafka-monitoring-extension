@@ -30,12 +30,10 @@ import java.util.Map;
 import static com.appdynamics.extensions.kafka.utils.Constants.DEFAULT_METRIC_PREFIX;
 
 public class KafkaMonitor extends ABaseMonitor {
-    private static final Logger logger = LoggerFactory.getLogger(KafkaMonitor.class);
 
     @Override
     protected void onConfigReload(File file) {
-        Map<String, ?> configMap = this.getContextConfiguration()
-                .getConfigYml();
+        Map<String, ?> configMap = this.getContextConfiguration().getConfigYml();
         SslUtils sslUtils = new SslUtils();
         sslUtils.setSslProperties(configMap);
     }

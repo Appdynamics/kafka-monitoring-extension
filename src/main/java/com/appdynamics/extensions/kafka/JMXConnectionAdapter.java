@@ -15,12 +15,10 @@
  */
 package com.appdynamics.extensions.kafka;
 
-
 import com.appdynamics.extensions.kafka.utils.Constants;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.sun.tools.internal.jxc.ap.Const;
 
 import javax.management.*;
 import javax.management.remote.JMXConnector;
@@ -40,14 +38,13 @@ public class JMXConnectionAdapter {
     private final JMXServiceURL serviceUrl;
     private final String username;
     private final String password;
-    private static final Logger logger = LoggerFactory.getLogger(JMXConnectionAdapter.class);
 
     private JMXConnectionAdapter(Map<String, String> requestMap) throws MalformedURLException {
         if(!Strings.isNullOrEmpty(requestMap.get(Constants.SERVICE_URL)))
             this.serviceUrl = new JMXServiceURL(requestMap.get(Constants.SERVICE_URL));
         else
-            this.serviceUrl = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" +
-                    requestMap.get(Constants.HOST) + ":" + requestMap.get(Constants.PORT) + "/jmxrmi");
+            {   this.serviceUrl = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" +
+                    requestMap.get(Constants.HOST) + ":" + requestMap.get(Constants.PORT) + "/jmxrmi");}
         this.username = requestMap.get(Constants.USERNAME);
         this.password = requestMap.get(Constants.PASSWORD);
     }
@@ -60,7 +57,7 @@ public class JMXConnectionAdapter {
         JMXConnector jmxConnector;
         final Map<String, Object> env = new HashMap<>();
 
-        if(Boolean.valueOf(connectionMap.get("useSsl").toString())) {
+        if(Boolean.valueOf(connectionMap.get(Constants.USE_SSL).toString())) {
             SslRMIClientSocketFactory sslRMIClientSocketFactory = new SslRMIClientSocketFactory();
             env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, sslRMIClientSocketFactory);
         }

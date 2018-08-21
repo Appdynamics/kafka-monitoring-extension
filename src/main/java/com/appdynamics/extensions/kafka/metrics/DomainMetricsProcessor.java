@@ -24,6 +24,7 @@ import com.appdynamics.extensions.kafka.utils.Constants;
 import com.appdynamics.extensions.metrics.Metric;
 import com.google.common.base.Strings;
 import org.slf4j.LoggerFactory;
+
 import javax.management.*;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeDataSupport;
@@ -147,5 +148,4 @@ public class DomainMetricsProcessor {
         }
         return sb.toString();
     }
-
 }

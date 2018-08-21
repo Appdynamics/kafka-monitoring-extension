@@ -99,15 +99,15 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
             Map<String, String> requestMap = buildRequestMap();
             jmxAdapter = JMXConnectionAdapter.create(requestMap);
             Map<String, Object> connectionMap =(Map<String, Object>) getConnectionParameters();
-            connectionMap.put("useSsl", this.kafkaServer.get("useSsl") );
-            logger.debug("[useSsl] is set [{}] for server [{}]", connectionMap.get("useSsl"),
+            connectionMap.put(Constants.USE_SSL, this.kafkaServer.get(Constants.USE_SSL) );
+            logger.debug("[useSsl] is set [{}] for server [{}]", connectionMap.get(Constants.USE_SSL),
                     this.kafkaServer.get(Constants.DISPLAY_NAME));
 
-            if(configuration.getConfigYml().containsKey("encryptionKey") &&
-                    !Strings.isNullOrEmpty( configuration.getConfigYml().get("encryptionKey").toString()) ) {
-                connectionMap.put("encryptionKey",configuration.getConfigYml().get("encryptionKey").toString());
+            if(configuration.getConfigYml().containsKey(Constants.ENCRYPTION_KEY) &&
+                    !Strings.isNullOrEmpty( configuration.getConfigYml().get(Constants.ENCRYPTION_KEY).toString()) ) {
+                connectionMap.put(Constants.ENCRYPTION_KEY,configuration.getConfigYml().get(Constants.ENCRYPTION_KEY).toString());
             }
-            else { connectionMap.put("encryptionKey" ,""); }
+            else { connectionMap.put(Constants.ENCRYPTION_KEY ,""); }
             jmxConnector = jmxAdapter.open(connectionMap);
 
             if(jmxConnector != null) {
@@ -153,7 +153,7 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
     }
 
     private Map<String,?> getConnectionParameters(){
-        if(configuration.getConfigYml().containsKey("connection"))
+        if(configuration.getConfigYml().containsKey(Constants.CONNECTION))
         return (Map<String, ?>) configuration.getConfigYml().get(Constants.CONNECTION);
         else
             return new HashMap<>();
