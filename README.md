@@ -76,13 +76,13 @@ Please place the extension in the <b>`monitors`</b> directory of your Machine Ag
             #Step #1
             keytool -keystore kafka.server.keystore.jks -alias localhost -validity 365 -genkey
             
-            Step #2 
+            #Step #2 
             openssl req -new -x509 -keyout ca-key -out ca-cert -days 365
             
             #Step #3a: if you are creating your own truststore 
             keytool -keystore kafka.client.truststore.jks -alias CARoot -import -file ca-cert
             
-            # Step #3b: or if you are using Machine Agent truststore 
+            #Step #3b: or if you are using Machine Agent truststore 
             keytool -keystore /path/to/MachineAgentHome/conf/cacerts.jks -alias CARoot -import -file ca-cert
                       
    - Additional info about creating SSL keys is listed [here](https://docs.confluent.io/current/tutorials/security_tutorial.html#creating-ssl-keys-and-certificates).
@@ -245,7 +245,6 @@ before you actually deploy it on the controller. Please review the following
 how to use the Extensions WorkBench
 
 ## Troubleshooting
-
 Please follow the steps listed in the [extensions troubleshooting document](https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695) in order to troubleshoot your issue. 
 These are a set of common issues that customers might have faced during the installation of the extension. If these don't solve your issue, please follow the last step on the troubleshooting-document to contact the support team.
 

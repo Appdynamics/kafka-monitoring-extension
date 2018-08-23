@@ -95,7 +95,7 @@ public class DomainMetricsProcessor {
                         String key = attribute.getName()+ "."+ str;
                         Object attributeValue = ((CompositeDataSupport) attribute.getValue()).get(str);
                         if(metricProperties.containsKey(key)){
-                            setMetricDetails(metricPrefix, key, attributeValue.toString(), instance,
+                            setMetricDetails(metricPrefix, key, attributeValue, instance,
                                     (Map<String, String>)metricProperties.get(key));
                         }
                     }

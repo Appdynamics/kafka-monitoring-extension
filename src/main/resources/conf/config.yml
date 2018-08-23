@@ -162,7 +162,7 @@ mbeans:
           - Count:
              alias: "Count"
              multiplier: ""
-             delta: false
+             delta: true
              aggregationType: "AVERAGE"
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"

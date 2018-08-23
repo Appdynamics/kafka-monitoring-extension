@@ -22,6 +22,6 @@ connection:
     connectTimeout: 1000
     sslProtocols: "TLSv1.2"
     sslCipherSuites: ""
-    sslTrustStorePath: "/Users/vishaka.sekar/AppDynamics/server/kafka.server.keystore.jks" #if [sslTrustStorePath: ""] empty, it defaults to MA home/conf/cacerts.jks
+    sslTrustStorePath: "src/test/resources/keystore/kafka.server.keystore.jks" #if [sslTrustStorePath: ""] empty, it defaults to MA home/conf/cacerts.jks
     sslTrustStorePassword: "test1234" # [sslTrustStorePassword: ""] defaults to ""
     sslTrustStoreEncryptedPassword: "" #provide encrypted Password if encryption is needed

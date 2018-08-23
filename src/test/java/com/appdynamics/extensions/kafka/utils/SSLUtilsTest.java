@@ -33,12 +33,14 @@ import javax.management.remote.JMXServiceURL;
 import javax.management.remote.rmi.RMIConnectorServer;
 import javax.rmi.ssl.SslRMIClientSocketFactory;
 import javax.rmi.ssl.SslRMIServerSocketFactory;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 public  class SSLUtilsTest {
-//
+
 //    @Before
 //    public void setUpConnectionWithoutSSL(){
 //
@@ -57,13 +59,14 @@ public  class SSLUtilsTest {
 //        Map env = new HashMap();
 //        JMXConnector jmxConnector = JMXConnectorFactory.connect(serviceUrl, env);
 //        Assert.assertNotNull(jmxConnector);
+//
 //    }
 
 //    @Before
 //    public void setUpConnectionWithSslAndCorrectKeys(){
-//        System.setProperty("javax.net.ssl.keyStore", "/Users/vishaka.sekar/AppDynamics/server/kafka.server.keystore.jks");
+//        System.setProperty("javax.net.ssl.keyStore", "src/test/resources/keystore/kafka.server.keystore.jks");
 //        System.setProperty("javax.net.ssl.keyStorePassword", "test1234");
-//        System.setProperty("java.rmi.server.hostname", "10.0.0.106");
+//        System.setProperty("java.rmi.server.hostname", "127.0.0.1");
 //        System.setProperty("com.sun.management.jmxremote.port", "6789");
 //        MonitorContextConfiguration contextConfiguration = new MonitorContextConfiguration
 //                ("Kafka Monitor",
@@ -82,19 +85,19 @@ public  class SSLUtilsTest {
 //              .startRemoteConnectorServer("6789", connectionProperties);
 //    }
 //
-//    @Test()
+//    @Test
 //    public void whenUsingSslAndCorrectKeysThenTestServerConnection() throws Exception {
-//        JMXServiceURL serviceUrl = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://10.0.0.106:6789/jmxrmi");
+//        JMXServiceURL serviceUrl = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://127.0.0.1:6789/jmxrmi");
 //        Map env = new HashMap();
 //        env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, new SslRMIClientSocketFactory());
 //        env.put(RMIConnectorServer.RMI_SERVER_SOCKET_FACTORY_ATTRIBUTE, new SslRMIServerSocketFactory());
 //        JMXConnector jmxConnector = JMXConnectorFactory.connect(serviceUrl, env);
 //        Assert.assertNotNull(jmxConnector);
 //    }
-
+//
 //    @Before
 //    public void setUpConnectionWithIncorrectKeys(){
-//        System.setProperty("javax.net.ssl.keyStore", "/Users/vishaka.sekar/AppDynamics/server/kafka.server.keystore.jks");
+//        System.setProperty("javax.net.ssl.keyStore", "src/test/resources/keystore/kafka.server.keystore.jks");
 //        System.setProperty("javax.net.ssl.keyStorePassword", "test1234");
 //        MonitorContextConfiguration contextConfiguration = new MonitorContextConfiguration
 //                ("Kafka Monitor",
@@ -112,7 +115,7 @@ public  class SSLUtilsTest {
 //    }
 //
 //
-//    @Test()
+//    @Test
 //    public void testSSLServerConnectionWithIncorrectTrustStore() {
 //        int port = 6789;
 //        try {
@@ -131,9 +134,10 @@ public  class SSLUtilsTest {
 //        }
 //    }
 
+
     @Before
     public void setUpConnectionWithSslAndDefaultKeys(){
-        System.setProperty("javax.net.ssl.keyStore", "/Users/vishaka.sekar/AppDynamics/server/kafka.server.keystore.jks");
+        System.setProperty("javax.net.ssl.keyStore", "src/test/resources/keystore/kafka.server.keystore.jks");
         System.setProperty("javax.net.ssl.keyStorePassword", "test1234");
         System.setProperty("java.rmi.server.hostname", "127.0.0.1");
         System.setProperty("com.sun.management.jmxremote.port", "6789");
@@ -154,7 +158,7 @@ public  class SSLUtilsTest {
               .startRemoteConnectorServer("6789", connectionProperties);
     }
 
-    @Test()
+    @Test
     public void whenUsingSslAndCorrectKeysThenTestServerConnection() throws Exception {
         JMXServiceURL serviceUrl = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://127.0.0.1:6789/jmxrmi");
         Map env = new HashMap();
