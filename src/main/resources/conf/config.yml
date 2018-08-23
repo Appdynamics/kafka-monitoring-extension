@@ -2,15 +2,15 @@
 #metricPrefix: "Custom metrics|Kafka"
 
 #The following prefix will populate the metrics under respective tiers
-metricPrefix: "Server|Component:<Tier-ID>|Custom Metrics|Kafka"
+metricPrefix: "Server|Component:<Component-ID>|Custom Metrics|Kafka"
 
-# To know your Tier-ID, Please refer the link
+# To know your Component-ID, Please refer the link
 # https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695
 
 
 # Add your Kafka Instances below
 servers:
-    - serviceUrl: "service:jmx:rmi:///jndi/rmi://10.0.66.179:9999/jmxrmi" #provide jmx service URL [OR] provide [host][port] pair
+    - serviceUrl: "service:jmx:rmi:///jndi/rmi://127.0.0.1:9999/jmxrmi" #provide jmx service URL [OR] provide [host][port] pair
       host: ""
       port: ""
       username: ""
@@ -38,7 +38,7 @@ connection:
     connectTimeout: 1000
     sslProtocols: "TLSv1.2"
     sslCipherSuites: ""
-    sslTrustStorePath: "" #if sslTrustStorePath: "" empty, it defaults to <MachineAgent_Home>/conf/cacerts.jks
+    sslTrustStorePath: "" #if [sslTrustStorePath]: "" empty, it defaults to <MachineAgent_Home>/conf/cacerts.jks
     sslTrustStorePassword: "changeit" # [sslTrustStorePassword: ""] defaults to ""
     sslTrustStoreEncryptedPassword: "" #provide encrypted Password if encryption is needed
 
@@ -60,8 +60,8 @@ mbeans:
              alias: "Count"
              multiplier: ""
              delta: false
-             aggregationType: "AVERAGE"
-             timeRollUpType: "AVERAGE"
+             aggregationType: "OBSERVATION"
+             timeRollUpType: "CURRENT"
              clusterRollUpType: "INDIVIDUAL"
 
           - MeanRate:
@@ -78,8 +78,8 @@ mbeans:
              alias: "Count"
              multiplier: ""
              delta: false
-             aggregationType: "AVERAGE"
-             timeRollUpType: "AVERAGE"
+             aggregationType: "OBSERVATION"
+             timeRollUpType: "CURRENT"
              clusterRollUpType: "INDIVIDUAL"
 
           - MeanRate:
@@ -95,8 +95,8 @@ mbeans:
              alias: "Count"
              multiplier: ""
              delta: false
-             aggregationType: "AVERAGE"
-             timeRollUpType: "AVERAGE"
+             aggregationType: "OBSERVATION"
+             timeRollUpType: "CURRENT"
              clusterRollUpType: "INDIVIDUAL"
 
           - MeanRate:
@@ -112,8 +112,8 @@ mbeans:
              alias: "Count"
              multiplier: ""
              delta: false
-             aggregationType: "AVERAGE"
-             timeRollUpType: "AVERAGE"
+             aggregationType: "OBSERVATION"
+             timeRollUpType: "CURRENT"
              clusterRollUpType: "INDIVIDUAL"
 
           - MeanRate:
@@ -129,8 +129,8 @@ mbeans:
              alias: "Count"
              multiplier: ""
              delta: false
-             aggregationType: "AVERAGE"
-             timeRollUpType: "AVERAGE"
+             aggregationType: "OBSERVATION"
+             timeRollUpType: "CURRENT"
              clusterRollUpType: "INDIVIDUAL"
 
           - MeanRate:
@@ -146,8 +146,8 @@ mbeans:
              alias: "Count"
              multiplier: ""
              delta: false
-             aggregationType: "AVERAGE"
-             timeRollUpType: "AVERAGE"
+             aggregationType: "OBSERVATION"
+             timeRollUpType: "CURRENT"
              clusterRollUpType: "INDIVIDUAL"
 
           - MeanRate:
@@ -162,9 +162,9 @@ mbeans:
           - Count:
              alias: "Count"
              multiplier: ""
-             delta: true
-             aggregationType: "AVERAGE"
-             timeRollUpType: "AVERAGE"
+             delta: false
+             aggregationType: "OBSERVATION"
+             timeRollUpType: "CURRENT"
              clusterRollUpType: "INDIVIDUAL"
 
           - MeanRate:
@@ -180,8 +180,8 @@ mbeans:
              alias: "Value"
              multiplier: ""
              delta: false
-             aggregationType: "AVERAGE"
-             timeRollUpType: "AVERAGE"
+             aggregationType: "OBSERVATION"
+             timeRollUpType: "SUM"
              clusterRollUpType: "INDIVIDUAL"
     - objectName: "kafka.server:type=ReplicaFetcherManager,*"
       metrics:
@@ -189,8 +189,8 @@ mbeans:
              alias: "Value"
              multiplier: ""
              delta: false
-             aggregationType: "AVERAGE"
-             timeRollUpType: "AVERAGE"
+             aggregationType: "OBSERVATION"
+             timeRollUpType: "SUM"
              clusterRollUpType: "INDIVIDUAL"
     - objectName: "kafka.server:type=ReplicaManager,name=LeaderCount"
       metrics:
@@ -198,8 +198,8 @@ mbeans:
              alias: "Value"
              multiplier: ""
              delta: false
-             aggregationType: "AVERAGE"
-             timeRollUpType: "AVERAGE"
+             aggregationType: "OBSERVATION"
+             timeRollUpType: "SUM"
              clusterRollUpType: "INDIVIDUAL"
     - objectName: "kafka.server:type=ReplicaManager,name=PartitionCount"
       metrics:
@@ -207,8 +207,8 @@ mbeans:
              alias: "Value"
              multiplier: ""
              delta: false
-             aggregationType: "AVERAGE"
-             timeRollUpType: "AVERAGE"
+             aggregationType: "OBSERVATION"
+             timeRollUpType: "SUM"
              clusterRollUpType: "INDIVIDUAL"
     - objectName: "kafka.server:type=ReplicaManager,name=UnderReplicatedPartitions"
       metrics:
@@ -216,8 +216,8 @@ mbeans:
              alias: "Value"
              multiplier: ""
              delta: false
-             aggregationType: "AVERAGE"
-             timeRollUpType: "AVERAGE"
+             aggregationType: "OBSERVATION"
+             timeRollUpType: "SUM"
              clusterRollUpType: "INDIVIDUAL"
     - objectName: "kafka.network:type=Processor,*"
       metrics:
@@ -225,8 +225,8 @@ mbeans:
              alias: "Value"
              multiplier: ""
              delta: false
-             aggregationType: "AVERAGE"
-             timeRollUpType: "AVERAGE"
+             aggregationType: "OBSERVATION"
+             timeRollUpType: "SUM"
              clusterRollUpType: "INDIVIDUAL"
     - objectName: "kafka.network:type=RequestChannel,*"
       metrics:
@@ -234,8 +234,8 @@ mbeans:
              alias: "Value"
              multiplier: ""
              delta: false
-             aggregationType: "AVERAGE"
-             timeRollUpType: "AVERAGE"
+             aggregationType: "OBSERVATION"
+             timeRollUpType: "SUM"
              clusterRollUpType: "INDIVIDUAL"
     - objectName: "kafka.network:type=SocketServer,*"
       metrics:
@@ -243,8 +243,8 @@ mbeans:
              alias: "Value"
              multiplier: ""
              delta: false
-             aggregationType: "AVERAGE"
-             timeRollUpType: "AVERAGE"
+             aggregationType: "OBSERVATION"
+             timeRollUpType: "SUM"
              clusterRollUpType: "INDIVIDUAL"
     - objectName: "kafka.server:type=KafkaServer,name=BrokerState"
       metrics:
@@ -252,8 +252,8 @@ mbeans:
              alias: "Value"
              multiplier: ""
              delta: false
-             aggregationType: "AVERAGE"
-             timeRollUpType: "AVERAGE"
+             aggregationType: "OBSERVATION"
+             timeRollUpType: "SUM"
              clusterRollUpType: "INDIVIDUAL"
 
 #JVM Metrics
