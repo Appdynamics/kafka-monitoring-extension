@@ -19,7 +19,6 @@ import com.appdynamics.extensions.kafka.utils.Constants;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
-
 import javax.management.*;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;

@@ -56,14 +56,6 @@ mbeans:
 
     - objectName: "kafka.server:type=BrokerTopicMetrics,*"
       metrics:
-          - Count:
-             alias: "Count"
-             multiplier: ""
-             delta: false
-             aggregationType: "OBSERVATION"
-             timeRollUpType: "CURRENT"
-             clusterRollUpType: "INDIVIDUAL"
-
           - MeanRate:
              alias: "Mean Rate"
              multiplier: ""
@@ -72,15 +64,8 @@ mbeans:
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"
 
-    - objectName: "kafka.server:type=KafkaRequestHandlerPool,*"
+    - objectName: "kafka.server:type=KafkaRequestHandlerPool,name=RequestHandlerAvgIdlePercent"
       metrics:
-          - Count:
-             alias: "Count"
-             multiplier: ""
-             delta: false
-             aggregationType: "OBSERVATION"
-             timeRollUpType: "CURRENT"
-             clusterRollUpType: "INDIVIDUAL"
 
           - MeanRate:
              alias: "Mean Rate"
@@ -91,13 +76,6 @@ mbeans:
              clusterRollUpType: "INDIVIDUAL"
     - objectName: "kafka.server:type=ReplicaManager,name=IsrExpandsPerSec"
       metrics:
-          - Count:
-             alias: "Count"
-             multiplier: ""
-             delta: false
-             aggregationType: "OBSERVATION"
-             timeRollUpType: "CURRENT"
-             clusterRollUpType: "INDIVIDUAL"
 
           - MeanRate:
              alias: "Mean Rate"
@@ -108,13 +86,6 @@ mbeans:
              clusterRollUpType: "INDIVIDUAL"
     - objectName: "kafka.server:type=ReplicaManager,name=IsrShrinksPerSec"
       metrics:
-          - Count:
-             alias: "Count"
-             multiplier: ""
-             delta: false
-             aggregationType: "OBSERVATION"
-             timeRollUpType: "CURRENT"
-             clusterRollUpType: "INDIVIDUAL"
 
           - MeanRate:
              alias: "Mean Rate"
@@ -125,13 +96,6 @@ mbeans:
              clusterRollUpType: "INDIVIDUAL"
     - objectName: "kafka.server:type=SessionExpireListener,*"
       metrics:
-          - Count:
-             alias: "Count"
-             multiplier: ""
-             delta: false
-             aggregationType: "OBSERVATION"
-             timeRollUpType: "CURRENT"
-             clusterRollUpType: "INDIVIDUAL"
 
           - MeanRate:
              alias: "Mean Rate"
@@ -142,13 +106,7 @@ mbeans:
              clusterRollUpType: "INDIVIDUAL"
     - objectName: "kafka.network:type=RequestMetrics,*"
       metrics:
-          - Count:
-             alias: "Count"
-             multiplier: ""
-             delta: false
-             aggregationType: "OBSERVATION"
-             timeRollUpType: "CURRENT"
-             clusterRollUpType: "INDIVIDUAL"
+
 
           - MeanRate:
              alias: "Mean Rate"
@@ -159,13 +117,6 @@ mbeans:
              clusterRollUpType: "INDIVIDUAL"
     - objectName: "kafka.controller:type=ControllerStats,*"
       metrics:
-          - Count:
-             alias: "Count"
-             multiplier: ""
-             delta: false
-             aggregationType: "OBSERVATION"
-             timeRollUpType: "CURRENT"
-             clusterRollUpType: "INDIVIDUAL"
 
           - MeanRate:
              alias: "Mean Rate"
@@ -174,6 +125,7 @@ mbeans:
              aggregationType: "AVERAGE"
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"
+
     - objectName: "kafka.server:type=DelayedOperationPurgatory,*"
       metrics:
           - Value:
@@ -181,7 +133,7 @@ mbeans:
              multiplier: ""
              delta: false
              aggregationType: "OBSERVATION"
-             timeRollUpType: "SUM"
+             timeRollUpType: "CURRENT"
              clusterRollUpType: "INDIVIDUAL"
     - objectName: "kafka.server:type=ReplicaFetcherManager,*"
       metrics:
@@ -190,8 +142,9 @@ mbeans:
              multiplier: ""
              delta: false
              aggregationType: "OBSERVATION"
-             timeRollUpType: "SUM"
+             timeRollUpType: "CURRENT"
              clusterRollUpType: "INDIVIDUAL"
+
     - objectName: "kafka.server:type=ReplicaManager,name=LeaderCount"
       metrics:
           - Value:
@@ -199,7 +152,7 @@ mbeans:
              multiplier: ""
              delta: false
              aggregationType: "OBSERVATION"
-             timeRollUpType: "SUM"
+             timeRollUpType: "CURRENT"
              clusterRollUpType: "INDIVIDUAL"
     - objectName: "kafka.server:type=ReplicaManager,name=PartitionCount"
       metrics:
@@ -208,7 +161,7 @@ mbeans:
              multiplier: ""
              delta: false
              aggregationType: "OBSERVATION"
-             timeRollUpType: "SUM"
+             timeRollUpType: "CURRENT"
              clusterRollUpType: "INDIVIDUAL"
     - objectName: "kafka.server:type=ReplicaManager,name=UnderReplicatedPartitions"
       metrics:
@@ -217,7 +170,7 @@ mbeans:
              multiplier: ""
              delta: false
              aggregationType: "OBSERVATION"
-             timeRollUpType: "SUM"
+             timeRollUpType: "CURRENT"
              clusterRollUpType: "INDIVIDUAL"
     - objectName: "kafka.network:type=Processor,*"
       metrics:
@@ -226,7 +179,7 @@ mbeans:
              multiplier: ""
              delta: false
              aggregationType: "OBSERVATION"
-             timeRollUpType: "SUM"
+             timeRollUpType: "CURRENT"
              clusterRollUpType: "INDIVIDUAL"
     - objectName: "kafka.network:type=RequestChannel,*"
       metrics:
@@ -235,7 +188,7 @@ mbeans:
              multiplier: ""
              delta: false
              aggregationType: "OBSERVATION"
-             timeRollUpType: "SUM"
+             timeRollUpType: "CURRENT"
              clusterRollUpType: "INDIVIDUAL"
     - objectName: "kafka.network:type=SocketServer,*"
       metrics:
@@ -244,7 +197,7 @@ mbeans:
              multiplier: ""
              delta: false
              aggregationType: "OBSERVATION"
-             timeRollUpType: "SUM"
+             timeRollUpType: "CURRENT"
              clusterRollUpType: "INDIVIDUAL"
     - objectName: "kafka.server:type=KafkaServer,name=BrokerState"
       metrics:

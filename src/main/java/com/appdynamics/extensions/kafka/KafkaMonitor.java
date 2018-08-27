@@ -14,6 +14,7 @@ import com.appdynamics.extensions.TasksExecutionServiceProvider;
 import com.appdynamics.extensions.kafka.utils.Constants;
 import com.appdynamics.extensions.kafka.utils.SslUtils;
 import com.appdynamics.extensions.util.AssertUtils;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.Map;
 import static com.appdynamics.extensions.kafka.utils.Constants.DEFAULT_METRIC_PREFIX;
 
 public class KafkaMonitor extends ABaseMonitor {
-
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(KafkaMonitor.class);
     @Override
     protected void onConfigReload(File file) {
         Map<String, ?> configMap = this.getContextConfiguration().getConfigYml();
@@ -54,4 +55,5 @@ public class KafkaMonitor extends ABaseMonitor {
         AssertUtils.assertNotNull(servers, "The 'servers' section in config.yml is not initialised");
         return servers.size();
     }
+
 }

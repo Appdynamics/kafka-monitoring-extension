@@ -1,11 +1,11 @@
 package com.appdynamics.extensions.kafka.utils;
 
 import com.appdynamics.extensions.crypto.Decryptor;
-import com.appdynamics.extensions.util.AssertUtils;
+
 import com.appdynamics.extensions.util.PathResolver;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.singularity.ee.agent.systemagent.api.AManagedMonitor;
-import com.sun.tools.javac.util.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.File;
@@ -27,11 +27,9 @@ public class SslUtils {
 
         if (configMap.containsKey(Constants.CONNECTION)) {
             Map<String, ?> connectionMap = (Map<String, ?>) configMap.get(Constants.CONNECTION);
-
             if (connectionMap.containsKey(Constants.TRUST_STORE_PATH)){
-                Assert.checkNonNull(connectionMap.get(Constants.TRUST_STORE_PATH), "[sslTrustStorePath] cannot be null");
+                Preconditions.checkNotNull(connectionMap.get(Constants.TRUST_STORE_PATH), "[sslTrustStorePath] cannot be null");
                 if(!(connectionMap.get(Constants.TRUST_STORE_PATH).toString()).isEmpty()) {
-
                     String sslTrustStorePath = connectionMap.get(Constants.TRUST_STORE_PATH).toString();
                     File customSslTrustStoreFile = new File(sslTrustStorePath);
                      if (customSslTrustStoreFile == null || !customSslTrustStoreFile.exists()) {
@@ -39,24 +37,19 @@ public class SslUtils {
                      } else {
 
                         logger.debug("Using custom SSL truststore [{}] ", sslTrustStorePath);
-                        logger.debug("Setting SystemProperty [javax.net.ssl.trustStore] ", customSslTrustStoreFile.getAbsolutePath());
+                        logger.debug("Setting SystemProperty [javax.net.ssl.trustStore] {} ", customSslTrustStoreFile.getAbsolutePath());
                         System.setProperty("javax.net.ssl.trustStore", customSslTrustStoreFile.getAbsolutePath());
                     }
                 }
 
                 else if ((connectionMap.get(Constants.TRUST_STORE_PATH).toString()).isEmpty()) {
                     File installDir = PathResolver.resolveDirectory(AManagedMonitor.class);
-                    //while debugging please comment out the above line
-                    //and add
-                    //File installDir = new File("/path/to/machineagent-home");
-                    //for example,
-                    //File installDir = new File("/Users/vishaka.sekar/AppDynamics/machineagent");
                     File defaultTrustStoreFile = PathResolver.getFile("/conf/cacerts.jks", installDir);
                      if (defaultTrustStoreFile == null || !defaultTrustStoreFile.exists()) {
                         logger.debug("The file [{}] doesn't exist", installDir + "/conf/cacerts.jks");
                     } else {
                         logger.debug("Using Machine Agent truststore {}", installDir + "/conf/cacerts.jks");
-                        logger.debug("Setting SystemProperty [javax.net.ssl.trustStore] ",defaultTrustStoreFile.getAbsolutePath());
+                        logger.debug("Setting SystemProperty [javax.net.ssl.trustStore] {}",defaultTrustStoreFile.getAbsolutePath());
                         System.setProperty("javax.net.ssl.trustStore", defaultTrustStoreFile.getAbsolutePath());
                     }
                 }
