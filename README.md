@@ -8,22 +8,22 @@ Apache Kafka.
 ## Prerequisites ##
 - In order to use this extension, you do need a [Standalone JAVA Machine Agent](https://docs.appdynamics.com/display/PRO44/Standalone+Machine+Agents).
 or [SIM Agent](https://docs.appdynamics.com/display/PRO44/Server+Visibility).For more details on downloading these products, please  visit [Downloads](https://download.appdynamics.com/).<br>
-- The extension also needs a `[Kafka](https://kafka.apache.org/quickstart) server installed.
+- The extension also needs a [Kafka](https://kafka.apache.org/quickstart) server installed.
 - The extension needs to be able to connect to Kafka in order to collect and send metrics. 
   To do this, you will have to either establish a remote connection in between the extension and the product, 
   or have an agent on the same machine running the product in order for the extension to collect and send the metrics.
 ## Installation ##
 - To build from source, clone this repository and run 'mvn clean install'. This will produce a KafkaMonitor-VERSION.zip in the target directory Alternatively, download the latest release archive from [GitHub](#https://github.com/Appdynamics/kafka-monitoring-extension)
-- Unzip the file KafkaMonitor-[version].zip into <MACHINE_AGENT_HOME>/monitors/
-- In the newly created directory "KafkaMonitor", edit the config.yml to configure the parameters (See Configuration section below)
+- Unzip the file KafkaMonitor-[version].zip into <b><MACHINE_AGENT_HOME>/monitors/</b>
+- In the newly created directory <b>"KafkaMonitor"</b>, edit the config.yml to configure the parameters (See Configuration section below)
 - Restart the Machine Agent
-- In the AppDynamics Metric Browser, look for: Server|<Tier>|Custom Metrics|Kafka
+- In the AppDynamics Metric Browser, look for: Server|<Tier_ID>|Custom Metrics|Kafka
 ## Configuration
 ##### 1. Configuring ports
--  According to [Oracle's explanation](https://bugs.java.com/bugdatabase/view_bug.do?bug_id=8035404),JMX opens 3 different ports:
-    - One is the JMX connector port(the one in config.yml),
-    - one for the RMIRegistry and,
-    - the third one is an ephemeral port is RMI registry of the local only server.
+-  According to [Oracle's explanation](https://bugs.java.com/bugdatabase/view_bug.do?bug_id=8035404), JMX opens 3 different ports:
+    - One is the JMX connector port(the one in config.yml)
+    - One for the RMIRegistry
+    - The third one is an ephemeral port is RMI registry of the local only server
 -   We can explicitly configure the first two ports in the Kakfa start-up scripts to avoid it picking random ports.
 -  Here port 9999 is used as JMX Connector port  9998 is used as the JMX/RMI port.
 -  The third one, however, is an ephemeral port(that's how JMX works).
@@ -37,14 +37,14 @@ or [SIM Agent](https://docs.appdynamics.com/display/PRO44/Server+Visibility).For
     <br>Edit the Kafka start-up script `<Kafka Installation Folder>/bin/kafka-server-start.sh` to include:<br>
         `export JMX_PORT=${JMX_PORT:-9999}`<br/>
       This configures port 9999 as the JMX port of Kafka.
-  - Please note, that the Kafka server needs to be restarted once the JMX port is added.
+  - Please note that the Kafka server needs to be restarted once the JMX port is added.
 ##### 3. Configuring Kafka for non-SSL monitoring
    This section outlines the configuration of the Kafka start-up scripts if monitoring is <b>not</b> done over SSL.If SSL is being used please skip to [Setting up SSL in Kafka](#sslsettings).
    - To enable monitoring, some flags need to be set in the Kafka start-up scripts.
    Edit `<Kafka Installation Folder>/bin/kafka-run-class.sh` and modify `KAFKA_JMX_OPTS` variable like below<br>
      `KAFKA_JMX_OPTS="-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.rmi.port=9998 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"` 
    - Also, the changes to `kafka-run-class.sh` has to be made on all the Kafka servers that are being monitored.
-   - Please note, that any changes to  `kafka-run-class.sh` needs the Kafka server to be restarted for the changes to take effect.
+   - Please note that any changes to  `kafka-run-class.sh` needs the Kafka server to be restarted for the changes to take effect.
 ##### <a name="sslsettings">4. Monitoring over SSL </a>
   If you need to monitor your Kafka servers securely via SSL, please follow the following steps:
 ##### 4.1. Generating SSL Keys
