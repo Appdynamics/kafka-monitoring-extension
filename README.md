@@ -214,5 +214,5 @@ Always feel free to fork and contribute any changes directly via [GitHub](https:
 | Controller Compatibility:   | 4.0 or Later                |
 | Tested On:                  | Apache Kafka 2.11           |
 | Operating System Tested On: | Mac OS                      |
-| Last updated On:            | Aug 21, 2018                |
+| Last updated On:            | Aug 27, 2018                |
 | List of changes to this extension| [Change log](https://github.com/Appdynamics/kafka-monitoring-extension/blob/master/Changelog.md) 
