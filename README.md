@@ -17,8 +17,7 @@ or [SIM Agent](https://docs.appdynamics.com/display/PRO44/Server+Visibility).For
 - Unzip the file KafkaMonitor-\[version\].zip into <b><MACHINE_AGENT_HOME>/monitors/</b>
 - In the newly created directory <b>"KafkaMonitor"</b>, edit the config.yml to configure the parameters (See Configuration section below)
 - Restart the Machine Agent
-- In the AppDynamics Metric Browser, look for: Server|\<Tier\>|Custom Metrics|Kafka
-## Configuration
+- In the AppDynamics Metric Browser, look for: In the AppDynamics Metric Browser, look for: Application Infrastructure Performance|\<Tier\>|Custom Metrics|Log Monitor. If SIM is enabled, look for the metric browser under the Servers tab.
 ##### 1. Configuring ports
 -  According to [Oracle's explanation](https://bugs.java.com/bugdatabase/view_bug.do?bug_id=8035404), JMX opens 3 different ports:
     - One is the JMX connector port(the one in config.yml)
