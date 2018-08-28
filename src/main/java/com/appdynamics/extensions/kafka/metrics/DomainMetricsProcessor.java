@@ -1,141 +1,150 @@
-/*
- * Copyright 2018. AppDynamics LLC and its affiliates.
- * All Rights Reserved.
- * This is unpublished proprietary source code of AppDynamics LLC and its affiliates.
- * The copyright notice above does not evidence any actual or intended publication of such source code.
+/**
+ * Copyright 2018 AppDynamics, Inc.
  *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.appdynamics.extensions.kafka.metrics;
 
-import static com.appdynamics.extensions.kafka.ConfigConstants.EXCLUDE;
-import static com.appdynamics.extensions.kafka.ConfigConstants.INCLUDE;
-import static com.appdynamics.extensions.kafka.ConfigConstants.METRICS;
-import static com.appdynamics.extensions.kafka.Util.convertToString;
 
+import com.appdynamics.extensions.MetricWriteHelper;
+import com.appdynamics.extensions.conf.MonitorContextConfiguration;
 import com.appdynamics.extensions.kafka.JMXConnectionAdapter;
-import com.appdynamics.extensions.kafka.filters.ExcludeFilter;
-import com.appdynamics.extensions.kafka.filters.IncludeFilter;
+import com.appdynamics.extensions.kafka.utils.Constants;
+import com.appdynamics.extensions.metrics.Metric;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import org.slf4j.LoggerFactory;
 
-import javax.management.Attribute;
-import javax.management.InstanceNotFoundException;
-import javax.management.IntrospectionException;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectInstance;
-import javax.management.ObjectName;
-import javax.management.ReflectionException;
+import javax.management.*;
+import javax.management.openmbean.CompositeData;
+import javax.management.openmbean.CompositeDataSupport;
 import javax.management.remote.JMXConnector;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import java.util.*;
 
 public class DomainMetricsProcessor {
 
     static final org.slf4j.Logger logger = LoggerFactory.getLogger(DomainMetricsProcessor.class);
-
     private final JMXConnectionAdapter jmxAdapter;
     private final JMXConnector jmxConnection;
+    private MetricWriteHelper metricWriteHelper;
+    private String metricPrefix;
+    private String displayName;
+    private List<Metric> nodeMetrics = new ArrayList<>();
 
-
-    private final MetricValueTransformer valueConverter = new MetricValueTransformer();
-
-    public DomainMetricsProcessor(JMXConnectionAdapter jmxAdapter, JMXConnector jmxConnection) {
+    public DomainMetricsProcessor(MonitorContextConfiguration configuration, JMXConnectionAdapter jmxAdapter,
+                                  JMXConnector jmxConnection, String displayName, MetricWriteHelper metricWriteHelper) {
         this.jmxAdapter = jmxAdapter;
         this.jmxConnection = jmxConnection;
+        this.metricWriteHelper = metricWriteHelper;
+        this.metricPrefix = configuration.getMetricPrefix() + Constants.METRIC_SEPARATOR + displayName;
+        this.displayName = displayName;
     }
 
-    public List<Metric> getNodeMetrics(String objectName, Map aConfigMBean, Map<String, MetricProperties> metricPropsMap) throws IntrospectionException, ReflectionException, InstanceNotFoundException, IOException, MalformedObjectNameException {
-        List<Metric> nodeMetrics = Lists.newArrayList();
-        String configObjectName = convertToString(objectName, "");
-        Set<ObjectInstance> objectInstances = jmxAdapter.queryMBeans(jmxConnection, ObjectName.getInstance(configObjectName));
+    public void populateMetricsForMBean(Map mbeanFromConfig) {
+        try {
+                String objectName = (String) mbeanFromConfig.get(Constants.OBJECTNAME);
+                List<Map<String, ?>> metricsList = (List<Map<String, ?>>) mbeanFromConfig.get(Constants.METRICS);
+                logger.debug("Processing mbean {} ", objectName);
+                List<Metric> finalMetricList = getNodeMetrics(jmxConnection, objectName, metricsList);
+                logger.debug("Printing metrics for server {}", this.displayName);
+                metricWriteHelper.transformAndPrintMetrics(finalMetricList);
+                logger.debug("Finished processing mbean {} ", objectName);
+            } catch (IntrospectionException | IOException | MalformedObjectNameException
+                | InstanceNotFoundException | ReflectionException e) {
+            logger.error("Kafka Monitor error " ,e);
+            }
+    }
+
+    private List<Metric> getNodeMetrics (JMXConnector jmxConnection, String objectName,
+                                        List<Map<String, ?>> metricProperties)
+            throws IntrospectionException, ReflectionException, InstanceNotFoundException,
+            IOException, MalformedObjectNameException {
+
+        Set<ObjectInstance> objectInstances = this.jmxAdapter.queryMBeans(jmxConnection,
+                ObjectName.getInstance(objectName));
         for (ObjectInstance instance : objectInstances) {
-            List<String> metricNamesDictionary = jmxAdapter.getReadableAttributeNames(jmxConnection, instance);
-            List<String> metricNamesToBeExtracted = applyFilters(aConfigMBean, metricNamesDictionary);
-            List<Attribute> attributes = jmxAdapter.getAttributes(jmxConnection, instance.getObjectName(), metricNamesToBeExtracted.toArray(new String[metricNamesToBeExtracted.size()]));
-            collect(nodeMetrics, attributes, instance, metricPropsMap);
+            List<String> metricNamesDictionary = this.jmxAdapter.getReadableAttributeNames(jmxConnection, instance);
+            List<Attribute> attributes =this.jmxAdapter.getAttributes(jmxConnection,
+                    instance.getObjectName(), metricNamesDictionary.toArray(
+                            new String[metricNamesDictionary.size()]));
+            for(Map<String, ?> metricPropertiesPerMetric : metricProperties) {
+                collect(attributes, instance, metricPropertiesPerMetric);
+            }
         }
         return nodeMetrics;
     }
 
-    private List<String> applyFilters(Map aConfigMBean, List<String> metricNamesDictionary) throws IntrospectionException, ReflectionException, InstanceNotFoundException, IOException {
-        Set<String> filteredSet = Sets.newHashSet();
-        Map configMetrics = (Map) aConfigMBean.get(METRICS);
-        List includeDictionary = (List) configMetrics.get(INCLUDE);
-        List excludeDictionary = (List) configMetrics.get(EXCLUDE);
-        new ExcludeFilter(excludeDictionary).apply(filteredSet, metricNamesDictionary);
-        new IncludeFilter(includeDictionary).apply(filteredSet, metricNamesDictionary);
-        return Lists.newArrayList(filteredSet);
-    }
-
-    private void collect(List<Metric> nodeMetrics, List<Attribute> attributes, ObjectInstance instance, Map<String, MetricProperties> metricPropsPerMetricName) {
-        for (Attribute attr : attributes) {
+    private void collect (List<Attribute> attributes, ObjectInstance instance,
+                         Map<String, ?> metricProperties) {
+        for (Attribute attribute : attributes) {
             try {
-                String attrName = attr.getName();
-                MetricProperties props = metricPropsPerMetricName.get(attrName);
-                if (props == null) {
-                    logger.error("Could not find metric props for {}", attrName);
-                    continue;
+                if(isCompositeDataObject(attribute)){
+                    Set<String> attributesFound = ((CompositeData)attribute.getValue()).getCompositeType().keySet();
+                    for(String str: attributesFound){
+                        String key = attribute.getName()+ "."+ str;
+                        Object attributeValue = ((CompositeDataSupport) attribute.getValue()).get(str);
+                        if(metricProperties.containsKey(key)){
+                            setMetricDetails(metricPrefix, key, attributeValue, instance,
+                                    (Map<String, String>)metricProperties.get(key));
+                        }
+                    }
                 }
-                //get metric value by applying conversions if necessary
-
-
-                BigDecimal metricValue = valueConverter.transform(attrName, attr.getValue(), props);
-                if (metricValue != null) {
-
-                    Metric nodeMetric = new Metric();
-                    nodeMetric.setMetricName(attrName);
-                    String metricName = nodeMetric.getMetricNameOrAlias();
-                    nodeMetric.setProperties(props);
-
-                    String path = buildName(instance);
-
-                    nodeMetric.setMetricKey(path + metricName);
-                    nodeMetric.setMetricValue(metricValue);
-                    nodeMetrics.add(nodeMetric);
+                else{
+                    if(metricProperties.containsKey(attribute.getName())) {
+                        setMetricDetails(metricPrefix, attribute.getName(), attribute.getValue(), instance,
+                                (Map<String, String>)metricProperties.get(attribute.getName()));
+                    }
                 }
             } catch (Exception e) {
-                logger.error("Error collecting value for {} {}", instance.getObjectName(), attr.getName(), e);
+                logger.error("Error collecting value for {} {}", instance.getObjectName(), attribute.getName(), e);
             }
         }
     }
 
-    private String buildName(ObjectInstance instance) {
+    private boolean isCompositeDataObject (Attribute attribute){
+        return attribute.getValue().getClass().equals(CompositeDataSupport.class);
+    }
 
+    private void setMetricDetails (String metricPrefix, String attributeName, Object attributeValue,
+                                   ObjectInstance instance, Map<String, ?> metricPropertiesMap
+                                   ) {
+        String metricPath = metricPrefix + Constants.METRIC_SEPARATOR + buildName(instance)+ attributeName;
+        Metric metric = new Metric(attributeName,  attributeValue.toString(), metricPath, metricPropertiesMap);
+        nodeMetrics.add(metric);
+    }
+
+    private String buildName (ObjectInstance instance) {
         ObjectName objectName = instance.getObjectName();
         Hashtable<String, String> keyPropertyList = objectName.getKeyPropertyList();
-
         StringBuilder sb = new StringBuilder();
-
-        sb.append(objectName.getDomain());
-
         String type = keyPropertyList.get("type");
         String name = keyPropertyList.get("name");
-
+        sb.append(objectName.getDomain());
         if(!Strings.isNullOrEmpty(type)) {
-            sb.append("|");
+            sb.append(Constants.METRIC_SEPARATOR);
             sb.append(type);
         }
-
         if(!Strings.isNullOrEmpty(name)) {
-            sb.append("|");
+            sb.append(Constants.METRIC_SEPARATOR);
             sb.append(name);
         }
-
-        sb.append("|");
-
+        sb.append(Constants.METRIC_SEPARATOR);
         keyPropertyList.remove("type");
         keyPropertyList.remove("name");
-
         for (Map.Entry<String, String> entry : keyPropertyList.entrySet()) {
-            sb.append(entry.getKey()).append("|").append(entry.getValue()).append("|");
+            sb.append(entry.getKey()).append(Constants.METRIC_SEPARATOR).append(entry.getValue())
+                    .append(Constants.METRIC_SEPARATOR);
         }
         return sb.toString();
     }

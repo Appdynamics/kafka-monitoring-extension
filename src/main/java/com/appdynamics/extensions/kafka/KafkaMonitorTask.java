@@ -1,154 +1,162 @@
-/*
- * Copyright 2018. AppDynamics LLC and its affiliates.
- * All Rights Reserved.
- * This is unpublished proprietary source code of AppDynamics LLC and its affiliates.
- * The copyright notice above does not evidence any actual or intended publication of such source code.
+/**
+ * Copyright 2018 AppDynamics, Inc.
  *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.appdynamics.extensions.kafka;
 
-import static com.appdynamics.extensions.kafka.ConfigConstants.DISPLAY_NAME;
-import static com.appdynamics.extensions.kafka.Util.convertToString;
-
+import com.appdynamics.extensions.AMonitorTaskRunnable;
+import com.appdynamics.extensions.MetricWriteHelper;
+import com.appdynamics.extensions.TaskInputArgs;
+import com.appdynamics.extensions.TasksExecutionServiceProvider;
+import com.appdynamics.extensions.conf.MonitorContextConfiguration;
+import com.appdynamics.extensions.crypto.CryptoUtil;
 import com.appdynamics.extensions.kafka.metrics.DomainMetricsProcessor;
-import com.appdynamics.extensions.kafka.metrics.Metric;
-import com.appdynamics.extensions.kafka.metrics.MetricPrinter;
-import com.appdynamics.extensions.kafka.metrics.MetricProperties;
-import com.appdynamics.extensions.kafka.metrics.MetricPropertiesBuilder;
-import com.appdynamics.extensions.util.MetricWriteHelper;
-import com.singularity.ee.agent.systemagent.api.MetricWriter;
-import org.apache.log4j.Logger;
+import com.appdynamics.extensions.kafka.utils.Constants;
+import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
+import org.slf4j.LoggerFactory;
 
-import javax.management.MalformedObjectNameException;
 import javax.management.remote.JMXConnector;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Satish Muddam
- */
-public class KafkaMonitorTask implements Runnable {
-    private static final Logger logger = Logger.getLogger(KafkaMonitorTask.class);
-    private static final String METRICS_COLLECTION_SUCCESSFUL = "Metrics Collection Successful";
-    private static final BigDecimal ERROR_VALUE = BigDecimal.ZERO;
-    private static final BigDecimal SUCCESS_VALUE = BigDecimal.ONE;
-
-
+public class KafkaMonitorTask implements AMonitorTaskRunnable {
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(KafkaMonitorTask.class);
+    private MonitorContextConfiguration configuration;
+    private Map<String, String> kafkaServer;
+    private MetricWriteHelper metricWriteHelper;
     private String displayName;
-    /* metric prefix from the config.yaml to be applied to each metric path*/
-    private String metricPrefix;
-
-    /* server properties */
-    private Map server;
-
-    /* a facade to report metrics to the machine agent.*/
-    private MetricWriteHelper metricWriter;
-
-    /* a stateless JMX adapter that abstracts out all JMX methods.*/
     private JMXConnectionAdapter jmxAdapter;
+    private JMXConnector jmxConnector;
 
-    /* config mbeans from config.yaml. */
-    private List<Map> configMBeans;
+    KafkaMonitorTask(TasksExecutionServiceProvider serviceProvider, MonitorContextConfiguration configuration,
+                     Map kafkaServer) {
+        this.configuration = configuration;
+        this.kafkaServer = kafkaServer;
+        this.metricWriteHelper = serviceProvider.getMetricWriteHelper();
+        this.displayName = (String) kafkaServer.get(Constants.DISPLAY_NAME);
+    }
+
+    public void onTaskComplete() {
+        logger.info("All tasks for server {} finished", this.kafkaServer.get(Constants.DISPLAY_NAME));
+    }
 
     public void run() {
-        displayName = convertToString(server.get(DISPLAY_NAME), "");
-        long startTime = System.currentTimeMillis();
-        MetricPrinter metricPrinter = new MetricPrinter(metricPrefix, displayName, metricWriter);
-        try {
-            logger.debug(String.format("Kafka monitor thread for server {} started.", displayName));
-            BigDecimal status = extractAndReportMetrics(metricPrinter);
-            metricPrinter.printMetric(metricPrinter.formMetricPath(METRICS_COLLECTION_SUCCESSFUL), status
-                    , MetricWriter.METRIC_AGGREGATION_TYPE_OBSERVATION, MetricWriter.METRIC_TIME_ROLLUP_TYPE_CURRENT, MetricWriter.METRIC_CLUSTER_ROLLUP_TYPE_INDIVIDUAL);
-        } catch (Exception e) {
-            logger.error(String.format("Error in Kafka Monitor thread for server {}", displayName), e);
-            metricPrinter.printMetric(metricPrinter.formMetricPath(METRICS_COLLECTION_SUCCESSFUL), ERROR_VALUE
-                    , MetricWriter.METRIC_AGGREGATION_TYPE_OBSERVATION, MetricWriter.METRIC_TIME_ROLLUP_TYPE_CURRENT, MetricWriter.METRIC_CLUSTER_ROLLUP_TYPE_INDIVIDUAL);
-
-        } finally {
-            long endTime = System.currentTimeMillis() - startTime;
-            logger.debug(String.format("Kafka monitor thread for server {%s} ended. Time taken = {%s} and Total metrics reported = {%d}", displayName, endTime, metricPrinter.getTotalMetricsReported()));
-        }
+         try {
+                 populateAndPrintMetrics();
+                 logger.info("Completed Kafka Monitoring task for Kafka server: {}",
+                         this.kafkaServer.get(Constants.DISPLAY_NAME));
+         }catch(Exception e ) {
+             logger.error("Exception occurred while collecting metrics for: {} {}",
+                     this.kafkaServer.get(Constants.DISPLAY_NAME));
+         }
     }
 
-    private BigDecimal extractAndReportMetrics(final MetricPrinter metricPrinter) throws Exception {
-        JMXConnector jmxConnection = null;
-        try {
-            jmxConnection = jmxAdapter.open();
-            logger.debug("JMX Connection is open");
-            MetricPropertiesBuilder propertyBuilder = new MetricPropertiesBuilder();
-            for (Map aConfigMBean : configMBeans) {
-
-                List<String> mbeanNames = (List<String>) aConfigMBean.get("mbeanFullPath");
-
-                for (String mbeanFullName : mbeanNames) {
-
-                    String configObjectName = convertToString(mbeanFullName, "");
-                    logger.debug(String.format("Processing mbean %s from the config file", mbeanFullName));
-                    try {
-                        Map<String, MetricProperties> metricPropsMap = propertyBuilder.build(aConfigMBean);
-                        DomainMetricsProcessor nodeProcessor = new DomainMetricsProcessor(jmxAdapter, jmxConnection);
-                        List<Metric> nodeMetrics = nodeProcessor.getNodeMetrics(mbeanFullName, aConfigMBean, metricPropsMap);
-                        if (nodeMetrics.size() > 0) {
-                            metricPrinter.reportNodeMetrics(nodeMetrics);
-                        }
-
-                    } catch (MalformedObjectNameException e) {
-                        logger.error("Illegal object name {}" + configObjectName, e);
-                        throw e;
-                    } catch (Exception e) {
-                        //System.out.print("" + e);
-                        logger.error(String.format("Error fetching JMX metrics for {%s} and mbean={%s}", displayName, configObjectName), e);
-                        throw e;
-                    }
-                }
+    public void populateAndPrintMetrics() {
+        try{
+            BigDecimal connectionStatus = openJMXConnection();
+            List<Map<String, ?>> mbeansFromConfig = (List<Map<String, ?>>) configuration.getConfigYml()
+                    .get(Constants.MBEANS);
+            DomainMetricsProcessor domainMetricsProcessor = new DomainMetricsProcessor(configuration, jmxAdapter,
+                        jmxConnector,displayName, metricWriteHelper);
+            for (Map mbeanFromConfig : mbeansFromConfig) {
+                domainMetricsProcessor.populateMetricsForMBean(mbeanFromConfig);
             }
+            metricWriteHelper.printMetric(this.configuration.getMetricPrefix() +
+                            Constants.METRIC_SEPARATOR + this.displayName + Constants.METRIC_SEPARATOR+ "kafka.server" +
+                            Constants.METRIC_SEPARATOR+"HeartBeat",
+                            connectionStatus.toString(),
+                            Constants.AVERAGE, Constants.AVERAGE, Constants.INDIVIDUAL);
+        } catch (Exception e) {
+            logger.error("Error while opening JMX connection: {}  {}" ,this.kafkaServer.get(Constants.DISPLAY_NAME), e);
         } finally {
             try {
-                jmxAdapter.close(jmxConnection);
+                jmxAdapter.close(jmxConnector);
                 logger.debug("JMX connection is closed");
-            } catch (IOException ioe) {
-                logger.error("Unable to close the connection.");
-                return ERROR_VALUE;
+            } catch (Exception ioe) {
+                logger.error("Unable to close the connection: {} ", ioe);
             }
         }
-        return SUCCESS_VALUE;
     }
 
+    private BigDecimal openJMXConnection() {
+        try {
+            Map<String, String> requestMap = buildRequestMap();
+            jmxAdapter = JMXConnectionAdapter.create(requestMap);
+            Map<String, Object> connectionMap =(Map<String, Object>) getConnectionParameters();
+            connectionMap.put(Constants.USE_SSL, this.kafkaServer.get(Constants.USE_SSL) );
+            logger.debug("[useSsl] is set [{}] for server [{}]", connectionMap.get(Constants.USE_SSL),
+                    this.kafkaServer.get(Constants.DISPLAY_NAME));
 
-    static class Builder {
-        private KafkaMonitorTask task = new KafkaMonitorTask();
+            if(configuration.getConfigYml().containsKey(Constants.ENCRYPTION_KEY) &&
+                    !Strings.isNullOrEmpty( configuration.getConfigYml().get(Constants.ENCRYPTION_KEY).toString()) ) {
+                connectionMap.put(Constants.ENCRYPTION_KEY,configuration.getConfigYml().get(Constants.ENCRYPTION_KEY).toString());
+            }
+            else { connectionMap.put(Constants.ENCRYPTION_KEY ,""); }
+            jmxConnector = jmxAdapter.open(connectionMap);
 
-        Builder metricPrefix(String metricPrefix) {
-            task.metricPrefix = metricPrefix;
-            return this;
+            if(jmxConnector != null) {
+                logger.debug("JMX Connection is open to Kafka server: {}", this.kafkaServer.get(Constants.DISPLAY_NAME));
+                return BigDecimal.ONE;
+            }
+            return BigDecimal.ZERO;
+        } catch (IOException ioe) {
+            logger.error("Unable to open a JMX Connection Kafka server: {} {} "
+                    , this.kafkaServer.get(Constants.DISPLAY_NAME), ioe);
         }
-
-        Builder metricWriter(MetricWriteHelper metricWriter) {
-            task.metricWriter = metricWriter;
-            return this;
-        }
-
-        Builder server(Map server) {
-            task.server = server;
-            return this;
-        }
-
-        Builder jmxConnectionAdapter(JMXConnectionAdapter adapter) {
-            task.jmxAdapter = adapter;
-            return this;
-        }
-
-        Builder mbeans(List<Map> mBeans) {
-            task.configMBeans = mBeans;
-            return this;
-        }
-
-        KafkaMonitorTask build() {
-            return task;
-        }
+        return null;
     }
+
+    private Map<String, String> buildRequestMap() {
+        Map<String, String> requestMap = new HashMap<>();
+        requestMap.put(Constants.HOST, this.kafkaServer.get(Constants.HOST));
+        requestMap.put(Constants.PORT, this.kafkaServer.get(Constants.PORT));
+        requestMap.put(Constants.DISPLAY_NAME, this.kafkaServer.get(Constants.DISPLAY_NAME));
+        requestMap.put(Constants.SERVICE_URL, this.kafkaServer.get(Constants.SERVICE_URL));
+        requestMap.put(Constants.USERNAME, this.kafkaServer.get(Constants.USERNAME));
+        requestMap.put(Constants.PASSWORD, getPassword());
+        return requestMap;
+    }
+
+    private String getPassword() {
+        String password = this.kafkaServer.get(Constants.PASSWORD);
+        Map<String, ?> configMap =  configuration.getConfigYml();
+
+        if (!Strings.isNullOrEmpty(password)) { return password; }
+        if(configMap.containsKey(Constants.ENCRYPTION_KEY)) {
+            String encryptionKey = configMap.get(Constants.ENCRYPTION_KEY).toString();
+            String encryptedPassword = this.kafkaServer.get(Constants.ENCRYPTED_PASSWORD);
+
+            if (!Strings.isNullOrEmpty(encryptionKey) && !Strings.isNullOrEmpty(encryptedPassword)) {
+                java.util.Map<String, String> cryptoMap = Maps.newHashMap();
+                cryptoMap.put(TaskInputArgs.ENCRYPTED_PASSWORD, encryptedPassword);
+                cryptoMap.put(TaskInputArgs.ENCRYPTION_KEY, encryptionKey);
+                return CryptoUtil.getPassword(cryptoMap);
+            }
+        }
+        return "";
+    }
+
+    private Map<String,?> getConnectionParameters(){
+        if(configuration.getConfigYml().containsKey(Constants.CONNECTION))
+        return (Map<String, ?>) configuration.getConfigYml().get(Constants.CONNECTION);
+        else
+            return new HashMap<>();
+    }
+
 }
-
