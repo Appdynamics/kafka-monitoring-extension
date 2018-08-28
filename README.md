@@ -150,6 +150,7 @@ Configure the Kafka monitoring extension by editing the config.yml file in `<MAC
        | multiplier        | 1               | Any number                      | Value with which the metric needs to be multiplied.                                                            |
        | convert           | null            | Any key value map               | Set of key value pairs that indicates the value to which the metrics need to be transformed. eg: UP:0, DOWN:1  |
        | delta             | false           | true, false                     | If enabled, gives the delta values of metrics instead of actual values.                                        |
+
      For example,
      `objectName:  "kafka.server:type=BrokerTopicMetrics, * ` will fetch metrics of all objects nested under `BrokerTopicMetrics`.
 
