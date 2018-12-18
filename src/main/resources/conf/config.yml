@@ -1,7 +1,7 @@
-#This will populate the metrics in all the tiers, under this path(not recommended)
+#If SIM is enabled, use this
 #metricPrefix: 'Custom metrics|Kafka'
 
-#The following prefix will populate the metrics under respective tiers
+#If SIM is not enabled, then use this
 metricPrefix: 'Server|Component:<Component-ID>|Custom Metrics|Kafka'
 
 # To know your Component-ID, Please refer the link
@@ -36,7 +36,7 @@ connection:
   sslProtocols: 'TLSv1.2'
   sslCipherSuites: ''
   sslTrustStorePath: '' #if [sslTrustStorePath]: "" empty, it defaults to <MachineAgent_Home>/conf/cacerts.jks
-  sslTrustStorePassword: 'changeit' # [sslTrustStorePassword: ""] defaults to ""
+  sslTrustStorePassword: '' # [sslTrustStorePassword: ""] defaults to ""
   sslTrustStoreEncryptedPassword: '' #provide encrypted Password if encryption is needed
 
 # Each Kafka server needs 1 thread each, so please configure this according to the number of servers you are monitoring
@@ -170,7 +170,7 @@ mbeans:
           timeRollUpType: 'AVERAGE'
           clusterRollUpType: 'INDIVIDUAL'
 
-  #    Average fraction of time the request handler threads are idle. Values are between 0 (all resources are used) and 1 (all resources are available)
+#      Average fraction of time the request handler threads are idle. Values are between 0 (all resources are used) and 1 (all resources are available)
   - objectName: 'kafka.server:type=KafkaRequestHandlerPool,name=RequestHandlerAvgIdlePercent'
     metrics:
       - OneMinuteRate:
@@ -181,18 +181,18 @@ mbeans:
           timeRollUpType: 'AVERAGE'
           clusterRollUpType: 'INDIVIDUAL'
 
-  #     Average fraction of time the network processor threads are idle. Values are between 0 (all resources are used) and 1 (all resources are available)
+#  #     Average fraction of time the network processor threads are idle. Values are between 0 (all resources are used) and 1 (all resources are available)
   - objectName: 'kafka.network:type=SocketServer,name=NetworkProcessorAvgIdlePercent'
     metrics:
       - Value:
           alias: 'Value'
-          multiplier: ''
+          multiplier: '100'
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
           clusterRollUpType: 'INDIVIDUAL'
 
-  # Size of the request queue. A congested request queue will not be able to process incoming or outgoing requests
+#  # Size of the request queue. A congested request queue will not be able to process incoming or outgoing requests
   - objectName: 'kafka.network:type=RequestChannel,name=RequestQueueSize'
     metrics:
       - Value:
@@ -215,7 +215,7 @@ mbeans:
           clusterRollUpType: 'INDIVIDUAL'
 
   # Metric Per Topic
-  - objectName: 'kafka.server:type=BrokerTopicMetrics,name=*,topic=*david*'
+  - objectName: 'kafka.server:type=BrokerTopicMetrics,name=*,topic=*'
     metrics:
       - OneMinuteRate:
           alias: 'OneMinuteRate'

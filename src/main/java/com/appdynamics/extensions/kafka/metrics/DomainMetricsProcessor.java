@@ -40,7 +40,7 @@ public class DomainMetricsProcessor {
     private MetricWriteHelper metricWriteHelper;
     private String metricPrefix;
     private String displayName;
-    private List<Metric> nodeMetrics = new ArrayList<>();
+    private List<Metric> nodeMetrics ;
 
     public DomainMetricsProcessor(MonitorContextConfiguration configuration, JMXConnectionAdapter jmxAdapter,
                                   JMXConnector jmxConnection, String displayName, MetricWriteHelper metricWriteHelper) {
@@ -119,6 +119,9 @@ public class DomainMetricsProcessor {
     private void setMetricDetails (String metricPrefix, String attributeName, Object attributeValue,
                                    ObjectInstance instance, Map<String, ?> metricPropertiesMap
                                    ) {
+        nodeMetrics = new ArrayList<>(); //Code Fix: initializing nodeMetrixsList here,
+        // Reason: otherwise when new metrics are added, the transformAndPrint gets called for the entire list
+        //so multiply is being done multiple times(which is wrong, leads to exponential values)
         String metricPath = metricPrefix + Constants.METRIC_SEPARATOR + buildName(instance)+ attributeName;
         Metric metric = new Metric(attributeName,  attributeValue.toString(), metricPath, metricPropertiesMap);
         nodeMetrics.add(metric);
