@@ -32,14 +32,14 @@ import static org.mockito.Mockito.*;
 public class DomainMetricsProcessorTest {
 
     @Test
-    public void whenNonCompositeObjectsThenReturnMetrics() throws IOException,
-           IntrospectionException,ReflectionException, InstanceNotFoundException,MalformedObjectNameException {
+    public void whenNonCompositeObjectsThenReturnMetrics()  throws MalformedObjectNameException, ReflectionException,
+    InstanceNotFoundException,IntrospectionException,IOException {
 
         JMXConnector jmxConnector = mock(JMXConnector.class);
         JMXConnectionAdapter jmxConnectionAdapter = mock(JMXConnectionAdapter.class);
         MetricWriteHelper metricWriteHelper = mock(MetricWriteHelper.class);
 
-        ArgumentCaptor<List> pathCaptor = ArgumentCaptor.forClass(List.class);
+
         MonitorContextConfiguration contextConfiguration = new MonitorContextConfiguration
                 ("Kafka Monitor",
                         "Custom Metrics|Kafka|", PathResolver.resolveDirectory(AManagedMonitor.class),
@@ -51,39 +51,40 @@ public class DomainMetricsProcessorTest {
         Set<ObjectInstance> objectInstances = Sets.newHashSet();
         objectInstances.add(new ObjectInstance(
                 "org.apache.kafka.server:type=ReplicaManager,name=IsrExpandsPerSec", "test"));
+
         List<Attribute> attributes = Lists.newArrayList();
         attributes.add(new Attribute("Count", 100));
         attributes.add(new Attribute("Mean Rate", 200 ));
         List<String> metricNames = Lists.newArrayList();
-        metricNames.add("Count");
+
+
         doReturn(objectInstances).when(jmxConnectionAdapter).queryMBeans(eq(jmxConnector),
                 Mockito.any(ObjectName.class) );
         doReturn(metricNames).when(jmxConnectionAdapter).getReadableAttributeNames(eq(jmxConnector),
                 Mockito.any(ObjectInstance.class));
         doReturn(attributes).when(jmxConnectionAdapter).getAttributes(eq(jmxConnector), Mockito.any(ObjectName.class),
                 Mockito.any(String[].class));
-       DomainMetricsProcessor domainMetricsProcessor = new DomainMetricsProcessor(
-               contextConfiguration, jmxConnectionAdapter,
-               jmxConnector, "server1", metricWriteHelper);
+        DomainMetricsProcessor domainMetricsProcessor = new DomainMetricsProcessor(
+                contextConfiguration, jmxConnectionAdapter,
+                jmxConnector, "server1", metricWriteHelper);
 
-        for (Map mBean : mBeans) {
+        ArgumentCaptor<List> pathCaptor = ArgumentCaptor.forClass(List.class);
+        domainMetricsProcessor.populateMetricsForMBean(mBeans.get(0));
+        verify(metricWriteHelper).transformAndPrintMetrics(pathCaptor.capture());
 
-                domainMetricsProcessor.populateMetricsForMBean(mBean);
-                verify(metricWriteHelper)
-                        .transformAndPrintMetrics(pathCaptor.capture());
-                Metric firstResultMetric = (Metric)pathCaptor.getValue().get(0);
-                Metric secondResultMetric = (Metric)pathCaptor.getValue().get(1);
-                Assert.assertEquals(firstResultMetric.getMetricName(),"Count");
-                Assert.assertEquals(firstResultMetric.getMetricValue(), "100");
-                Assert.assertEquals(firstResultMetric.getAggregationType(), "AVERAGE");
-                Assert.assertEquals(firstResultMetric.getClusterRollUpType(), "INDIVIDUAL");
-                Assert.assertEquals(firstResultMetric.getTimeRollUpType(), "AVERAGE");
-                Assert.assertEquals(secondResultMetric.getMetricName(), "Mean Rate");
-                Assert.assertEquals(secondResultMetric.getMetricValue(), "200");
-                Assert.assertEquals(secondResultMetric.getAggregationType(), "AVERAGE");
-                Assert.assertEquals(secondResultMetric.getClusterRollUpType(), "INDIVIDUAL");
-                Assert.assertEquals(secondResultMetric.getTimeRollUpType(), "AVERAGE");
-        }
+        Metric firstResultMetric = (Metric)pathCaptor.getValue().get(0);
+        Metric secondResultMetric = (Metric)pathCaptor.getValue().get(1);
+        Assert.assertEquals(firstResultMetric.getMetricName(),"Count");
+        Assert.assertEquals(firstResultMetric.getMetricValue(), "100");
+        Assert.assertEquals(firstResultMetric.getAggregationType(), "AVERAGE");
+        Assert.assertEquals(firstResultMetric.getClusterRollUpType(), "INDIVIDUAL");
+        Assert.assertEquals(firstResultMetric.getTimeRollUpType(), "AVERAGE");
+        Assert.assertEquals(secondResultMetric.getMetricName(), "Mean Rate");
+        Assert.assertEquals(secondResultMetric.getMetricValue(), "200");
+        Assert.assertEquals(secondResultMetric.getAggregationType(), "AVERAGE");
+        Assert.assertEquals(secondResultMetric.getClusterRollUpType(), "INDIVIDUAL");
+        Assert.assertEquals(secondResultMetric.getTimeRollUpType(), "AVERAGE");
+
     }
 
     @Test

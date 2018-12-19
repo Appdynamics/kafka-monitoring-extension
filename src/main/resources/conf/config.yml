@@ -18,7 +18,7 @@ servers:
     displayName: 'Local Kafka Server'
     useSsl: true # set to true if you're using SSL for this server
 
-  #Provide the encryption key for the encrypted password
+  # Provide the encryption key for the encrypted password
 encryptionKey: ''
 
 # Configure the following connection section ONLY if:
@@ -28,15 +28,15 @@ encryptionKey: ''
 #  SSL is not being used for ANY of the Kafka servers listed in the 'servers' section
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#If you are using the connection section,
-#any change to the connection section below requires a machine agent restart for the changes to reflect
+# If you are using the connection section,
+# any change to the connection section below requires a machine agent restart for the changes to reflect
 connection:
   socketTimeout: 3000
   connectTimeout: 1000
   sslProtocols: 'TLSv1.2'
   sslCipherSuites: ''
-  sslTrustStorePath: '' #if [sslTrustStorePath]: "" empty, it defaults to <MachineAgent_Home>/conf/cacerts.jks
-  sslTrustStorePassword: '' # [sslTrustStorePassword: ""] defaults to ""
+  sslTrustStorePath: '' #if [sslTrustStorePath]: '' empty, it defaults to <MachineAgent_Home>/conf/cacerts.jks
+  sslTrustStorePassword: '' # [sslTrustStorePassword: ""] defaults to ''
   sslTrustStoreEncryptedPassword: '' #provide encrypted Password if encryption is needed
 
 # Each Kafka server needs 1 thread each, so please configure this according to the number of servers you are monitoring
@@ -59,7 +59,8 @@ mbeans:
           timeRollUpType: 'CURRENT'
           clusterRollUpType: 'INDIVIDUAL'
 
-  #    Number of partitions that don’t have an active leader and are hence not writable or readable. Alert if value is greater than 0.
+  #    Number of partitions that don’t have an active leader and are hence not writable or readable.
+  #  Alert if value is greater than 0.
   - objectName: 'kafka.controller:type=KafkaController,name=OfflinePartitionsCount'
     metrics:
       - Value:
@@ -71,7 +72,8 @@ mbeans:
           clusterRollUpType: 'INDIVIDUAL'
 
   #    Number of active controllers in the cluster.
-  #  Alert if the aggregated sum across all brokers in the cluster is anything other than 1 because there should be exactly one controller per cluster.
+  #  Alert if the aggregated sum across all brokers in the cluster is anything other than 1,
+  #  because there should be exactly one controller per cluster.
   - objectName: 'kafka.controller:type=KafkaController,name=ActiveControllerCount'
     metrics:
       - Value:
@@ -170,7 +172,8 @@ mbeans:
           timeRollUpType: 'AVERAGE'
           clusterRollUpType: 'INDIVIDUAL'
 
-#      Average fraction of time the request handler threads are idle. Values are between 0 (all resources are used) and 1 (all resources are available)
+#      Average fraction of time the request handler threads are idle.
+#     Values are between 0 (all resources are used) and 100 (all resources are available)
   - objectName: 'kafka.server:type=KafkaRequestHandlerPool,name=RequestHandlerAvgIdlePercent'
     metrics:
       - OneMinuteRate:
@@ -181,7 +184,8 @@ mbeans:
           timeRollUpType: 'AVERAGE'
           clusterRollUpType: 'INDIVIDUAL'
 
-#  #     Average fraction of time the network processor threads are idle. Values are between 0 (all resources are used) and 1 (all resources are available)
+  #     Average fraction of time the network processor threads are idle.
+  #  Values are between 0 (all resources are used) and 100 (all resources are available)
   - objectName: 'kafka.network:type=SocketServer,name=NetworkProcessorAvgIdlePercent'
     metrics:
       - Value:
@@ -192,7 +196,7 @@ mbeans:
           timeRollUpType: 'AVERAGE'
           clusterRollUpType: 'INDIVIDUAL'
 
-#  # Size of the request queue. A congested request queue will not be able to process incoming or outgoing requests
+  #   Size of the request queue. A congested request queue will not be able to process incoming or outgoing requests
   - objectName: 'kafka.network:type=RequestChannel,name=RequestQueueSize'
     metrics:
       - Value:
@@ -203,7 +207,8 @@ mbeans:
           timeRollUpType: 'CURRENT'
           clusterRollUpType: 'INDIVIDUAL'
 
-  #The ZooKeeper session has expired. When a session expires, we can have leader changes and even a new controller. It is important to keep an eye on the number of such events across a Kafka cluster and if the overall number is high
+  #   The ZooKeeper session has expired. When a session expires, we can have leader changes and even a new controller.
+  #  It is important to keep an eye on the number of such events across a Kafka cluster and if the overall number is high
   - objectName: 'kafka.server:type=SessionExpireListener,name=ZooKeeperExpiresPerSec'
     metrics:
       - OneMinuteRate:
@@ -214,7 +219,7 @@ mbeans:
           timeRollUpType: 'CURRENT'
           clusterRollUpType: 'INDIVIDUAL'
 
-  # Metric Per Topic
+  #   Metric Per Topic
   - objectName: 'kafka.server:type=BrokerTopicMetrics,name=*,topic=*'
     metrics:
       - OneMinuteRate:
@@ -225,7 +230,8 @@ mbeans:
           timeRollUpType: 'AVERAGE'
           clusterRollUpType: 'INDIVIDUAL'
 
-  #    When a broker is brought up after a failure, it starts catching up by reading from the leader. Once it is caught up, it gets added back to the ISR.
+  #    When a broker is brought up after a failure, it starts catching up by reading from the leader.
+  #    Once it is caught up, it gets added back to the ISR.
   - objectName: 'kafka.server:type=ReplicaManager,name=IsrExpandsPerSec'
     metrics:
       - OneMinuteRate:
@@ -236,7 +242,9 @@ mbeans:
           timeRollUpType: 'AVERAGE'
           clusterRollUpType: 'INDIVIDUAL'
 
-  #If a broker goes down, ISR for some of the partitions will shrink. When that broker is up again, ISR will be expanded once the replicas are fully caught up. Other than that, the expected value for both ISR shrink rate and expansion rate is 0.
+  #    If a broker goes down, ISR for some of the partitions will shrink.
+  #  When that broker is up again, ISR will be expanded once the replicas are fully caught up.
+  #  Other than that, the expected value for both ISR shrink rate and expansion rate is 0.
   - objectName: 'kafka.server:type=ReplicaManager,name=IsrShrinksPerSec'
     metrics:
       - OneMinuteRate:
@@ -247,7 +255,7 @@ mbeans:
           timeRollUpType: 'AVERAGE'
           clusterRollUpType: 'INDIVIDUAL'
 
-  #JVM Metrics
+  #   JVM Metrics
   - objectName: 'java.lang:type=Memory'
     metrics:
       - HeapMemoryUsage.committed:
@@ -267,7 +275,7 @@ mbeans:
           clusterRollUpType: 'INDIVIDUAL'
 
       - HeapMemoryUsage.used:
-          alias: 'Non Heap Memory Usage | Used (bytes)'
+          alias: 'Heap Memory Usage | Used (bytes)'
           multiplier: ''
           delta: false
           aggregationType: 'AVERAGE'

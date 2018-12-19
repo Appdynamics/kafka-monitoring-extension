@@ -1,12 +1,12 @@
 /**
  * Copyright 2018 AppDynamics, Inc.
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,46 +44,47 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
     private JMXConnectionAdapter jmxAdapter;
     private JMXConnector jmxConnector;
 
-    KafkaMonitorTask(TasksExecutionServiceProvider serviceProvider, MonitorContextConfiguration configuration,
-                     Map kafkaServer) {
+    KafkaMonitorTask (TasksExecutionServiceProvider serviceProvider, MonitorContextConfiguration configuration,
+                      Map kafkaServer) {
         this.configuration = configuration;
         this.kafkaServer = kafkaServer;
         this.metricWriteHelper = serviceProvider.getMetricWriteHelper();
         this.displayName = (String) kafkaServer.get(Constants.DISPLAY_NAME);
     }
 
-    public void onTaskComplete() {
+    public void onTaskComplete () {
         logger.info("All tasks for server {} finished", this.kafkaServer.get(Constants.DISPLAY_NAME));
     }
 
-    public void run() {
-         try {
-                 populateAndPrintMetrics();
-                 logger.info("Completed Kafka Monitoring task for Kafka server: {}",
-                         this.kafkaServer.get(Constants.DISPLAY_NAME));
-         }catch(Exception e ) {
-             logger.error("Exception occurred while collecting metrics for: {} {}",
-                     this.kafkaServer.get(Constants.DISPLAY_NAME));
-         }
+    public void run () {
+        try {
+            logger.info("Starting Kafka Monitoring task for Kafka server: {} ", this.kafkaServer.get(Constants.DISPLAY_NAME));
+            populateAndPrintMetrics();
+            logger.info("Completed Kafka Monitoring task for Kafka server: {}",
+                    this.kafkaServer.get(Constants.DISPLAY_NAME));
+        } catch (Exception e) {
+            logger.error("Exception occurred while collecting metrics for: {} {}",
+                    this.kafkaServer.get(Constants.DISPLAY_NAME), e);
+        }
     }
 
-    public void populateAndPrintMetrics() {
-        try{
+    public void populateAndPrintMetrics () {
+        try {
             BigDecimal connectionStatus = openJMXConnection();
-            List<Map<String, ?>> mbeansFromConfig = (List<Map<String, ?>>) configuration.getConfigYml()
+            List<Map<String, ?>> mBeansListFromConfig = (List<Map<String, ?>>) configuration.getConfigYml()
                     .get(Constants.MBEANS);
             DomainMetricsProcessor domainMetricsProcessor = new DomainMetricsProcessor(configuration, jmxAdapter,
-                        jmxConnector,displayName, metricWriteHelper);
-            for (Map mbeanFromConfig : mbeansFromConfig) {
+                    jmxConnector, displayName, metricWriteHelper);
+            for (Map mbeanFromConfig : mBeansListFromConfig) {
                 domainMetricsProcessor.populateMetricsForMBean(mbeanFromConfig);
             }
             metricWriteHelper.printMetric(this.configuration.getMetricPrefix() +
-                            Constants.METRIC_SEPARATOR + this.displayName + Constants.METRIC_SEPARATOR+ "kafka.server" +
-                            Constants.METRIC_SEPARATOR+"HeartBeat",
-                            connectionStatus.toString(),
-                            Constants.AVERAGE, Constants.AVERAGE, Constants.INDIVIDUAL);
+                            Constants.METRIC_SEPARATOR + this.displayName + Constants.METRIC_SEPARATOR + "kafka.server" +
+                            Constants.METRIC_SEPARATOR + "HeartBeat",
+                    connectionStatus.toString(),
+                    Constants.AVERAGE, Constants.AVERAGE, Constants.INDIVIDUAL);
         } catch (Exception e) {
-            logger.error("Error while opening JMX connection: {}  {}" ,this.kafkaServer.get(Constants.DISPLAY_NAME), e);
+            logger.error("Error while opening JMX connection: {}  {}", this.kafkaServer.get(Constants.DISPLAY_NAME), e);
         } finally {
             try {
                 jmxAdapter.close(jmxConnector);
@@ -94,23 +95,22 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
         }
     }
 
-    private BigDecimal openJMXConnection() {
+    private BigDecimal openJMXConnection () {
         try {
             Map<String, String> requestMap = buildRequestMap();
             jmxAdapter = JMXConnectionAdapter.create(requestMap);
-            Map<String, Object> connectionMap =(Map<String, Object>) getConnectionParameters();
-            connectionMap.put(Constants.USE_SSL, this.kafkaServer.get(Constants.USE_SSL) );
+            Map<String, Object> connectionMap = (Map<String, Object>) getConnectionParameters();
+            connectionMap.put(Constants.USE_SSL, this.kafkaServer.get(Constants.USE_SSL));
             logger.debug("[useSsl] is set [{}] for server [{}]", connectionMap.get(Constants.USE_SSL),
                     this.kafkaServer.get(Constants.DISPLAY_NAME));
-
-            if(configuration.getConfigYml().containsKey(Constants.ENCRYPTION_KEY) &&
-                    !Strings.isNullOrEmpty( configuration.getConfigYml().get(Constants.ENCRYPTION_KEY).toString()) ) {
-                connectionMap.put(Constants.ENCRYPTION_KEY,configuration.getConfigYml().get(Constants.ENCRYPTION_KEY).toString());
+            if (configuration.getConfigYml().containsKey(Constants.ENCRYPTION_KEY) &&
+                    !Strings.isNullOrEmpty(configuration.getConfigYml().get(Constants.ENCRYPTION_KEY).toString())) {
+                connectionMap.put(Constants.ENCRYPTION_KEY, configuration.getConfigYml().get(Constants.ENCRYPTION_KEY).toString());
+            } else {
+                connectionMap.put(Constants.ENCRYPTION_KEY, "");
             }
-            else { connectionMap.put(Constants.ENCRYPTION_KEY ,""); }
             jmxConnector = jmxAdapter.open(connectionMap);
-
-            if(jmxConnector != null) {
+            if (jmxConnector != null) {
                 logger.debug("JMX Connection is open to Kafka server: {}", this.kafkaServer.get(Constants.DISPLAY_NAME));
                 return BigDecimal.ONE;
             }
@@ -122,7 +122,7 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
         return null;
     }
 
-    private Map<String, String> buildRequestMap() {
+    private Map<String, String> buildRequestMap () {
         Map<String, String> requestMap = new HashMap<>();
         requestMap.put(Constants.HOST, this.kafkaServer.get(Constants.HOST));
         requestMap.put(Constants.PORT, this.kafkaServer.get(Constants.PORT));
@@ -133,15 +133,15 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
         return requestMap;
     }
 
-    private String getPassword() {
+    private String getPassword () {
         String password = this.kafkaServer.get(Constants.PASSWORD);
-        Map<String, ?> configMap =  configuration.getConfigYml();
-
-        if (!Strings.isNullOrEmpty(password)) { return password; }
-        if(configMap.containsKey(Constants.ENCRYPTION_KEY)) {
+        Map<String, ?> configMap = configuration.getConfigYml();
+        if (!Strings.isNullOrEmpty(password)) {
+            return password;
+        }
+        if (configMap.containsKey(Constants.ENCRYPTION_KEY)) {
             String encryptionKey = configMap.get(Constants.ENCRYPTION_KEY).toString();
             String encryptedPassword = this.kafkaServer.get(Constants.ENCRYPTED_PASSWORD);
-
             if (!Strings.isNullOrEmpty(encryptionKey) && !Strings.isNullOrEmpty(encryptedPassword)) {
                 java.util.Map<String, String> cryptoMap = Maps.newHashMap();
                 cryptoMap.put(TaskInputArgs.ENCRYPTED_PASSWORD, encryptedPassword);
@@ -152,11 +152,10 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
         return "";
     }
 
-    private Map<String,?> getConnectionParameters(){
-        if(configuration.getConfigYml().containsKey(Constants.CONNECTION))
-        return (Map<String, ?>) configuration.getConfigYml().get(Constants.CONNECTION);
+    private Map<String, ?> getConnectionParameters () {
+        if (configuration.getConfigYml().containsKey(Constants.CONNECTION))
+            return (Map<String, ?>) configuration.getConfigYml().get(Constants.CONNECTION);
         else
             return new HashMap<>();
     }
-
 }

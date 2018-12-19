@@ -17,50 +17,40 @@
 
 package com.appdynamics.extensions.kafka.utils;
 
-import com.appdynamics.extensions.AMonitorJob;
-import com.appdynamics.extensions.conf.MonitorContextConfiguration;
-import com.appdynamics.extensions.util.PathResolver;
-import com.singularity.ee.agent.systemagent.api.AManagedMonitor;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXServiceURL;
-import javax.management.remote.rmi.RMIConnectorServer;
-import javax.rmi.ssl.SslRMIClientSocketFactory;
-import javax.rmi.ssl.SslRMIServerSocketFactory;
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 public  class SSLUtilsTest {
 
-//    @Before
-//    public void setUpConnectionWithoutSSL(){
-//
-//        Properties props = new Properties();
-//        props.setProperty("com.sun.management.jmxremote.authenticate", "false");
-//        props.setProperty("com.sun.management.jmxremote.ssl", "false");
-//        props.setProperty("com.sun.management.jmxremote.registry.ssl", "false");
-//        JMXConnectorServer server = sun.management.jmxremote.ConnectorBootstrap
-//                .startRemoteConnectorServer("9990", props);
-//    }
-//
-//    @Test
-//    public void whenNotUsingSslThenTestServerConnection() throws Exception {
-//
-//        JMXServiceURL serviceUrl = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://127.0.0.1:9990/jmxrmi");
-//        Map env = new HashMap();
-//        JMXConnector jmxConnector = JMXConnectorFactory.connect(serviceUrl, env);
-//        Assert.assertNotNull(jmxConnector);
-//
-//    }
+    @Before
+    public void setUpConnectionWithoutSSL(){
+
+        Properties props = new Properties();
+        props.setProperty("com.sun.management.jmxremote.authenticate", "false");
+        props.setProperty("com.sun.management.jmxremote.ssl", "false");
+        props.setProperty("com.sun.management.jmxremote.registry.ssl", "false");
+        JMXConnectorServer server = sun.management.jmxremote.ConnectorBootstrap
+                .startRemoteConnectorServer("9990", props);
+    }
+
+    @Test
+    public void whenNotUsingSslThenTestServerConnection() throws Exception {
+
+        JMXServiceURL serviceUrl = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://127.0.0.1:9990/jmxrmi");
+        Map env = new HashMap();
+        JMXConnector jmxConnector = JMXConnectorFactory.connect(serviceUrl, env);
+        Assert.assertNotNull(jmxConnector);
+
+    }
 
 //    @Before
 //    public void setUpConnectionWithSslAndCorrectKeys(){
@@ -134,38 +124,6 @@ public  class SSLUtilsTest {
 //        }
 //    }
 
-
-    @Before
-    public void setUpConnectionWithSslAndDefaultKeys(){
-        System.setProperty("javax.net.ssl.keyStore", "src/test/resources/keystore/kafka.server.keystore.jks");
-        System.setProperty("javax.net.ssl.keyStorePassword", "test1234");
-        System.setProperty("java.rmi.server.hostname", "127.0.0.1");
-        System.setProperty("com.sun.management.jmxremote.port", "6789");
-        MonitorContextConfiguration contextConfiguration = new MonitorContextConfiguration
-                ("Kafka Monitor",
-                        "Custom Metrics|Kafka|", PathResolver.resolveDirectory(AManagedMonitor.class),
-                        Mockito.mock(AMonitorJob.class));
-        contextConfiguration.setConfigYml("src/test/resources/conf/config_ssl_default_keys.yml");
-        Map configMap = contextConfiguration.getConfigYml();
-        SslUtils sslUtils = new SslUtils();
-        sslUtils.setSslProperties(configMap);
-        Properties connectionProperties = new Properties();
-        connectionProperties.setProperty("com.sun.management.jmxremote.authenticate", "false");
-        connectionProperties.setProperty("com.sun.management.jmxremote.ssl", "true");
-        connectionProperties.setProperty("com.sun.management.jmxremote.registry.ssl", "false");
-
-        JMXConnectorServer server = sun.management.jmxremote.ConnectorBootstrap
-              .startRemoteConnectorServer("6789", connectionProperties);
-    }
-
-    @Test
-    public void whenUsingSslAndCorrectKeysThenTestServerConnection() throws Exception {
-        JMXServiceURL serviceUrl = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://127.0.0.1:6789/jmxrmi");
-        Map env = new HashMap();
-        env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, new SslRMIClientSocketFactory());
-        JMXConnector jmxConnector = JMXConnectorFactory.connect(serviceUrl, env);
-        Assert.assertNotNull(jmxConnector);
-    }
 
 
 }

@@ -8,7 +8,6 @@
 
 package com.appdynamics.extensions.kafka;
 
-
 import com.appdynamics.extensions.ABaseMonitor;
 import com.appdynamics.extensions.TasksExecutionServiceProvider;
 import com.appdynamics.extensions.kafka.utils.Constants;
@@ -24,36 +23,38 @@ import static com.appdynamics.extensions.kafka.utils.Constants.DEFAULT_METRIC_PR
 
 public class KafkaMonitor extends ABaseMonitor {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(KafkaMonitor.class);
+
     @Override
-    protected void onConfigReload(File file) {
+    protected void onConfigReload (File file) {
         Map<String, ?> configMap = this.getContextConfiguration().getConfigYml();
         SslUtils sslUtils = new SslUtils();
         sslUtils.setSslProperties(configMap);
     }
 
-    protected String getDefaultMetricPrefix() { return DEFAULT_METRIC_PREFIX; }
+    protected String getDefaultMetricPrefix () {
+        return DEFAULT_METRIC_PREFIX;
+    }
 
-    public String getMonitorName() {
+    public String getMonitorName () {
         return Constants.KAFKA_MONITOR;
     }
 
-    protected void doRun(TasksExecutionServiceProvider tasksExecutionServiceProvider) {
+    protected void doRun (TasksExecutionServiceProvider tasksExecutionServiceProvider) {
         List<Map<String, String>> kafkaServers = (List<Map<String, String>>)
                 this.getContextConfiguration().getConfigYml().get(Constants.SERVERS);
         for (Map<String, String> kafkaServer : kafkaServers) {
             KafkaMonitorTask task = new KafkaMonitorTask(tasksExecutionServiceProvider,
-                                                this.getContextConfiguration(), kafkaServer);
+                    this.getContextConfiguration(), kafkaServer);
             AssertUtils.assertNotNull(kafkaServer.get(Constants.DISPLAY_NAME),
                     "The displayName can not be null");
             tasksExecutionServiceProvider.submit(kafkaServer.get(Constants.DISPLAY_NAME), task);
         }
     }
 
-    protected int getTaskCount() {
+    protected int getTaskCount () {
         List<Map<String, String>> servers = (List<Map<String, String>>) getContextConfiguration().
                 getConfigYml().get(Constants.SERVERS);
-        AssertUtils.assertNotNull(servers, "The 'servers' section in config.yml is not initialised");
+        AssertUtils.assertNotNull(servers, "The 'servers' section in config.yml is not initialized");
         return servers.size();
     }
-
 }
