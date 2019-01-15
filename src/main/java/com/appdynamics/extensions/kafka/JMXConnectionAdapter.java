@@ -62,9 +62,8 @@ public class JMXConnectionAdapter {
         }
 
         if (!Strings.isNullOrEmpty(this.username)) {env.put(JMXConnector.CREDENTIALS, new String[]{username, password});}
-        jmxConnector = JMXConnectorFactory.connect(this.serviceUrl,env);
+        jmxConnector = JMXConnectorFactory.connect(this.serviceUrl, env);
         if (jmxConnector == null) { throw new IOException("Unable to connect to Mbean server"); }
-        jmxConnector = JMXConnectorFactory.connect(this.serviceUrl,env);
         return jmxConnector;
     }
 

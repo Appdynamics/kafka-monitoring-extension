@@ -57,4 +57,5 @@ public class KafkaMonitor extends ABaseMonitor {
         AssertUtils.assertNotNull(servers, "The 'servers' section in config.yml is not initialized");
         return servers.size();
     }
+
 }

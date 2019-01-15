@@ -114,6 +114,7 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
                 logger.debug("JMX Connection is open to Kafka server: {}", this.kafkaServer.get(Constants.DISPLAY_NAME));
                 return BigDecimal.ONE;
             }
+
             return BigDecimal.ZERO;
         } catch (IOException ioe) {
             logger.error("Unable to open a JMX Connection Kafka server: {} {} "
@@ -158,4 +159,6 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
         else
             return new HashMap<>();
     }
+
+
 }
