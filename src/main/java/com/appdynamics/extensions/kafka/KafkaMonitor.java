@@ -42,6 +42,7 @@ public class KafkaMonitor extends ABaseMonitor {
     protected void doRun (TasksExecutionServiceProvider tasksExecutionServiceProvider) {
         List<Map<String, String>> kafkaServers = (List<Map<String, String>>)
                 this.getContextConfiguration().getConfigYml().get(Constants.SERVERS);
+        logger.info("The size of servers section is: "+kafkaServers);
         for (Map<String, String> kafkaServer : kafkaServers) {
             KafkaMonitorTask task = new KafkaMonitorTask(tasksExecutionServiceProvider,
                     this.getContextConfiguration(), kafkaServer);

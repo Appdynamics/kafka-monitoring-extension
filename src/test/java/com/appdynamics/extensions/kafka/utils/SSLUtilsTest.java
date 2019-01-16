@@ -38,14 +38,16 @@ public  class SSLUtilsTest {
         props.setProperty("com.sun.management.jmxremote.authenticate", "false");
         props.setProperty("com.sun.management.jmxremote.ssl", "false");
         props.setProperty("com.sun.management.jmxremote.registry.ssl", "false");
+        System.setProperty("java.rmi.server.hostname", "127.0.0.1");
+
         JMXConnectorServer server = sun.management.jmxremote.ConnectorBootstrap
-                .startRemoteConnectorServer("9990", props);
+                .startRemoteConnectorServer("9993", props);
     }
 
     @Test
     public void whenNotUsingSslThenTestServerConnection() throws Exception {
 
-        JMXServiceURL serviceUrl = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://127.0.0.1:9990/jmxrmi");
+        JMXServiceURL serviceUrl = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://127.0.0.1:9993/jmxrmi");
         Map env = new HashMap();
         JMXConnector jmxConnector = JMXConnectorFactory.connect(serviceUrl, env);
         Assert.assertNotNull(jmxConnector);
@@ -84,7 +86,7 @@ public  class SSLUtilsTest {
 //        JMXConnector jmxConnector = JMXConnectorFactory.connect(serviceUrl, env);
 //        Assert.assertNotNull(jmxConnector);
 //    }
-//
+
 //    @Before
 //    public void setUpConnectionWithIncorrectKeys(){
 //        System.setProperty("javax.net.ssl.keyStore", "src/test/resources/keystore/kafka.server.keystore.jks");
@@ -100,6 +102,7 @@ public  class SSLUtilsTest {
 //        Properties props = new Properties();
 //        props.setProperty("com.sun.management.jmxremote.authenticate", "false");
 //        props.setProperty("com.sun.management.jmxremote.ssl", "true");
+//        System.setProperty("java.rmi.server.hostname", "127.0.0.1");
 //        JMXConnectorServer server = sun.management.jmxremote.ConnectorBootstrap
 //              .startRemoteConnectorServer("6789", props);
 //    }
@@ -107,7 +110,6 @@ public  class SSLUtilsTest {
 //
 //    @Test
 //    public void testSSLServerConnectionWithIncorrectTrustStore() {
-//        int port = 6789;
 //        try {
 //            JMXServiceURL serviceUrl = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://127.0.0.1:6789/jmxrmi");
 //            Map env = new HashMap();
