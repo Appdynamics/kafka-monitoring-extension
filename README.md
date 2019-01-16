@@ -210,9 +210,9 @@ Always feel free to fork and contribute any changes directly via [GitHub](https:
 ## Version
 | Name                        |  Version                    | 
 | :---------------------------| :---------------------------|
-| Extension Version:          | 2.0.0                       | 
+| Extension Version:          | 2.0.1                      |
 | Controller Compatibility:   | 4.0 or Later                |
-| Tested On:                  | Apache Kafka 2.11           |
-| Operating System Tested On: | Mac OS                      |
-| Last updated On:            | Aug 27, 2018                |
+| Tested On:                  | Apache Kafka 2.0.0         |
+| Operating System Tested On: | Mac OS, Linux               |
+| Last updated On:            | Jan 16, 2019          |
 | List of changes to this extension| [Change log](https://github.com/Appdynamics/kafka-monitoring-extension/blob/master/Changelog.md) 
