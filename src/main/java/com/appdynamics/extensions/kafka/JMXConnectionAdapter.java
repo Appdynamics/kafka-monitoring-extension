@@ -57,13 +57,18 @@ public class JMXConnectionAdapter {
         final Map<String, Object> env = new HashMap<>();
 
         if(Boolean.valueOf(connectionMap.get(Constants.USE_SSL).toString())) {
+            //TODO this is not needed as even if you comment it the SSL connections still work.
             SslRMIClientSocketFactory sslRMIClientSocketFactory = new SslRMIClientSocketFactory();
             env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, sslRMIClientSocketFactory);
         }
 
-        if (!Strings.isNullOrEmpty(this.username)) {env.put(JMXConnector.CREDENTIALS, new String[]{username, password});}
+        if (!Strings.isNullOrEmpty(this.username)) {
+            env.put(JMXConnector.CREDENTIALS, new String[]{username, password});
+        }
         jmxConnector = JMXConnectorFactory.connect(this.serviceUrl, env);
-        if (jmxConnector == null) { throw new IOException("Unable to connect to Mbean server"); }
+        if (jmxConnector == null) {
+            throw new IOException("Unable to connect to Mbean server");
+        }
         return jmxConnector;
     }
 

@@ -27,6 +27,7 @@ public class KafkaMonitor extends ABaseMonitor {
     @Override
     protected void onConfigReload (File file) {
         Map<String, ?> configMap = this.getContextConfiguration().getConfigYml();
+        //#TODO We need to find a better way to handle SSL in JMX.
         SslUtils sslUtils = new SslUtils();
         sslUtils.setSslProperties(configMap);
     }
