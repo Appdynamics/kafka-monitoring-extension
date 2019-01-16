@@ -16,7 +16,7 @@ mbeans:
     metrics:
       - Count:
          alias: "Count"
-         multiplier: ""
+         multiplier: "100"
          delta: "false"
          aggregationType: "AVERAGE"
          timeRollUpType: "AVERAGE"
@@ -28,4 +28,15 @@ mbeans:
          aggregationType: "AVERAGE"
          timeRollUpType: "AVERAGE"
          clusterRollUpType: "INDIVIDUAL"
+
+  - objectName: "kafka.server:type=BrokerTopicMetrics,name=*"
+    metrics:
+      - Count:
+         alias: "Count"
+         multiplier: "100"
+         delta: "false"
+         aggregationType: "AVERAGE"
+         timeRollUpType: "AVERAGE"
+         clusterRollUpType: "INDIVIDUAL"
+
 
