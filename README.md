@@ -41,7 +41,8 @@ or [SIM Agent](https://docs.appdynamics.com/display/PRO44/Server+Visibility).For
    This section outlines the configuration of the Kafka start-up scripts if monitoring is <b>not</b> done over SSL.If SSL is being used please skip to [Setting up SSL in Kafka](#sslsettings).
    - To enable monitoring, some flags need to be set in the Kafka start-up scripts.
    Edit `<Kafka Installation Folder>/bin/kafka-run-class.sh` and modify `KAFKA_JMX_OPTS` variable like below<br>
-     `KAFKA_JMX_OPTS="-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.rmi.port=9998 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"` 
+     `KAFKA_JMX_OPTS="-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.rmi.port=9998 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"`
+   - Please also include `-Djava.rmi.server.hostname=your.host.ip` to the `KAFKA_JMX_OPTS` variable if you are monitoring Kafka from a remote machine.
    - Also, the changes to `kafka-run-class.sh` has to be made on all the Kafka servers that are being monitored.
    - Please note that any changes to  `kafka-run-class.sh` needs the Kafka server to be restarted for the changes to take effect.
 ##### <a name="sslsettings">4. Monitoring over SSL </a>
@@ -71,6 +72,8 @@ or [SIM Agent](https://docs.appdynamics.com/display/PRO44/Server+Visibility).For
    ```
    KAFKA_JMX_OPTS="-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.rmi.port=9998 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=true -Djavax.net.ssl.keyStore=/Absolute/path/to/keystore -Djavax.net.ssl.keyStorePassword=password -Dcom.sun.management.jmxremote.registry.ssl=false"
    ```
+
+   - Please also include `-Djava.rmi.server.hostname=your.host.ip` to the `KAFKA_JMX_OPTS` variable if you are monitoring Kafka from a remote machine.
 ##### 4.3. Configuring the Extension to use SSL  ####
    - The extension also needs to be configured to use SSL. In the config.yml of the Kafka Extension, uncomment the `connection` section.<br/>
       ```
