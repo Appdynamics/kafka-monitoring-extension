@@ -65,7 +65,7 @@ or [SIM Agent](https://docs.appdynamics.com/display/PRO44/Server+Visibility).For
             
             #Step #3b: or if you are using Machine Agent truststore 
             keytool -keystore /path/to/MachineAgentHome/conf/cacerts.jks -alias CARoot -import -file ca-cert
-   - Additional info about creating SSL keys is listed [here](https://docs.confluent.io/current/tutorials/security_tutorial.html#creating-ssl-keys-and-certificates).
+
 ##### 4.2. Configuring Kafka for monitoring over SSL  ####
    Edit `<Kafka Installation Folder>/bin/kafka-run-class.sh` and modify `KAFKA_JMX_OPTS` variable, as listed below:<br>
    ```
