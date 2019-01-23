@@ -56,7 +56,7 @@ public class JMXConnectionAdapter {
         JMXConnector jmxConnector;
         final Map<String, Object> env = new HashMap<>();
 
-        if(Boolean.valueOf(connectionMap.get(Constants.USE_SSL).toString())) {
+        if(Boolean.valueOf((String)connectionMap.get(Constants.USE_SSL))) {
             //TODO this is not needed as even if you comment it the SSL connections still work.
             SslRMIClientSocketFactory sslRMIClientSocketFactory = new SslRMIClientSocketFactory();
             env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, sslRMIClientSocketFactory);
