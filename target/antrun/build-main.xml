@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <project name="maven-antrun-" default="main"  >
 <target name="main">
-  <property name="target.dir" value="/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension/target/KafkaMonitor"/>
-  <mkdir dir="/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension/target/KafkaMonitor"/>
-  <copy todir="/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension/target/KafkaMonitor">
+  <property name="target.dir" value="/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension-ci/target/KafkaMonitor"/>
+  <mkdir dir="/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension-ci/target/KafkaMonitor"/>
+  <copy todir="/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension-ci/target/KafkaMonitor">
     <fileset includes="config.yml" dir="src/main/resources/conf"/>
     <fileset includes="monitor.xml" dir="src/main/resources/conf"/>
   </copy>
-  <copy todir="/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension/target/KafkaMonitor">
-    <fileset includes="kafka-monitoring-extension.jar" dir="/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension/target"/>
+  <copy todir="/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension-ci/target/KafkaMonitor">
+    <fileset includes="kafka-monitoring-extension.jar" dir="/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension-ci/target"/>
   </copy>
-  <copy todir="/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension/target/KafkaMonitor">
-    <fileset includes="LICENSE.txt" dir="/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension"/>
+  <copy todir="/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension-ci/target/KafkaMonitor">
+    <fileset includes="LICENSE.txt" dir="/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension-ci"/>
   </copy>
-  <copy todir="/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension/target/KafkaMonitor">
-    <fileset includes="NOTICE.txt" dir="/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension"/>
+  <copy todir="/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension-ci/target/KafkaMonitor">
+    <fileset includes="NOTICE.txt" dir="/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension-ci"/>
   </copy>
-  <zip destfile="/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension/target/KafkaMonitor-2.0.1.zip">
-    <zipfileset prefix="KafkaMonitor/" filemode="755" dir="/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension/target/KafkaMonitor"/>
+  <zip destfile="/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension-ci/target/KafkaMonitor-2.0.1.zip">
+    <zipfileset prefix="KafkaMonitor/" filemode="755" dir="/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension-ci/target/KafkaMonitor"/>
   </zip>
-  <delete dir="/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension/target/KafkaMonitor"/>
+  <delete dir="/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension-ci/target/KafkaMonitor"/>
 </target>
 </project>
