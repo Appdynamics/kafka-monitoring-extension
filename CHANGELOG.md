@@ -1,17 +1,56 @@
-# AppDynamics Kafka Monitoring Extension CHANGELOG
+Changelog
+=========
 
-## 2.0.1 - Dec 18, 2018
-1. Code fix so that metric properties are not applied multiple times
-2. Refactoring code and test cases
-3. Cleaner config.yml
-4. removed multiple open connections, this will fix kafka monitor
-hitting the `nproc` limit.
+Kafka features are not tied to a specific kafka-docker version (ideally all changes will be merged into all branches). Therefore, this changelog will track changes to the image by date.
 
-## 2.0.0 - Aug 8,  2018
-1. Moved to 2.0 framework.
-2. Added support for SSL
-3. Added support for composite metrics 
+21-Nov-2018
+-----------
 
+- Update to latest Kafka: `2.1.0`
+- Set scala version for Kafka `2.1.0` and `2.0.1` to recommended `2.12`
 
+10-Nov-2018
+-----------
 
+-	Update to Kafka `2.0.0` -> `2.0.1`.
+-	Update glibc to `2.28-r0`
+-	Update base image to openjdk:8u181-jre-alpine
 
+29-Jun-2018
+-----------
+
+-	**MAJOR:** Use new docker image labelling (`<scala-version>-<kafka-version>`) and use travis to publish images.
+-	Update base image to openjdk:8u171-jre-alpine
+
+20-Apr-2018
+-----------
+
+-	Issue #312 - Fix conflict between KAFKA_xxx broker config values (e.g. KAFKA_JMX_OPTS) and container configuration options (e.g. KAFKA_CREATE_TOPICS)
+
+19-Apr-2018
+-----------
+
+-	Issue #310 - Only return Apache download mirrors that can supply required kafka/scala version
+
+11-Apr-2018
+-----------
+
+-	Issue #313 - Fix parsing of environment value substitution when spaces included.
+
+08-Apr-2018
+-----------
+
+-	Issue #208 - Add `KAFKA_CREATE_TOPICS_SEPARATOR` to allow custom input, such as multi-line YAML.
+-	Issue #298 - Fix SNAPPY compression support by adding glibc port back into image (removed when switching to openjdk base image in #7a25ade)
+
+04-Apr-2018
+-----------
+
+-	Support `_{PORT_COMMAND}` placeholder.
+
+03-Apr-2018
+-----------
+
+-	**BREAKING:** removed `KAFKA_ADVERTISED_PROTOCOL_NAME` and `KAFKA_PROTOCOL_NAME`. Use the canonical [Kafka Configuration](http://kafka.apache.org/documentation.html#brokerconfigs) instead.
+-	Support `_{HOSTNAME_COMMAND}` placeholder.
+-	**BREAKING:** Make `KAFKA_ZOOKEEPER_CONNECT` mandatory
