@@ -1,17 +1,16 @@
 #If SIM is enabled, use this
-#metricPrefix: 'Custom metrics|Kafka'
+metricPrefix: 'Custom Metrics|Kafka'
 
 #If SIM is not enabled, then use this
-metricPrefix: 'Server|Component:<Component-ID>|Custom Metrics|Kafka'
+#metricPrefix: 'Server|Component:<Component-ID>|Custom Metrics|Kafka'
 
 # To know your Component-ID, Please refer the link
 # https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695
 
 # Add your Kafka Instances below
 servers:
-  - serviceUrl: 'service:jmx:rmi:///jndi/rmi://127.0.0.1:9999/jmxrmi' #provide jmx service URL [OR] provide [host][port] pair
-    host: ''
-    port: ''
+  - host: '${KAFKA_HOST}'
+    port: '${KAFKA_PORT}'
     username: ''
     password: ''
     encryptedPassword: ''
