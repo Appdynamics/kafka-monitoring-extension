@@ -53,11 +53,16 @@ public class KafkaMonitor extends ABaseMonitor {
         }
     }
 
-    protected int getTaskCount () {
-        List<Map<String, String>> servers = (List<Map<String, String>>) getContextConfiguration().
-                getConfigYml().get(Constants.SERVERS);
-        AssertUtils.assertNotNull(servers, "The 'servers' section in config.yml is not initialized");
-        return servers.size();
-    }
+//    protected int getTaskCount () {
+//        List<Map<String, String>> servers = (List<Map<String, String>>) getContextConfiguration().
+//                getConfigYml().get(Constants.SERVERS);
+//        AssertUtils.assertNotNull(servers, "The 'servers' section in config.yml is not initialized");
+//        return servers.size();
+//    }
 
+    @Override
+    protected List<Map<String, ?>> getServers () {
+        return (List<Map<String, ?>>) getContextConfiguration().
+                getConfigYml().get(Constants.SERVERS);
+    }
 }
