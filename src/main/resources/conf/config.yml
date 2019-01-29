@@ -9,8 +9,8 @@ metricPrefix: 'Custom Metrics|Kafka'
 
 # Add your Kafka Instances below
 servers:
-  - host: '${KAFKA_HOST}'
-    port: '${KAFKA_PORT}'
+  - host: '127.0.0.1'
+    port: '1099'
     username: ''
     password: ''
     encryptedPassword: ''
