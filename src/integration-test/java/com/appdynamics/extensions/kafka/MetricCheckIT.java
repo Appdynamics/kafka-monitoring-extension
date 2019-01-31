@@ -62,7 +62,7 @@ public class MetricCheckIT {
         builder.host("ec2-54-202-144-212.us-west-2.compute.amazonaws.com").port(8090).ssl(false).path("controller/rest/applications/Server%20&%20Infrastructure%20Monitoring/metric-data");
         builder.query("metric-path", "Application%20Infrastructure%20Performance%7CRoot%7CCustom%20Metrics%7CKafka%7CLocal%20Kafka%20Server%7Ckafka.server%7CHeartBeat");
         builder.query("time-range-type", "BEFORE_NOW");
-        builder.query("duration-in-mins", "1440");
+        builder.query("duration-in-mins", "60");
         builder.query("output", "JSON");
 
         CloseableHttpResponse httpResponse = sendGET(builder.build());
