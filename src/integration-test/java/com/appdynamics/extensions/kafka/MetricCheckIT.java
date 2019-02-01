@@ -42,7 +42,6 @@ public class MetricCheckIT {
         httpClient = HttpClientBuilder.create()
                 .setDefaultCredentialsProvider(provider)
                 .build();
-
     }
 
     @After
@@ -61,14 +60,14 @@ public class MetricCheckIT {
         builder.host("ec2-54-202-144-212.us-west-2.compute.amazonaws.com").port(8090).ssl(false).path("controller/rest/applications/Server%20&%20Infrastructure%20Monitoring/metric-data");
         builder.query("metric-path", "Application%20Infrastructure%20Performance%7CRoot%7CHardware%20Resources%7CMachine%7CAvailability");
         builder.query("time-range-type", "BEFORE_NOW");
-        builder.query("duration-in-mins", "60");
+        builder.query("duration-in-mins", "60"); //TODO: 60 min is too long? can be shorter, like 15 min.
         builder.query("output", "JSON");
 
         CloseableHttpResponse httpResponse = sendGET(builder.build());
 
         int statusCode = httpResponse.getStatusLine().getStatusCode();
 
-        Assert.assertEquals("Invalid response code", 200, statusCode);
+        Assert.assertEquals("Controller API is unreachable", 200, statusCode);
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(
                 httpResponse.getEntity().getContent()));
@@ -95,8 +94,8 @@ public class MetricCheckIT {
     }
 
     @Test
-    public void testAvgIdlePercentValueNot100(){
-        //servers should not be 100% idle, if they are, we are not reporting correctly
+    public void testAvgIdlePercentValueNotAlways100(){
+        //servers should not be 100% idle, if they are, we are not reporting that metric correctly
     }
 
     @Test
@@ -142,13 +141,17 @@ public class MetricCheckIT {
 
         Assert.assertEquals("Invalid metric name", "Custom Metrics|Kafka|Metrics Uploaded", metricName);
 
-        Assert.assertNotEquals("Agent is not reporting metrics", 1, metricValue);
+        Assert.assertNotEquals("Agent is not reporting Kafka metrics", 1, metricValue);
 
 
     }
 
     @Test
     public void testJMXConnectionWithUserNamePasswordEnabled(){}
+    //TODO: these have to be populated from config.yml
+
+    @Test
+    public void testJMXConnectionWithUserNameAndPasswordEncryptionEnabled(){}
 
     @Test
     public void testHeartBeatMetric() throws IOException {
@@ -194,7 +197,6 @@ public class MetricCheckIT {
     private CloseableHttpResponse sendGET(String url) throws IOException {
 
         HttpGet httpGet = new HttpGet(url);
-
         httpGet.addHeader("User-Agent", USER_AGENT);
         CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
 
