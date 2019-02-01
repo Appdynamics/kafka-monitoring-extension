@@ -9,13 +9,22 @@ metricPrefix: 'Custom Metrics|Kafka'
 
 # Add your Kafka Instances below
 servers:
-  - host: "${KAFKA_HOST}"
-    port: "${KAFKA_PORT}"
+  - host: "${KAFKA_HOST_1}"
+    port: "${KAFKA_PORT_1}"
     username: ''
     password: ''
     encryptedPassword: ''
-    displayName: 'Local Kafka Server'
+    displayName: 'Local Kafka Server1'
     useSsl: false # set to true if you're using SSL for this server
+
+  - host: "${KAFKA_HOST_2}"
+    port: "${KAFKA_PORT_2}"
+    username: ''
+    password: ''
+    encryptedPassword: ''
+    displayName: 'Local Kafka Server2'
+    useSsl: false # set to true if you're using SSL for this server
+
 
   # Provide the encryption key for the encrypted password
 encryptionKey: ''
