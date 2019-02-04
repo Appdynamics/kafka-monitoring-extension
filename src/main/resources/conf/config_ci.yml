@@ -20,7 +20,7 @@ servers:
 
 
   # Provide the encryption key for the encrypted password
-encryptionKey: ''
+encryptionKey: "axcdde43535hdhdgfiniyy576"
 
 # Configure the following connection section ONLY if:
 # the config property [useSsl] is set to true in any of the servers in the 'servers' section
