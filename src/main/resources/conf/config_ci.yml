@@ -13,14 +13,14 @@ servers:
     port: "${KAFKA_PORT_1}"
     username: "${KAFKA_USERNAME}"
     password:
-    encryptedPassword: "${KAFKA_PWD}"
+    encryptedPassword: "${KAFKA_ENCRYPTED_PWD}"
     displayName: 'Local Kafka Server'
     useSsl: false # set to true if you're using SSL for this server
 
 
 
   # Provide the encryption key for the encrypted password
-encryptionKey: "axcdde43535hdhdgfiniyy576"
+encryptionKey: "${KAFKA_ENCRYPTION_KEY}"
 
 # Configure the following connection section ONLY if:
 # the config property [useSsl] is set to true in any of the servers in the 'servers' section

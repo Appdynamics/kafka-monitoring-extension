@@ -147,13 +147,6 @@ public class MetricCheckIT {
     }
 
     @Test
-    public void testJMXConnectionWithUserNamePasswordEnabled(){}
-    //TODO: these have to be populated from config.yml
-
-    @Test
-    public void testJMXConnectionWithUserNameAndPasswordEncryptionEnabled(){}
-
-    @Test
     public void testHeartBeatMetric() throws IOException {
 
         UrlBuilder builder = UrlBuilder.builder();
@@ -187,6 +180,8 @@ public class MetricCheckIT {
 
         String metricName = jsonNode.get(0).get("metricName").getTextValue();
         int metricValue = jsonNode.get(0).get("metricValues").get(0).get("value").getIntValue();
+        //TODO: this test fails if Kafka Server name is changed
+        //Donot hardcode server name
 
         Assert.assertEquals("Invalid metric name", "Custom Metrics|Kafka|Local Kafka Server|kafka.server|HeartBeat", metricName);
 
