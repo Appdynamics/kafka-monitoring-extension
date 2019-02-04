@@ -17,8 +17,8 @@ servers:
     displayName: 'Local Kafka Server'
     useSsl: false # set to true if you're using SSL for this server
 
-  - host: "${KAFKA_HOST_1}"
-    port: "${KAFKA_PORT_1}"
+  - host: "${KAFKA_HOST_2}"
+    port: "${KAFKA_PORT_2}"
     username: "${KAFKA_USERNAME}"
     password:
     encryptedPassword: "${KAFKA_ENCRYPTED_PWD}"
