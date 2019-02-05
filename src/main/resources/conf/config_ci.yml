@@ -16,14 +16,14 @@ servers:
     encryptedPassword:
     displayName: 'Local Kafka Server'
     useSsl: false # set to true if you're using SSL for this server
-#
-#  - host: "${KAFKA_HOST_2}"
-#    port: "${KAFKA_PORT_2}"
-#    username: "${KAFKA_USERNAME}"
-#    password:
-#    encryptedPassword: "${KAFKA_ENCRYPTED_PWD}"
-#    displayName: 'Local Kafka Server'
-#    useSsl: false # set to true if you're using SSL for this server
+
+  - host: "${KAFKA_HOST_1}"
+    port: "${KAFKA_PORT_1}"
+    username: "monitorRole"
+    password: "QED"
+    encryptedPassword:
+    displayName: 'Local Kafka Server2'
+    useSsl: false # set to true if you're using SSL for this server
 
 
   # Provide the encryption key for the encrypted password
