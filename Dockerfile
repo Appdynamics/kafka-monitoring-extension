@@ -39,7 +39,7 @@ RUN apk add --no-cache bash curl jq docker \
  && rm glibc-${GLIBC_VERSION}.apk
 
 COPY overrides /opt/overrides
-COPY /src/test/resources/keystore/kafka.server.keystore.jks /opt/kafka
+COPY src/test/resources/keystore/kafka.server.keystore.jks /opt/kafka
 
 VOLUME ["/kafka"]
 
