@@ -4,6 +4,8 @@ cp /usr/lib/jvm/java-1.8-openjdk/jre/lib/management/jmxremote.password.template 
 echo "monitorRole  QED" >> /usr/lib/jvm/java-1.8-openjdk/jre/lib/management/jmxremote.password
 chmod 600 /usr/lib/jvm/java-1.8-openjdk/jre/lib/management/jmxremote.password
 
+
+
 # Allow specific kafka versions to perform any unique bootstrap operations
 OVERRIDE_FILE="/opt/overrides/${KAFKA_VERSION}.sh"
 if [[ -x "$OVERRIDE_FILE" ]]; then
