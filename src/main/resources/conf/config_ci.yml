@@ -12,8 +12,8 @@ servers:
   - host: "${KAFKA_HOST_1}"
     port: "${KAFKA_PORT_1}"
     username: "${KAFKA_USERNAME}"
-    password:
-    encryptedPassword: "${KAFKA_ENCRYPTED_PWD}"
+    password: "QED"
+    encryptedPassword:
     displayName: 'Local Kafka Server'
     useSsl: true # set to true if you're using SSL for this server656
 
@@ -43,8 +43,8 @@ connection:
   connectTimeout: 1000
   sslProtocols: 'TLSv1.2'
   sslCipherSuites: ''
-  sslTrustStorePath: '' #if [sslTrustStorePath]: '' empty, it defaults to <MachineAgent_Home>/conf/cacerts.jks
-  sslTrustStorePassword: '' # [sslTrustStorePassword: ""] defaults to ''
+  sslTrustStorePath: '/opt/appdynamics/kafka.client.truststore.jks' #if [sslTrustStorePath]: '' empty, it defaults to <MachineAgent_Home>/conf/cacerts.jks
+  sslTrustStorePassword: 'test1234' # [sslTrustStorePassword: ""] defaults to ''
   sslTrustStoreEncryptedPassword: '' #provide encrypted Password if encryption is needed
 
 # Each Kafka server needs 1 thread each, so please configure this according to the number of servers you are monitoring
