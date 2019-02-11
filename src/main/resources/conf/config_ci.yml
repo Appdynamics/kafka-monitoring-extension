@@ -15,7 +15,7 @@ servers:
     password: "QED"
     encryptedPassword:
     displayName: 'Local Kafka Server'
-    useSsl: false # set to true if you're using SSL for this server656
+    useSsl: true # set to true if you're using SSL for this server656
 
   - host: "${KAFKA_HOST_2}"
     port: "${KAFKA_PORT_2}"
