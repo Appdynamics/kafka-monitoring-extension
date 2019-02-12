@@ -191,7 +191,7 @@ public class MetricCheckIT {
         ControllerClient controllerClient;
         ControllerAPIService controllerAPIService;
         MetricAPIService metricAPIService;
-        File installDir = new File("/opt/appdynamics/monitors/KafkaMonitor/");
+        File installDir = new File("/opt/appdynamics");
 
 
         File configFile = new File("/opt/appdynamics/monitors/KafkaMonitor/config.yml");
