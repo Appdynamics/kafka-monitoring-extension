@@ -47,6 +47,25 @@ connection:
   sslTrustStorePassword: 'test1234' # [sslTrustStorePassword: ""] defaults to ''
   sslTrustStoreEncryptedPassword: '' #provide encrypted Password if encryption is needed
 
+
+controllerInfo:
+    controllerHost: "ec2-54-202-144-212.us-west-2.compute.amazonaws.com"
+    controllerPort: 8090
+    account: "customer1"
+    username: "admin"
+    password: "admin"
+    encryptedPassword: ""
+    encryptionKey: ""
+    controllerSslEnabled: false
+    enableOrchestration: false
+    uniqueHostId: ""
+    accountAccessKey: "4c3eaeba-8115-44ef-89e7-80b0e3eed16a"
+    machinePath: ""
+    simEnabled: true
+    applicationName: ""
+    tierName: ""
+    nodeName: ""
+
 # Each Kafka server needs 1 thread each, so please configure this according to the number of servers you are monitoring
 # [numberOfThreads] = Number_of_Kafka_Servers_Monitored
 numberOfThreads: 10
