@@ -191,10 +191,10 @@ public class MetricCheckIT {
         ControllerClient controllerClient;
         ControllerAPIService controllerAPIService;
         MetricAPIService metricAPIService;
-        File installDir = new File("/opt/appdynamics");
+        File installDir = new File("src/main/resources/conf/");
 
 
-        File configFile = new File("/opt/appdynamics/monitors/KafkaMonitor/config.yml");
+        File configFile = new File("src/main/resources/conf/config.yml");
         Map<String, ?> config = YmlReader.readFromFileAsMap(configFile);
 
         Map controllerInfoMap = (Map) config.get("controllerInfo");
