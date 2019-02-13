@@ -100,7 +100,7 @@ public class MetricCheckIT {
         JsonNode jsonNode = null;
         if(metricAPIService != null) {
             jsonNode = metricAPIService.getMetricData("",
-                    "Server%20&%20Infrastructure%20Monitoring/metric-data?metric-path=Application%20Infrastructure%20Performance%7CRoot%7CCustom%20Metrics%7CKafka%7CLocal%20Kafka%20Server2%7Ckafka.server%7CReplicaManager%7CUnderReplicatedPartitions%7CUnderReplicatedPartitions&time-range-type=BEFORE_NOW&duration-in-mins=60&output=JSON");
+                    "Server%20&%20Infrastructure%20Monitoring/metric-data?metric-path=Application%20Infrastructure%20Performance%7CRoot%7CCustom%20Metrics%7CKafka%7CLocal%20Kafka%20Server2%7Ckafka.server%7CReplicaManager%7CUnderReplicatedPartitions%7CUnderReplicatedPartitions&time-range-type=BEFORE_NOW&duration-in-mins=15&output=JSON");
         }
         if (jsonNode != null) {
             JsonNode valueNode = JsonUtils.getNestedObject(jsonNode, "metricName");
