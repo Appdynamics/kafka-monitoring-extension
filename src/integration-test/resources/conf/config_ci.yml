@@ -79,7 +79,7 @@ mbeans:
   - objectName: 'kafka.server:type=ReplicaManager,name=UnderReplicatedPartitions'
     metrics:
       - Value:
-          alias: 'Value'
+          alias: 'UnderReplicatedPartitions'
           multiplier: ''
           delta: false
           aggregationType: 'OBSERVATION'
