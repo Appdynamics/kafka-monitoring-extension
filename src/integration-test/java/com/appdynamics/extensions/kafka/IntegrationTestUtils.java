@@ -1,79 +1,59 @@
 package com.appdynamics.extensions.kafka;
-import com.appdynamics.extensions.http.UrlBuilder;
-import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.junit.Assert;
+import com.appdynamics.extensions.controller.*;
+import com.appdynamics.extensions.controller.apiservices.ControllerAPIService;
+import com.appdynamics.extensions.controller.apiservices.ControllerAPIServiceFactory;
+import com.appdynamics.extensions.controller.apiservices.MetricAPIService;
+import com.appdynamics.extensions.logging.ExtensionsLoggerFactory;
+import com.appdynamics.extensions.yml.YmlReader;
+import com.google.common.collect.Maps;
+import org.slf4j.Logger;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.File;
+import java.util.Map;
+
+import static com.appdynamics.extensions.Constants.ENCRYPTION_KEY;
 
 /**
  * @author: {Vishaka Sekar} on {2/11/19}
  */
 public class IntegrationTestUtils {
 
-    private static final String USER_AGENT = "Mozilla/5.0";
+    private static ControllerInfo controllerInfo;
+    private static ControllerClient controllerClient;
+    private  static  ControllerAPIService controllerAPIService;
+    private  static MetricAPIService metricAPIService;
+    private static final Logger logger = ExtensionsLoggerFactory.getLogger(IntegrationTestUtils.class);
 
-    public static UrlBuilder controllerQueryBuilder(String host,String metricPath, String timeRangeType, String durationInMin){
+    public static MetricAPIService setUpControllerClient(File configFile, File installDir){
 
-        UrlBuilder builder = UrlBuilder.builder();
-        String path = "Application%20Infrastructure%20Performance%7CRoot%7CCustom%20Metrics%7CKafka%7CMetrics%20Uploaded";
-        builder.host(host).port(8090).ssl(false).path(path);
-        builder.query("metric-path", metricPath);
-        builder.query("time-range-type", timeRangeType);
-        builder.query("duration-in-mins", durationInMin);
-        builder.query("output", "JSON");
-        return builder;
-    }
-
-    public static void validateMetricNameAndValue(HttpResponse httpResponse, String expectedMetricName, int expectedMetricValue)
-            throws IOException{
-
-        //TODO: add logging stmts
-
-
-        int statusCode = httpResponse.getStatusLine().getStatusCode();
-        Assert.assertEquals("Controller API is unreachable", 200, statusCode);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(
-                httpResponse.getEntity().getContent()));
-        String inputLine;
-        StringBuffer response = new StringBuffer();
-        while ((inputLine = reader.readLine()) != null) {
-            response.append(inputLine);
+        Map<String, ?> config = YmlReader.readFromFileAsMap(configFile);
+        Map controllerInfoMap = (Map) config.get("controllerInfo");
+        if(controllerInfoMap == null) {
+            controllerInfoMap = Maps.newHashMap();
         }
-        reader.close();
+        controllerInfoMap.put(ENCRYPTION_KEY, config.get(ENCRYPTION_KEY));
+        try {
+            controllerInfo = ControllerInfoFactory.initialize(controllerInfoMap, installDir);
+            logger.info("Initialized ControllerInfo");
+            ControllerInfoValidator controllerInfoValidator = new ControllerInfoValidator(controllerInfo);
+            if (controllerInfoValidator.isValidated()) {
+                controllerClient = ControllerClientFactory.initialize(controllerInfo,
+                        (Map<String, ?>) config.get("connection"), (Map<String, ?>) config.get("proxy"),
+                        (String) config.get(ENCRYPTION_KEY));
+                logger.debug("Initialized ControllerClient");
+                controllerAPIService = ControllerAPIServiceFactory.initialize(controllerInfo, controllerClient);
+                logger.debug("Initialized ControllerAPIService");
+                metricAPIService = controllerAPIService.getMetricAPIService();
+                logger.debug("Initialized metricAPIService");
+                return metricAPIService;
+            }
+            logger.warn("ControllerInfo instance is not validated and resolved.....the ControllerClient and ControllerAPIService are null");
+        } catch (Exception e) {
+            logger.error("Unable to initialize the ControllerModule properly.....the ControllerClient and ControllerAPIService will be set to null", e);
+        }
 
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode jsonNode = mapper.readTree(response.toString());
-
-        String metricName = jsonNode.get(0).get("metricName").getTextValue();
-        int metricValue = jsonNode.get(0).get("metricValues").get(0).get("value").getIntValue();
-
-        Assert.assertEquals("Invalid metric name", expectedMetricName, metricName);
-        Assert.assertEquals("Metric value mismatch ", expectedMetricValue, metricValue);
-
+        //TODO: check if this is ok
+        return null;
     }
-
-    public static CloseableHttpClient createHttpClient(String username, String password){
-        CredentialsProvider provider = new BasicCredentialsProvider();
-        UsernamePasswordCredentials credentials
-                = new UsernamePasswordCredentials(username, password);
-        provider.setCredentials(AuthScope.ANY, credentials);
-
-        CloseableHttpClient httpClient = HttpClientBuilder.create()
-                .setDefaultCredentialsProvider(provider)
-                .build();
-
-        return httpClient;
-    }
-
 
 }
