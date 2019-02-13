@@ -123,7 +123,6 @@
                                 <copy todir="${target.dir}">
 
                                     <fileset dir="src/main/resources/conf" includes="config.yml"/>
-                                    <fileset dir="src/main/resources/conf" includes="config_ci.yml"/>
                                     <fileset dir="src/main/resources/conf" includes="monitor.xml"/>
                                     <fileset dir="src/test/resources/keystore/" includes="kafka.client.truststore.jks" />
                                 </copy>
