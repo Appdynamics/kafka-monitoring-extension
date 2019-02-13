@@ -1,4 +1,5 @@
 package com.appdynamics.extensions.kafka;
+import com.appdynamics.extensions.conf.processor.ConfigProcessor;
 import com.appdynamics.extensions.controller.*;
 import com.appdynamics.extensions.controller.apiservices.ControllerAPIService;
 import com.appdynamics.extensions.controller.apiservices.ControllerAPIServiceFactory;
@@ -27,6 +28,7 @@ public class IntegrationTestUtils {
     public static MetricAPIService setUpControllerClient(File configFile, File installDir){
 
         Map<String, ?> config = YmlReader.readFromFileAsMap(configFile);
+        config = ConfigProcessor.process(config);
         Map controllerInfoMap = (Map) config.get("controllerInfo");
         if(controllerInfoMap == null) {
             controllerInfoMap = Maps.newHashMap();
