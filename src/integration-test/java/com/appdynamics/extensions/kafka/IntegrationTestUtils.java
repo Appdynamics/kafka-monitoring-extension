@@ -18,11 +18,11 @@ import static com.appdynamics.extensions.Constants.ENCRYPTION_KEY;
  */
 public class IntegrationTestUtils {
 
-    private static ControllerInfo controllerInfo;
-    private static ControllerClient controllerClient;
-    private  static  ControllerAPIService controllerAPIService;
-    private  static MetricAPIService metricAPIService;
-    private static final Logger logger = ExtensionsLoggerFactory.getLogger(IntegrationTestUtils.class);
+     static ControllerInfo controllerInfo;
+     static ControllerClient controllerClient;
+     static  ControllerAPIService controllerAPIService;
+     static MetricAPIService metricAPIService;
+     static final Logger logger = ExtensionsLoggerFactory.getLogger(IntegrationTestUtils.class);
 
     public static MetricAPIService setUpControllerClient(File configFile, File installDir){
 

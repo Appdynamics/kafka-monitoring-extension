@@ -51,9 +51,9 @@ connection:
 controllerInfo:
     controllerHost: "ec2-54-202-144-212.us-west-2.compute.amazonaws.com"
     controllerPort: 8090
-    account: "${APPDYNAMICS_AGENT_ACCOUNT_NAME}"
+    account: "customer1"
     username: "admin"
-    password: "${APPDYNAMICS_CONTROLLER_PWD}"
+    password: "admin"
     encryptedPassword: ""
     encryptionKey: ""
     controllerSslEnabled: false
