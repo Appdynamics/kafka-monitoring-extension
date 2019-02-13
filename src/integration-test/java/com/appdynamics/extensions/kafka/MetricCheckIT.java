@@ -106,7 +106,7 @@ public class MetricCheckIT {
             JsonNode valueNode = JsonUtils.getNestedObject(jsonNode, "metricName");
             String metricName = (valueNode == null) ? "" : valueNode.get(0).toString();
             int metricValue = (valueNode == null) ? 0 : valueNode.get(0).asInt();
-            Assert.assertEquals("Metric alias is invalid","\"Custom Metrics|Kafka|Local Kafka Server2|kafka.server|ReplicaManager|UnderReplicatedPartitions|Value\"",metricName);
+            Assert.assertEquals("Metric alias is invalid","\"Custom Metrics|Kafka|Local Kafka Server2|kafka.server|ReplicaManager|UnderReplicatedPartitions|UnderReplicatedPartitions\"",metricName);
             Assert.assertNotNull("Metric Value is  null in last 15min, maybe a stale metric ", metricValue);
         }
 
