@@ -11,9 +11,9 @@ metricPrefix: 'Custom Metrics|Kafka'
 servers:
   - host: ""
     port: ""
-    username: ''
+    username: ""
     password: ""
-    encryptedPassword: ''
+    encryptedPassword: ""
     displayName: 'Local Kafka Server'
     useSsl: false # set to true if you're using SSL for this server
 
