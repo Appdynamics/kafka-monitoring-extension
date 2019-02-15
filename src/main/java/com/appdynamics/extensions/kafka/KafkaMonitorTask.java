@@ -136,21 +136,21 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
     private String getPassword () {
         String password = this.kafkaServer.get(Constants.PASSWORD);
         Map<String, ?> configMap = configuration.getConfigYml();
+        java.util.Map<String, String> cryptoMap = Maps.newHashMap();
+        cryptoMap.put(Constants.PASSWORD, password);
         //TODO:commenting out to because CryptoUtil in latest appd-ext-commons is changed.
         //TODO: this will have to re-written
         if (configMap.containsKey(Constants.ENCRYPTION_KEY)) {
             String encryptionKey = configMap.get(Constants.ENCRYPTION_KEY).toString();
             String encryptedPassword = this.kafkaServer.get(Constants.ENCRYPTED_PASSWORD);
             if (!Strings.isNullOrEmpty(encryptionKey) && !Strings.isNullOrEmpty(encryptedPassword)) {
-                java.util.Map<String, String> cryptoMap = Maps.newHashMap();
+
                 cryptoMap.put(Constants.ENCRYPTED_PASSWORD, encryptedPassword);
                 cryptoMap.put(Constants.ENCRYPTION_KEY, encryptionKey);
-                cryptoMap.put(Constants.PASSWORD, password);
-                return CryptoUtils.getPassword(cryptoMap);
 
             }
         }
-        return "";
+        return CryptoUtils.getPassword(cryptoMap);
     }
 
     private Map<String, ?> getConnectionParameters () {
