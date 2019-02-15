@@ -22,7 +22,9 @@ import com.appdynamics.extensions.TasksExecutionServiceProvider;
 import com.appdynamics.extensions.conf.MonitorContextConfiguration;
 import com.appdynamics.extensions.kafka.metrics.DomainMetricsProcessor;
 import com.appdynamics.extensions.kafka.utils.Constants;
+import com.appdynamics.extensions.util.CryptoUtils;
 import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import org.slf4j.LoggerFactory;
 
 import javax.management.remote.JMXConnector;
@@ -134,21 +136,20 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
     private String getPassword () {
         String password = this.kafkaServer.get(Constants.PASSWORD);
         Map<String, ?> configMap = configuration.getConfigYml();
-        if (!Strings.isNullOrEmpty(password)) {
-            return password;
-        }
         //TODO:commenting out to because CryptoUtil in latest appd-ext-commons is changed.
         //TODO: this will have to re-written
-//        if (configMap.containsKey(Constants.ENCRYPTION_KEY)) {
-//            String encryptionKey = configMap.get(Constants.ENCRYPTION_KEY).toString();
-//            String encryptedPassword = this.kafkaServer.get(Constants.ENCRYPTED_PASSWORD);
-//            if (!Strings.isNullOrEmpty(encryptionKey) && !Strings.isNullOrEmpty(encryptedPassword)) {
-//                java.util.Map<String, String> cryptoMap = Maps.newHashMap();
-//                cryptoMap.put(TaskInputArgs.ENCRYPTED_PASSWORD, encryptedPassword);
-//                cryptoMap.put(TaskInputArgs.ENCRYPTION_KEY, encryptionKey);
-//                return CryptoUtil.getPassword(cryptoMap);
-//            }
-//        }
+        if (configMap.containsKey(Constants.ENCRYPTION_KEY)) {
+            String encryptionKey = configMap.get(Constants.ENCRYPTION_KEY).toString();
+            String encryptedPassword = this.kafkaServer.get(Constants.ENCRYPTED_PASSWORD);
+            if (!Strings.isNullOrEmpty(encryptionKey) && !Strings.isNullOrEmpty(encryptedPassword)) {
+                java.util.Map<String, String> cryptoMap = Maps.newHashMap();
+                cryptoMap.put(Constants.ENCRYPTED_PASSWORD, encryptedPassword);
+                cryptoMap.put(Constants.ENCRYPTION_KEY, encryptionKey);
+                cryptoMap.put(Constants.PASSWORD, password);
+                return CryptoUtils.getPassword(cryptoMap);
+
+            }
+        }
         return "";
     }
 

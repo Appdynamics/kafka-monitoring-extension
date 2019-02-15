@@ -65,4 +65,5 @@ public class KafkaMonitor extends ABaseMonitor {
         return (List<Map<String, ?>>) getContextConfiguration().
                 getConfigYml().get(Constants.SERVERS);
     }
+
 }
