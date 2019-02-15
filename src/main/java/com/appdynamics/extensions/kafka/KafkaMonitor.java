@@ -66,5 +66,28 @@ public class KafkaMonitor extends ABaseMonitor {
                 getConfigYml().get(Constants.SERVERS);
     }
 
-
+//    public static void main(String[] args) throws TaskExecutionException, IOException {
+//
+//        ConsoleAppender ca = new ConsoleAppender();
+//        ca.setWriter(new OutputStreamWriter(System.out));
+//        ca.setLayout(new PatternLayout("%-5p [%t]: %m%n"));
+//        ca.setThreshold(Level.DEBUG);
+//        org.apache.log4j.Logger.getRootLogger().addAppender(ca);
+//
+//
+//        KafkaMonitor monitor = new KafkaMonitor();
+//        final Map<String, String> taskArgs = Maps.newHashMap();
+//        taskArgs.put("config-file", "/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension-ci/src/main/resources/conf/config.yml");
+//        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+//        scheduler.scheduleAtFixedRate(new Runnable() {
+//            public void run() {
+//                try {
+//                    monitor.execute(taskArgs, null);
+//                } catch (Exception e) {
+//                    logger.error("Error while running the task", e);
+//                }
+//            }
+//        }, 2, 60, TimeUnit.SECONDS);
+//
+//    }
 }
