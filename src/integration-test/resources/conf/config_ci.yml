@@ -48,6 +48,15 @@ connection:
   sslTrustStoreEncryptedPassword: '' #provide encrypted Password if encryption is needed
 
 
+# Generate a custom dashboard based on the provided template
+customDashboard:
+    enabled: true
+    dashboardName: "Kafka Monitor Dashboard"
+
+    # Update the path to the dashboard file.
+    pathToSIMDashboard: "monitors/KafKa Monitor/CustomDashboard_Kafka+BTD+Dashbaord_1550505032301.json"
+    #pathToNormalDashboard: "monitors/SampleMonitor/normalDashboard.json"
+
 controllerInfo:
     controllerHost: "ec2-54-202-144-212.us-west-2.compute.amazonaws.com"
     controllerPort: 8090
