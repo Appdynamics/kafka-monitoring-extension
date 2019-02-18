@@ -48,6 +48,8 @@ connection:
   sslTrustStoreEncryptedPassword: '' #provide encrypted Password if encryption is needed
 
 
+
+
 # Generate a custom dashboard based on the provided template
 customDashboard:
     enabled: true
@@ -74,6 +76,11 @@ controllerInfo:
     applicationName: ""
     tierName: ""
     nodeName: ""
+
+metricPathReplacements:
+  - replace: "Percent"
+    replaceWith: "%"
+
 
 # Each Kafka server needs 1 thread each, so please configure this according to the number of servers you are monitoring
 # [numberOfThreads] = Number_of_Kafka_Servers_Monitored

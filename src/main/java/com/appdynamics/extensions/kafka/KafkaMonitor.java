@@ -87,7 +87,7 @@ public class KafkaMonitor extends ABaseMonitor {
 
         KafkaMonitor monitor = new KafkaMonitor();
         final Map<String, String> taskArgs = Maps.newHashMap();
-        taskArgs.put("config-file", "/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension-ci/src/integration-test/resources/conf/config_ci.yml");
+        taskArgs.put("config-file", "/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension-ci/src/main/resources/conf/config.yml");
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(new Runnable() {
             public void run() {
