@@ -80,6 +80,8 @@ controllerInfo:
 metricPathReplacements:
   - replace: "Percent"
     replaceWith: "%"
+  - replace: "OneMinuteRate"
+    replaceWith: "1 min Rate"
 
 
 # Each Kafka server needs 1 thread each, so please configure this according to the number of servers you are monitoring
