@@ -1,4 +1,5 @@
 package com.appdynamics.extensions.kafka;
+import com.appdynamics.extensions.controller.apiservices.CustomDashboardAPIService;
 import com.appdynamics.extensions.controller.apiservices.MetricAPIService;
 import com.appdynamics.extensions.util.JsonUtils;
 import org.codehaus.jackson.JsonNode;
@@ -9,11 +10,14 @@ import org.junit.Test;
 
 import java.io.File;
 
+import static com.appdynamics.extensions.util.JsonUtils.getTextValue;
+
 /**
  * @author: {Vishaka Sekar} on {1/31/19}
  */
 public class MetricCheckIT {
     MetricAPIService metricAPIService;
+    CustomDashboardAPIService customDashboardAPIService;
 
 
     @Before
@@ -21,7 +25,8 @@ public class MetricCheckIT {
 
     File installDir = new File("src/integration-test/resources/conf/");
     File configFile = new File("src/integration-test/resources/conf/config_ci.yml");
-    metricAPIService = IntegrationTestUtils.setUpControllerClient(configFile,installDir);
+    metricAPIService = IntegrationTestUtils.setUpMetricAPIService(configFile,installDir);
+    customDashboardAPIService = IntegrationTestUtils.setUpCustomDashBoardAPIService(configFile, installDir);
 
     }
 
@@ -111,6 +116,31 @@ public class MetricCheckIT {
         }
 
     }
+
+    @Test
+    public void checkDashboardsUploaded(){
+
+        if(customDashboardAPIService != null) {
+            JsonNode allDashboardsNode = customDashboardAPIService.getAllDashboards();
+            boolean dashboardPresent = isDashboardPresent("Kafka BTD Dashbaord", allDashboardsNode);
+            Assert.assertTrue(dashboardPresent);
+
+            }
+        }
+
+
+    private boolean isDashboardPresent(String dashboardName, JsonNode existingDashboards) {
+        if (existingDashboards != null) {
+            for (JsonNode existingDashboard : existingDashboards) {
+                if (dashboardName.equals(getTextValue(existingDashboard.get("name")))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
 
 
 
