@@ -122,12 +122,11 @@ public class MetricCheckIT {
 
         if(customDashboardAPIService != null) {
             JsonNode allDashboardsNode = customDashboardAPIService.getAllDashboards();
-            boolean dashboardPresent = isDashboardPresent("Kafka BTD Dashbaord", allDashboardsNode);
+            boolean dashboardPresent = isDashboardPresent("Kafka BTD Dashboard", allDashboardsNode);
             Assert.assertTrue(dashboardPresent);
 
             }
-        }
-
+    }
 
     private boolean isDashboardPresent(String dashboardName, JsonNode existingDashboards) {
         if (existingDashboards != null) {
@@ -139,6 +138,7 @@ public class MetricCheckIT {
         }
         return false;
     }
+
 
 
 

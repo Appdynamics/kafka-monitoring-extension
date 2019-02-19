@@ -53,7 +53,7 @@ connection:
 # Generate a custom dashboard based on the provided template
 customDashboard:
     enabled: true
-    dashboardName: "Kafka Monitor Dashboard"
+    dashboardName: "Kafka BTD Dashboard"
     # Update the path to the dashboard file.
     pathToSIMDashboard: "/opt/appdynamics/monitors/KafkaMonitor/CustomDashboard_Kafka+BTD+Dashbaord_1550505032301.json"
     #pathToNormalDashboard: "monitors/SampleMonitor/normalDashboard.json"
