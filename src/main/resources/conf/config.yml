@@ -9,16 +9,25 @@ metricPrefix: 'Custom Metrics|Kafka'
 
 # Add your Kafka Instances below
 servers:
-  - host: ""
-    port: ""
+  - host: "127.0.0.1"
+    port: "9999"
     username: ""
     password: ""
-    encryptedPassword: ""
+    encryptedPassword:
     displayName: 'Local Kafka Server'
-    useSsl: false # set to true if you're using SSL for this server
+    useSsl: false # set to true if you're using SSL for this server656
+
+#  - host: "${KAFKA_HOST_2}"
+#    port: "${KAFKA_PORT_2}"
+#    username: "${KAFKA_USERNAME}"
+#    password:
+#    encryptedPassword: "old"
+#    displayName: 'Local Kafka Server2'
+#    useSsl: false # set to true if you're using SSL for this server
+
 
   # Provide the encryption key for the encrypted password
-encryptionKey: '${KEY}'
+encryptionKey: ""
 
 # Configure the following connection section ONLY if:
 # the config property [useSsl] is set to true in any of the servers in the 'servers' section
@@ -29,14 +38,48 @@ encryptionKey: '${KEY}'
 
 # If you are using the connection section,
 # any change to the connection section below requires a machine agent restart for the changes to reflect
-connection:
-  socketTimeout: 3000
-  connectTimeout: 1000
-  sslProtocols: 'TLSv1.2'
-  sslCipherSuites: ''
-  sslTrustStorePath: '' #if [sslTrustStorePath]: '' empty, it defaults to <MachineAgent_Home>/conf/cacerts.jks
-  sslTrustStorePassword: '' # [sslTrustStorePassword: ""] defaults to ''
-  sslTrustStoreEncryptedPassword: '' #provide encrypted Password if encryption is needed
+#connection:
+#  socketTimeout: 3000
+#  connectTimeout: 1000
+#  sslProtocols: 'TLSv1.2'
+#  sslCipherSuites: ''
+#  sslTrustStorePath: '/opt/appdynamics/kafka.client.truststore.jks' #if [sslTrustStorePath]: '' empty, it defaults to <MachineAgent_Home>/conf/cacerts.jks
+#  sslTrustStorePassword: 'test1234' # [sslTrustStorePassword: ""] defaults to ''
+#  sslTrustStoreEncryptedPassword: '' #provide encrypted Password if encryption is needed
+metricPathReplacements:
+  - replace: "Percent"
+    replaceWith: "%"
+  - replace: "OneMinuteRate"
+    replaceWith: "1 min Rate"
+
+
+
+# Generate a custom dashboard based on the provided template
+customDashboard:
+    enabled: true
+    dashboardName: "Kafka Monitor Dashboard"
+
+    # Update the path to the dashboard file.
+    pathToSIMDashboard: "/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension-ci/src/integration-test/resources/CustomDashboard_Kafka+BTD+Dashbaord_1550505032301.json"
+    #pathToNormalDashboard: "monitors/SampleMonitor/normalDashboard.json"
+
+controllerInfo:
+    controllerHost: "ec2-54-202-144-212.us-west-2.compute.amazonaws.com"
+    controllerPort: 8090
+    account: "customer1"
+    username: "admin"
+    password: "admin"
+    encryptedPassword: ""
+    encryptionKey: ""
+    controllerSslEnabled: false
+    enableOrchestration: false
+    uniqueHostId: ""
+    accountAccessKey: "4c3eaeba-8115-44ef-89e7-80b0e3eed16a"
+    machinePath: ""
+    simEnabled: true
+    applicationName: ""
+    tierName: ""
+    nodeName: ""
 
 # Each Kafka server needs 1 thread each, so please configure this according to the number of servers you are monitoring
 # [numberOfThreads] = Number_of_Kafka_Servers_Monitored
@@ -51,7 +94,7 @@ mbeans:
   - objectName: 'kafka.server:type=ReplicaManager,name=UnderReplicatedPartitions'
     metrics:
       - Value:
-          alias: 'Value'
+          alias: 'UnderReplicatedPartitions'
           multiplier: ''
           delta: false
           aggregationType: 'OBSERVATION'

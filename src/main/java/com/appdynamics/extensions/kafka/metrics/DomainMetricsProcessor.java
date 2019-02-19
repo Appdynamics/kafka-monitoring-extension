@@ -117,7 +117,7 @@ public class DomainMetricsProcessor {
                                      ObjectInstance instance, Map<String, ?> metricPropertiesMap
     ) {
         String metricPath = metricPrefix + Constants.METRIC_SEPARATOR + buildName(instance) + attributeName;
-        return new Metric(attributeName, attributeValue.toString(), metricPath, metricPropertiesMap);
+        return new Metric(attributeName, attributeValue.toString(),metricPropertiesMap, metricPath, "Custom Metrics|Kafka");
     }
 
     private String buildName (ObjectInstance instance) {
