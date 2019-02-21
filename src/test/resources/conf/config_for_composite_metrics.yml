@@ -9,6 +9,10 @@ servers:
     useSsl: false
     displayName: "Test Kafka Server"
 
+metricPathReplacements:
+  - replace: ".lang"
+    replaceWith: " char"
+
 mbeans:
 
    - objectName: "java.lang:type=Memory"
@@ -21,10 +25,4 @@ mbeans:
              timeRollUpType: "AVERAGE"
              clusterRollUpType: "INDIVIDUAL"
 
-          - HeapMemoryUsage.max:
-             alias: "Heap Memory Usage | max"
-             multiplier: ""
-             delta: "false"
-             aggregationType: "AVERAGE"
-             timeRollUpType: "AVERAGE"
-             clusterRollUpType: "INDIVIDUAL"
+

@@ -1,11 +1,17 @@
 package com.appdynamics.extensions.kafka.metrics;
 
+import com.appdynamics.extensions.ABaseMonitor;
 import com.appdynamics.extensions.AMonitorJob;
 import com.appdynamics.extensions.MetricWriteHelper;
+import com.appdynamics.extensions.conf.MonitorContext;
 import com.appdynamics.extensions.conf.MonitorContextConfiguration;
+import com.appdynamics.extensions.conf.modules.MetricCharSequenceReplaceModule;
 import com.appdynamics.extensions.kafka.JMXConnectionAdapter;
 import com.appdynamics.extensions.metrics.Metric;
+import com.appdynamics.extensions.metrics.MetricCharSequenceReplacer;
+import com.appdynamics.extensions.util.MetricPathUtils;
 import com.appdynamics.extensions.util.PathResolver;
+import com.appdynamics.extensions.yml.YmlReader;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.singularity.ee.agent.systemagent.api.AManagedMonitor;
@@ -20,6 +26,7 @@ import javax.management.openmbean.CompositeType;
 import javax.management.openmbean.OpenDataException;
 import javax.management.openmbean.OpenType;
 import javax.management.remote.JMXConnector;
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
@@ -38,7 +45,21 @@ public class DomainMetricsProcessorTest {
         JMXConnector jmxConnector = mock(JMXConnector.class);
         JMXConnectionAdapter jmxConnectionAdapter = mock(JMXConnectionAdapter.class);
         MetricWriteHelper metricWriteHelper = mock(MetricWriteHelper.class);
+        MonitorContext monitorContext = mock(MonitorContext.class);
+        MonitorContextConfiguration configuration = mock(MonitorContextConfiguration.class);
+        ABaseMonitor kafkaMonitor = mock(ABaseMonitor.class);
+        when(kafkaMonitor.getContextConfiguration()).thenReturn(configuration);
+        when(configuration.getContext()).thenReturn(monitorContext);
+        MetricPathUtils.registerMetricCharSequenceReplacer(kafkaMonitor);
+        Map<String, ?> conf = YmlReader.readFromFile(new File("/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension-ci/src/test/resources/conf/config_composite_and_non_composite_metrics.yml"));
+        MetricCharSequenceReplaceModule metricCharSequenceReplaceModule = new MetricCharSequenceReplaceModule();
+        metricCharSequenceReplaceModule.initMetricCharSequenceReplacer(conf);
+        when(monitorContext.getMetricCharSequenceReplacer()).thenReturn(metricCharSequenceReplaceModule.getMetricCharSequenceReplacer());
 
+        MetricCharSequenceReplacer replacer = mock(MetricCharSequenceReplacer.class);
+        when(monitorContext.getMetricCharSequenceReplacer()).thenReturn(replacer);
+        when(MetricPathUtils.getReplacedString("Count")).thenReturn("Count");
+        when(MetricPathUtils.getReplacedString("Mean Rate")).thenReturn("Mean Rate");
 
         MonitorContextConfiguration contextConfiguration = new MonitorContextConfiguration
                 ("Kafka Monitor",
@@ -71,7 +92,6 @@ public class DomainMetricsProcessorTest {
         ArgumentCaptor<List> pathCaptor = ArgumentCaptor.forClass(List.class);
         domainMetricsProcessor.populateMetricsForMBean(mBeans.get(0));
         verify(metricWriteHelper).transformAndPrintMetrics(pathCaptor.capture());
-
         Metric firstResultMetric = (Metric)pathCaptor.getValue().get(0);
         Metric secondResultMetric = (Metric)pathCaptor.getValue().get(1);
         Assert.assertEquals(firstResultMetric.getMetricName(),"Count");
@@ -94,30 +114,36 @@ public class DomainMetricsProcessorTest {
         JMXConnector jmxConnector = mock(JMXConnector.class);
         JMXConnectionAdapter jmxConnectionAdapter = mock(JMXConnectionAdapter.class);
         MetricWriteHelper metricWriteHelper = mock(MetricWriteHelper.class);
+        MonitorContext monitorContext = mock(MonitorContext.class);
+        MonitorContextConfiguration configuration = mock(MonitorContextConfiguration.class);
+        ABaseMonitor kafkaMonitor = mock(ABaseMonitor.class);
+        when(kafkaMonitor.getContextConfiguration()).thenReturn(configuration);
+        when(configuration.getContext()).thenReturn(monitorContext);
+        MetricPathUtils.registerMetricCharSequenceReplacer(kafkaMonitor);
+        Map<String, ?> conf = YmlReader.readFromFile(new File("src/test/resources/conf/config_for_composite_metrics.yml"));
+        MetricCharSequenceReplaceModule metricCharSequenceReplaceModule = new MetricCharSequenceReplaceModule();
+        metricCharSequenceReplaceModule.initMetricCharSequenceReplacer(conf);
+        when(monitorContext.getMetricCharSequenceReplacer()).thenReturn(metricCharSequenceReplaceModule.getMetricCharSequenceReplacer());
+
+        MetricCharSequenceReplacer replacer = mock(MetricCharSequenceReplacer.class);
+        when(monitorContext.getMetricCharSequenceReplacer()).thenReturn(replacer);
+        when(MetricPathUtils.getReplacedString("HeapMemoryUsage.min")).thenReturn("HeapMemoryUsage Min");
 
         ArgumentCaptor<List> pathCaptor = ArgumentCaptor.forClass(List.class);
-        MonitorContextConfiguration contextConfiguration = new MonitorContextConfiguration
-                ("Kafka Monitor",
-                        "Custom Metrics|Kafka|", PathResolver.resolveDirectory(AManagedMonitor.class),
-                        Mockito.mock(AMonitorJob.class));
-
-
-        contextConfiguration.setConfigYml("src/test/resources/conf/config_for_composite_metrics.yml");
-        Map config = contextConfiguration.getConfigYml();
-        List<Map<String, ?>> mBeans = (List<Map<String, ?>>) config.get("mbeans");
+        List<Map<String, ?>> mBeans = (List<Map<String, ?>>) conf.get("mbeans");
         Set<ObjectInstance> objectInstances = Sets.newHashSet();
         objectInstances.add(new ObjectInstance("java.lang:type=Memory", "test"));
         List<Attribute> attributes = Lists.newArrayList();
         attributes.add(new Attribute("HeapMemoryUsage", createCompositeDataSupportObject()));
-        attributes.add(new Attribute("Count", 100));
-        attributes.add(new Attribute("Mean Rate", 200 ));
+
         List<String> metricNames = Lists.newArrayList();
+
         doReturn(objectInstances).when(jmxConnectionAdapter).queryMBeans(eq(jmxConnector),Mockito.any(ObjectName.class) );
         doReturn(metricNames).when(jmxConnectionAdapter).getReadableAttributeNames(eq(jmxConnector), Mockito.any(ObjectInstance.class));
         doReturn(attributes).when(jmxConnectionAdapter).getAttributes(eq(jmxConnector), Mockito.any(ObjectName.class), Mockito.any(String[]
                 .class));
         DomainMetricsProcessor domainMetricsProcessor = new DomainMetricsProcessor(
-                contextConfiguration, jmxConnectionAdapter,
+                configuration, jmxConnectionAdapter,
                 jmxConnector, "server2", metricWriteHelper);
         for (Map mBean : mBeans) {
 
@@ -125,17 +151,11 @@ public class DomainMetricsProcessorTest {
                 verify(metricWriteHelper)
                         .transformAndPrintMetrics(pathCaptor.capture());
                 Metric firstResultMetric = (Metric)pathCaptor.getValue().get(0);
-                Metric secondResultMetric = (Metric)pathCaptor.getValue().get(1);
-                Assert.assertEquals(firstResultMetric.getMetricName(),"HeapMemoryUsage.min");
+                Assert.assertEquals(firstResultMetric.getMetricName(),"HeapMemoryUsage Min");
                 Assert.assertEquals(firstResultMetric.getMetricValue(), "50");
                 Assert.assertEquals(firstResultMetric.getAggregationType(), "AVERAGE");
                 Assert.assertEquals(firstResultMetric.getClusterRollUpType(), "INDIVIDUAL");
                 Assert.assertEquals(firstResultMetric.getTimeRollUpType(), "AVERAGE");
-                Assert.assertEquals(secondResultMetric.getMetricName(),"HeapMemoryUsage.max");
-                Assert.assertEquals(secondResultMetric.getMetricValue(), "100");
-                Assert.assertEquals(secondResultMetric.getAggregationType(), "AVERAGE");
-                Assert.assertEquals(secondResultMetric.getClusterRollUpType(), "INDIVIDUAL");
-                Assert.assertEquals(secondResultMetric.getTimeRollUpType(), "AVERAGE");
         }
     }
 
@@ -147,16 +167,25 @@ public class DomainMetricsProcessorTest {
         JMXConnector jmxConnector = mock(JMXConnector.class);
         JMXConnectionAdapter jmxConnectionAdapter = mock(JMXConnectionAdapter.class);
         MetricWriteHelper metricWriteHelper = mock(MetricWriteHelper.class);
+        MonitorContext monitorContext = mock(MonitorContext.class);
+        MonitorContextConfiguration configuration = mock(MonitorContextConfiguration.class);
+        ABaseMonitor kafkaMonitor = mock(ABaseMonitor.class);
+        when(kafkaMonitor.getContextConfiguration()).thenReturn(configuration);
+        when(configuration.getContext()).thenReturn(monitorContext);
+        MetricPathUtils.registerMetricCharSequenceReplacer(kafkaMonitor);
+        Map<String, ?> conf = YmlReader.readFromFile(new File("src/test/resources/conf/config_composite_and_non_composite_metrics.yml"));
+        MetricCharSequenceReplaceModule metricCharSequenceReplaceModule = new MetricCharSequenceReplaceModule();
+        metricCharSequenceReplaceModule.initMetricCharSequenceReplacer(conf);
+        when(monitorContext.getMetricCharSequenceReplacer()).thenReturn(metricCharSequenceReplaceModule.getMetricCharSequenceReplacer());
 
-        ArgumentCaptor<List> pathCaptor = ArgumentCaptor.forClass(List.class);
-        MonitorContextConfiguration contextConfiguration = new MonitorContextConfiguration
-                ("Kafka Monitor",
-                        "Custom Metrics|Kafka|", PathResolver.resolveDirectory(AManagedMonitor.class),
-                        Mockito.mock(AMonitorJob.class));
+        MetricCharSequenceReplacer replacer = mock(MetricCharSequenceReplacer.class);
+        when(monitorContext.getMetricCharSequenceReplacer()).thenReturn(replacer);
+        when(MetricPathUtils.getReplacedString("HeapMemoryUsage.min")).thenReturn("HeapMemoryUsage Min");
+        when(MetricPathUtils.getReplacedString("HeapMemoryUsage.max")).thenReturn("HeapMemoryUsage Max");
+        when(MetricPathUtils.getReplacedString("Count")).thenReturn("Count");
+        when(MetricPathUtils.getReplacedString("IsrExpandsPerSec")).thenReturn("IsrExpandsPerSec Min");
 
-        contextConfiguration.setConfigYml("src/test/resources/conf/config_composite_and_non_composite_metrics.yml");
-        Map config = contextConfiguration.getConfigYml();
-        List<Map<String, ?>> mBeans = (List<Map<String, ?>>) config.get("mbeans");
+        List<Map<String, ?>> mBeans = (List<Map<String, ?>>) conf.get("mbeans");
         Set<ObjectInstance> objectInstances = Sets.newHashSet();
         objectInstances.add(new ObjectInstance(
                 "org.apache.kafka.server:type=ReplicaManager,name=IsrExpandsPerSec", "test"));
@@ -164,8 +193,8 @@ public class DomainMetricsProcessorTest {
         attributes.add(new Attribute(("Count"), 0));
         attributes.add(new Attribute("HeapMemoryUsage", createCompositeDataSupportObject()));
         List<String> metricNames = Lists.newArrayList();
-        metricNames.add("metric1");
-        metricNames.add("metric2");
+
+        ArgumentCaptor<List> pathCaptor = ArgumentCaptor.forClass(List.class);
         doReturn(objectInstances).when(jmxConnectionAdapter).queryMBeans(eq(jmxConnector)
                 ,Mockito.any(ObjectName.class) );
         doReturn(metricNames).when(jmxConnectionAdapter).getReadableAttributeNames(eq(jmxConnector)
@@ -174,13 +203,14 @@ public class DomainMetricsProcessorTest {
                 Mockito.any(ObjectName.class), Mockito.any(String[]
                 .class));
         DomainMetricsProcessor domainMetricsProcessor = new DomainMetricsProcessor(
-                contextConfiguration, jmxConnectionAdapter,
+                configuration, jmxConnectionAdapter,
                 jmxConnector,"server1", metricWriteHelper);
         for (Map mBean : mBeans) {
 
                 domainMetricsProcessor.populateMetricsForMBean(mBean);
                 verify(metricWriteHelper)
                         .transformAndPrintMetrics(pathCaptor.capture());
+                System.out.println(pathCaptor.getAllValues());
                 Metric firstResultMetric = (Metric) pathCaptor.getValue().get(0);
                 Metric secondResultMetric = (Metric) pathCaptor.getValue().get(1);
                 Assert.assertEquals(firstResultMetric.getMetricName(), "Count");
@@ -188,7 +218,7 @@ public class DomainMetricsProcessorTest {
                 Assert.assertEquals(firstResultMetric.getAggregationType(), "AVERAGE");
                 Assert.assertEquals(firstResultMetric.getClusterRollUpType(), "INDIVIDUAL");
                 Assert.assertEquals(firstResultMetric.getTimeRollUpType(), "AVERAGE");
-                Assert.assertEquals(secondResultMetric.getMetricName(), "HeapMemoryUsage.min");
+                Assert.assertEquals(secondResultMetric.getMetricName(), "HeapMemoryUsage Min");
                 Assert.assertEquals(secondResultMetric.getMetricValue(), "50");
                 Assert.assertEquals(secondResultMetric.getAggregationType(), "AVERAGE");
                 Assert.assertEquals(secondResultMetric.getClusterRollUpType(), "INDIVIDUAL");

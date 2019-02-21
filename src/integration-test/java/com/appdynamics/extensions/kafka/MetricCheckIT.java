@@ -19,116 +19,107 @@ public class MetricCheckIT {
     MetricAPIService metricAPIService;
     CustomDashboardAPIService customDashboardAPIService;
 
-
     @Before
-    public void setup() {
-
-    File installDir = new File("src/integration-test/resources/conf/");
-    File configFile = new File("src/integration-test/resources/conf/config_ci.yml");
-    metricAPIService = IntegrationTestUtils.setUpMetricAPIService(configFile,installDir);
-    customDashboardAPIService = IntegrationTestUtils.setUpCustomDashBoardAPIService(configFile, installDir);
-
+    public void setup () {
+        File installDir = new File("src/integration-test/resources/conf/");
+        File configFile = new File("src/integration-test/resources/conf/config_ci.yml");
+        metricAPIService = IntegrationTestUtils.setUpMetricAPIService(configFile, installDir);
+        customDashboardAPIService = IntegrationTestUtils.setUpCustomDashBoardAPIService(configFile, installDir);
     }
 
     @After
-    public void tearDown() {
-            //todo: shutdown client
+    public void tearDown () {
+        //todo: shutdown client
     }
 
     @Test
-    public void whenInstanceIsUpThenHeartBeatIs1ForServerWithSSLDisabled(){
-
-    JsonNode jsonNode = null;
-    if(metricAPIService != null) {
-        jsonNode = metricAPIService.getMetricData("",
-                    "Server%20&%20Infrastructure%20Monitoring/metric-data?metric-path=Application%20Infrastructure%20Performance%7CRoot%7CCustom%20Metrics%7CKafka%7CLocal%20Kafka%20Server2%7Ckafka.server%7CHeartBeat&time-range-type=BEFORE_NOW&duration-in-mins=15&output=JSON");
-    }
-    if (jsonNode != null) {
-        JsonNode valueNode = JsonUtils.getNestedObject(jsonNode, "*", "metricValues", "*", "value");
-        int heartBeat = (valueNode == null) ? 0 : valueNode.get(0).asInt();
-        Assert.assertEquals("heartbeat is 0", heartBeat,1);
-    }
-
-    }
-
-    @Test
-    public void whenInstanceIsUpThenHeartBeatIs1ForServerWithSSLEnabled(){
-
+    public void whenInstanceIsUpThenHeartBeatIs1ForServerWithSSLDisabled () {
         JsonNode jsonNode = null;
-        if(metricAPIService != null) {
+        if (metricAPIService != null) {
             jsonNode = metricAPIService.getMetricData("",
-                    "Server%20&%20Infrastructure%20Monitoring/metric-data?metric-path=Application%20Infrastructure%20Performance%7CRoot%7CCustom%20Metrics%7CKafka%7CLocal%20Kafka%20Server%7Ckafka.server%7CHeartBeat&time-range-type=BEFORE_NOW&duration-in-mins=15&output=JSON");
+                    "Server%20&%20Infrastructure%20Monitoring/metric-data?metric-path=Application%20Infrastructure%20Performance%7CRoot%7CCustom%20Metrics%7CKafka%7CLocal%20Kafka%20Server2%7Ckafka.server%7CHeartBeat&time-range-type=BEFORE_NOW&duration-in-mins=15&output=JSON");
         }
+        Assert.assertNotNull("Cannot connect to controller API",jsonNode);
         if (jsonNode != null) {
             JsonNode valueNode = JsonUtils.getNestedObject(jsonNode, "*", "metricValues", "*", "value");
             int heartBeat = (valueNode == null) ? 0 : valueNode.get(0).asInt();
-            Assert.assertEquals("heartbeat is 0", heartBeat,1);
+            Assert.assertEquals("heartbeat is 0", heartBeat, 1);
         }
 
     }
 
     @Test
-    public void whenMultiplierIsAppliedThenCheckMetricValue(){
+    public void whenInstanceIsUpThenHeartBeatIs1ForServerWithSSLEnabled () {
         JsonNode jsonNode = null;
-        if(metricAPIService != null) {
+        if (metricAPIService != null) {
+            jsonNode = metricAPIService.getMetricData("",
+                    "Server%20&%20Infrastructure%20Monitoring/metric-data?metric-path=Application%20Infrastructure%20Performance%7CRoot%7CCustom%20Metrics%7CKafka%7CLocal%20Kafka%20Server%7Ckafka.server%7CHeartBeat&time-range-type=BEFORE_NOW&duration-in-mins=15&output=JSON");
+        }
+        Assert.assertNotNull("Cannot connect to controller API",jsonNode);
+        if (jsonNode != null) {
+            JsonNode valueNode = JsonUtils.getNestedObject(jsonNode, "*", "metricValues", "*", "value");
+            int heartBeat = (valueNode == null) ? 0 : valueNode.get(0).asInt();
+            Assert.assertEquals("heartbeat is 0", 1, heartBeat);
+        }
+    }
+
+    @Test
+    public void whenMultiplierIsAppliedThenCheckMetricValue () {
+        JsonNode jsonNode = null;
+        if (metricAPIService != null) { //TODO: abstract it out to a method
             jsonNode = metricAPIService.getMetricData("",
                     "Server%20&%20Infrastructure%20Monitoring/metric-data?metric-path=Application%20Infrastructure%20Performance%7CRoot%7CCustom%20Metrics%7CKafka%7CLocal%20Kafka%20Server2%7Ckafka.server%7CKafkaRequestHandlerPool%7CRequestHandlerAvgIdlePercent%7COneMinuteRate&time-range-type=BEFORE_NOW&duration-in-mins=15&output=JSON");
         }
+        Assert.assertNotNull("Cannot connect to controller API",jsonNode);
         if (jsonNode != null) {
             JsonNode valueNode = JsonUtils.getNestedObject(jsonNode, "*", "metricValues", "*", "value");
             int requestHandlerAvgPercent = (valueNode == null) ? 0 : valueNode.get(0).asInt();
             Assert.assertTrue((requestHandlerAvgPercent > 90) && (requestHandlerAvgPercent <= 100));
-
         }
-
     }
 
     @Test
-    public void checkTotalNumberOfMetricsReportedIsGreaterThan1(){
+    public void checkTotalNumberOfMetricsReportedIsGreaterThan1 () {
         JsonNode jsonNode = null;
-        if(metricAPIService != null) {
+        if (metricAPIService != null) {
             jsonNode = metricAPIService.getMetricData("",
                     "Server%20&%20Infrastructure%20Monitoring/metric-data?metric-path=Application%20Infrastructure%20Performance%7CRoot%7CCustom%20Metrics%7CKafka%7CMetrics%20Uploaded&time-range-type=BEFORE_NOW&duration-in-mins=15&output=JSON");
         }
+        Assert.assertNotNull("Cannot connect to controller API",jsonNode);
         if (jsonNode != null) {
             JsonNode valueNode = JsonUtils.getNestedObject(jsonNode, "*", "metricValues", "*", "value");
             int totalNumberOfMetricsReported = (valueNode == null) ? 0 : valueNode.get(0).asInt();
             Assert.assertTrue(totalNumberOfMetricsReported > 1);
-
         }
-
     }
 
     @Test
-    public void whenAliasIsAppliedThenCheckMetricName(){
-
+    public void whenAliasIsAppliedThenCheckMetricName () {
         JsonNode jsonNode = null;
-        if(metricAPIService != null) {
+        if (metricAPIService != null) {
             jsonNode = metricAPIService.getMetricData("",
                     "Server%20&%20Infrastructure%20Monitoring/metric-data?metric-path=Application%20Infrastructure%20Performance%7CRoot%7CCustom%20Metrics%7CKafka%7CLocal%20Kafka%20Server2%7Ckafka.server%7CReplicaManager%7CUnderReplicatedPartitions%7CUnderReplicatedPartitions&time-range-type=BEFORE_NOW&duration-in-mins=15&output=JSON");
         }
+        Assert.assertNotNull("Cannot connect to controller API",jsonNode);
         if (jsonNode != null) {
             JsonNode valueNode = JsonUtils.getNestedObject(jsonNode, "metricName");
             String metricName = (valueNode == null) ? "" : valueNode.get(0).toString();
             int metricValue = (valueNode == null) ? 0 : valueNode.get(0).asInt();
-            Assert.assertEquals("Metric alias is invalid","\"Custom Metrics|Kafka|Local Kafka Server2|kafka.server|ReplicaManager|UnderReplicatedPartitions|UnderReplicatedPartitions\"",metricName);
+            Assert.assertEquals("Metric alias is invalid", "\"Custom Metrics|Kafka|Local Kafka Server2|kafka.server|ReplicaManager|UnderReplicatedPartitions|UnderReplicatedPartitions\"", metricName);
             Assert.assertNotNull("Metric Value is  null in last 15min, maybe a stale metric ", metricValue);
         }
-
     }
 
     @Test
-    public void checkDashboardsUploaded(){
-
-        if(customDashboardAPIService != null) {
+    public void checkDashboardsUploaded () {//TODO: have a good dashboard
+        if (customDashboardAPIService != null) {
             JsonNode allDashboardsNode = customDashboardAPIService.getAllDashboards();
             boolean dashboardPresent = isDashboardPresent("Kafka BTD Dashboard", allDashboardsNode);
             Assert.assertTrue(dashboardPresent);
-
-            }
+        }
     }
 
-    private boolean isDashboardPresent(String dashboardName, JsonNode existingDashboards) {
+    private boolean isDashboardPresent (String dashboardName, JsonNode existingDashboards) {
         if (existingDashboards != null) {
             for (JsonNode existingDashboard : existingDashboards) {
                 if (dashboardName.equals(getTextValue(existingDashboard.get("name")))) {
@@ -138,17 +129,4 @@ public class MetricCheckIT {
         }
         return false;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

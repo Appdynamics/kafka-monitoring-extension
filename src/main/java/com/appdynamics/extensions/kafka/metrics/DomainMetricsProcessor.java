@@ -97,8 +97,9 @@ public class DomainMetricsProcessor {
                         }
                     } else {
                         if (metric.containsKey(attribute.getName())) {
-                            metrics.add(setMetricDetails(metricPrefix, attribute.getName(), attribute.getValue(), instance,
-                                    (Map<String, String>) metric.get(attribute.getName())));
+                            Metric metricToBeAdded = setMetricDetails(metricPrefix, attribute.getName(), attribute.getValue(), instance,
+                                    (Map<String, String>) metric.get(attribute.getName()));
+                            metrics.add(metricToBeAdded);
                         }
                     }
                 } catch (Exception e) {
@@ -114,10 +115,13 @@ public class DomainMetricsProcessor {
     }
 
     private Metric setMetricDetails (String metricPrefix, String attributeName, Object attributeValue,
-                                     ObjectInstance instance, Map<String, ?> metricPropertiesMap
-    ) {
-        String metricPath = metricPrefix + Constants.METRIC_SEPARATOR + buildName(instance) + attributeName;
-        return new Metric(attributeName, attributeValue.toString(),metricPropertiesMap, metricPath, "Custom Metrics|Kafka");
+                                     ObjectInstance instance, Map<String, ?> metricPropertiesMap) {
+        String token = null;
+        token =   buildName(instance)+ attributeName;
+        String[] tokens = token.split("\\|");
+        Metric metric = new Metric(attributeName, String.valueOf(attributeValue), metricPropertiesMap, metricPrefix, tokens);
+        return metric;
+
     }
 
     private String buildName (ObjectInstance instance) {

@@ -21,9 +21,14 @@ mbeans:
          clusterRollUpType: "INDIVIDUAL"
 
       - HeapMemoryUsage.min:
-         alias: "Heap Memory Usage | Min"
+#         alias: "Heap Memory Usage | Min"
          multiplier: ""
          delta: "false"
          aggregationType: "AVERAGE"
          timeRollUpType: "SUM"
          clusterRollUpType: "INDIVIDUAL"
+
+#TODO: is this part needed? the values are being mocked in code
+metricPathReplacements:
+  - replace: "HeapMemoryUsage.min"
+    replaceWith: "HeapMemoryUsage min"
