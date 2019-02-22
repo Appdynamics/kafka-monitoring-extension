@@ -18,6 +18,18 @@ import static com.appdynamics.extensions.Constants.ENCRYPTION_KEY;
 /**
  * @author: {Vishaka Sekar} on {2/11/19}
  */
+
+
+/***
+ * This class is not needed , it will eventually be removed as it
+ * can be used directly from Commons code.
+ * This class was created just because this code
+ * was not merged to master branch of commons.
+ *
+ *
+ * */
+
+//TODO: will the objects work if the code is moved to commons?
 public class IntegrationTestUtils {
 
      static ControllerInfo controllerInfo;

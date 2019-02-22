@@ -129,4 +129,22 @@ public class MetricCheckIT {
         }
         return false;
     }
+
+    @Test
+    public void checkMetricCharReplaced () {
+        JsonNode jsonNode = null;
+        if (metricAPIService != null) {
+            jsonNode = metricAPIService.getMetricData("",
+                    "Server%20&%20Infrastructure%20Monitoring/metric-data?metric-path=Application%20Infrastructure%20Performance%7CRoot%7CCustom%20Metrics%7CKafka%7CLocal%20Kafka%20Server2%7Ckafka.server%7CKafkaRequestHandlerPool%7CRequestHandlerAvgIdle%25%7COneMinuteRate&time-range-type=BEFORE_NOW&duration-in-mins=15&output=JSON");
+        }
+        Assert.assertNotNull("Cannot connect to controller API",jsonNode);
+        if (jsonNode != null) {
+            JsonNode valueNode = JsonUtils.getNestedObject(jsonNode, "metricName");
+            String metricName = (valueNode == null) ? "" : valueNode.get(0).toString();
+            int metricValue = (valueNode == null) ? 0 : valueNode.get(0).asInt();
+            Assert.assertEquals("Metric char replacement is not done", "\"Custom Metrics|Kafka|Local Kafka Server2|kafka.server|KafkaRequestHandlerPool|RequestHandlerAvgIdle%|OneMinuteRate\"", metricName);
+            Assert.assertNotNull("Metric Value is  null in last 15min, maybe a stale metric ", metricValue);
+        }
+
+    }
 }
