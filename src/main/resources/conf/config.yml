@@ -15,15 +15,8 @@ servers:
     password: ""
     encryptedPassword:
     displayName: 'Local Kafka Server'
-    useSsl: false # set to true if you're using SSL for this server656
+    useSsl: false # set to true if you're using SSL for this server
 
-#  - host: "${KAFKA_HOST_2}"
-#    port: "${KAFKA_PORT_2}"
-#    username: "${KAFKA_USERNAME}"
-#    password:
-#    encryptedPassword: "old"
-#    displayName: 'Local Kafka Server2'
-#    useSsl: false # set to true if you're using SSL for this server
 
 
   # Provide the encryption key for the encrypted password
@@ -56,7 +49,7 @@ metricPathReplacements:
 
 # Generate a custom dashboard based on the provided template
 customDashboard:
-    enabled: true
+    enabled: false
     dashboardName: "Kafka Monitor Dashboard"
 
     # Update the path to the dashboard file.
@@ -64,17 +57,17 @@ customDashboard:
     #pathToNormalDashboard: "monitors/SampleMonitor/normalDashboard.json"
 
 controllerInfo:
-    controllerHost: "ec2-54-202-144-212.us-west-2.compute.amazonaws.com"
+    controllerHost: ""
     controllerPort: 8090
-    account: "customer1"
-    username: "admin"
-    password: "admin"
+    account: ""
+    username: ""
+    password: ""
     encryptedPassword: ""
     encryptionKey: ""
     controllerSslEnabled: false
     enableOrchestration: false
     uniqueHostId: ""
-    accountAccessKey: "4c3eaeba-8115-44ef-89e7-80b0e3eed16a"
+    accountAccessKey: ""
     machinePath: ""
     simEnabled: true
     applicationName: ""
