@@ -1,5 +1,8 @@
 # AppDynamics Kafka Monitoring Extension CHANGELOG
 
+## 2.0.2 - Feb 22, 2019
+1. Updated SIM metricPrefix in config.yml
+
 ## 2.0.2 - Jan 23, 2019
 1. Fixed null pointer in JMXConnection
 

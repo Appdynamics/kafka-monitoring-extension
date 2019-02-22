@@ -1,5 +1,5 @@
 #If SIM is enabled, use this
-#metricPrefix: 'Custom metrics|Kafka'
+#metricPrefix: 'Custom Metrics|Kafka'
 
 #If SIM is not enabled, then use this
 metricPrefix: 'Server|Component:<Component-ID>|Custom Metrics|Kafka'
