@@ -213,7 +213,7 @@ Always feel free to fork and contribute any changes directly via [GitHub](https:
 ## Version
 | Name                        |  Version                    | 
 | :---------------------------| :---------------------------|
-| Extension Version:          | 2.0.2                     |
+| Extension Version:          | 2.0.3                   |
 | Controller Compatibility:   | 4.0 or Later                |
 | Tested On:                  | Apache Kafka 2.0.0         |
 | Operating System Tested On: | Mac OS, Linux               |
