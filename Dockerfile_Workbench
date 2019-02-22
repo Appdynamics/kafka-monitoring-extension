@@ -1,0 +1,20 @@
+FROM vishakasekar/machineagent:latest AS MA
+RUN pwd
+ARG ENCRYPTION_KEY
+ARG PLAINTEXT_PWD
+ENV ENCRYPTION_KEY=$ENCRYPTION_KEY
+ENV PLAINTEXT_PWD=$PLAINTEXT_PWD
+ADD target/KafkaMonitor-*.zip /opt/appdynamics/monitors
+COPY /src/test/resources/keystore/kafka.client.truststore.jks /opt/appdynamics
+RUN unzip -q "/opt/appdynamics/monitors/KafkaMonitor-*.zip" -d /opt/appdynamics/monitors
+#RUN java -DENCRYPTION_KEY=${ENCRYPTION_KEY} -DPLAINTEXT_PWD=${PLAINTEXT_PWD} -cp  "/opt/appdynamics/monitors/KafkaMonitor/kafka-monitoring-extension.jar" com.appdynamics.extensions.crypto.Encryptor > tmp1.txt
+RUN java -cp "/opt/appdynamics/monitors/KafkaMonitor/kafka-monitoring-extension.jar" com.appdynamics.extensions.crypto.Encryptor $ENCRYPTION_KEY $PLAINTEXT_PWD  > tmp1.txt
+RUN cat tmp1.txt
+COPY /src/integration-test/resources/conf/config_ci.yml /opt/appdynamics/monitors/KafkaMonitor/config.yml
+RUN export KAFKA_ENCRYPTED_PWD="$(head -2 tmp1.txt | tail -1)" && echo $KAFKA_ENCRYPTED_PWD && \
+sed -i "s/old/${KAFKA_ENCRYPTED_PWD}/g" /opt/appdynamics/monitors/KafkaMonitor/config.yml
+RUN find /opt/appdynamics/monitors/ -name '*.zip' -delete
+CMD ["sh", "-c" , "java  -jar  /opt/appdynamics/monitors/KafkaMonitor/kafka-monitoring-extension.jar"]
+
+
+
