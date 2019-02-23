@@ -2,6 +2,10 @@ package com.appdynamics.extensions.kafka;
 import com.appdynamics.extensions.controller.apiservices.CustomDashboardAPIService;
 import com.appdynamics.extensions.controller.apiservices.MetricAPIService;
 import com.appdynamics.extensions.util.JsonUtils;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.codehaus.jackson.JsonNode;
 import org.junit.After;
 import org.junit.Assert;
@@ -9,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
 
 import static com.appdynamics.extensions.util.JsonUtils.getTextValue;
 
@@ -18,6 +23,7 @@ import static com.appdynamics.extensions.util.JsonUtils.getTextValue;
 public class MetricCheckIT {
     MetricAPIService metricAPIService;
     CustomDashboardAPIService customDashboardAPIService;
+
 
     @Before
     public void setup () {
@@ -66,9 +72,9 @@ public class MetricCheckIT {
     @Test
     public void whenMultiplierIsAppliedThenCheckMetricValue () {
         JsonNode jsonNode = null;
-        if (metricAPIService != null) { //TODO: abstract it out to a method
+        if (metricAPIService != null) {
             jsonNode = metricAPIService.getMetricData("",
-                    "Server%20&%20Infrastructure%20Monitoring/metric-data?metric-path=Application%20Infrastructure%20Performance%7CRoot%7CCustom%20Metrics%7CKafka%7CLocal%20Kafka%20Server2%7Ckafka.server%7CKafkaRequestHandlerPool%7CRequestHandlerAvgIdlePercent%7COneMinuteRate&time-range-type=BEFORE_NOW&duration-in-mins=15&output=JSON");
+                    "Server%20&%20Infrastructure%20Monitoring/metric-data?metric-path=Application%20Infrastructure%20Performance%7CRoot%7CCustom%20Metrics%7CKafka%7CLocal%20Kafka%20Server2%7Ckafka.server%7CKafkaRequestHandlerPool%7CRequestHandlerAvgIdle%25%7COneMinuteRate&time-range-type=BEFORE_NOW&duration-in-mins=15&output=JSON");
         }
         Assert.assertNotNull("Cannot connect to controller API",jsonNode);
         if (jsonNode != null) {
@@ -147,4 +153,22 @@ public class MetricCheckIT {
         }
 
     }
+
+
+    @Test
+    public void checkWorkBenchUrlIsUp () {
+
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        HttpGet get = new HttpGet("http://0.0.0.0:9090");
+        try {
+            CloseableHttpResponse response = httpClient.execute(get);
+            Assert.assertEquals(200, response.getStatusLine());
+        }catch (IOException ioe){
+
+
+        }
+
+    }
+
+
 }
