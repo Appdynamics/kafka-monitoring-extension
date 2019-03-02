@@ -51,7 +51,7 @@ public class DomainMetricsProcessorTest {
         when(kafkaMonitor.getContextConfiguration()).thenReturn(configuration);
         when(configuration.getContext()).thenReturn(monitorContext);
         MetricPathUtils.registerMetricCharSequenceReplacer(kafkaMonitor);
-        Map<String, ?> conf = YmlReader.readFromFile(new File("/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension-ci/src/test/resources/conf/config_composite_and_non_composite_metrics.yml"));
+        Map<String, ?> conf = YmlReader.readFromFile(new File("src/test/resources/conf/config_composite_and_non_composite_metrics.yml"));
         MetricCharSequenceReplaceModule metricCharSequenceReplaceModule = new MetricCharSequenceReplaceModule();
         metricCharSequenceReplaceModule.initMetricCharSequenceReplacer(conf);
         when(monitorContext.getMetricCharSequenceReplacer()).thenReturn(metricCharSequenceReplaceModule.getMetricCharSequenceReplacer());
