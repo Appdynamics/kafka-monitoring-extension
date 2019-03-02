@@ -272,7 +272,7 @@
                 <enabled>true</enabled>
             </releases>
             <snapshots>
-                <enabled>false</enabled>
+                <enabled>true</enabled>
             </snapshots>
             <url>https://github.com/Appdynamics/maven-repo/raw/master/releases</url>
         </repository>
