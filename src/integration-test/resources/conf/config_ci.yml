@@ -59,14 +59,14 @@ customDashboard:
     #pathToNormalDashboard: "monitors/SampleMonitor/normalDashboard.json"
 
 controllerInfo:
-    controllerHost: "ec2-54-202-144-212.us-west-2.compute.amazonaws.com"
-    controllerPort: 8090
-    account: "customer1"
+    controllerHost: "${APPDYNAMICS_CONTROLLER_HOST_NAME}"
+    controllerPort: "${APPDYNAMICS_CONTROLLER_PORT}"
+    account: "${APPDYNAMICS_CONTROLLER_SSL_ENABLED}"
     username: "admin"
     password: "admin"
     encryptedPassword: ""
     encryptionKey: ""
-    controllerSslEnabled: false
+    controllerSslEnabled: "${APPDYNAMICS_CONTROLLER_SSL_ENABLED}"
     enableOrchestration: false
     uniqueHostId: ""
     accountAccessKey: "${APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY}"
