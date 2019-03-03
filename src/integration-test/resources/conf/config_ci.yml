@@ -66,7 +66,7 @@ controllerInfo:
     password: "admin"
     encryptedPassword: ""
     encryptionKey: ""
-    controllerSslEnabled: "${APPDYNAMICS_CONTROLLER_SSL_ENABLED}"
+    controllerSslEnabled: false
     enableOrchestration: false
     uniqueHostId: ""
     accountAccessKey: "${APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY}"
