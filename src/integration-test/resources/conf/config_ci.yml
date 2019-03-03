@@ -61,7 +61,7 @@ customDashboard:
 controllerInfo:
     controllerHost: "${APPDYNAMICS_CONTROLLER_HOST_NAME}"
     controllerPort: "${APPDYNAMICS_CONTROLLER_PORT}"
-    account: "${APPDYNAMICS_CONTROLLER_SSL_ENABLED}"
+    account: "${APPDYNAMICS_AGENT_ACCOUNT_NAME}"
     username: "admin"
     password: "admin"
     encryptedPassword: ""
