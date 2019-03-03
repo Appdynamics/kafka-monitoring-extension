@@ -159,7 +159,7 @@ public class MetricCheckIT {
     public void checkWorkBenchUrlIsUp () {
 
         CloseableHttpClient httpClient = HttpClients.createDefault();
-        HttpGet get = new HttpGet("http://0.0.0.0:9090");
+        HttpGet get = new HttpGet("http://0.0.0.0:9089");
         try {
             CloseableHttpResponse response = httpClient.execute(get);
             Assert.assertEquals(200, response.getStatusLine());
