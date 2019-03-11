@@ -70,18 +70,21 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
     public void populateAndPrintMetrics () {
         try {
             BigDecimal connectionStatus = openJMXConnection();
-            List<Map<String, ?>> mBeansListFromConfig = (List<Map<String, ?>>) configuration.getConfigYml()
-                    .get(Constants.MBEANS);
-            DomainMetricsProcessor domainMetricsProcessor = new DomainMetricsProcessor(configuration, jmxAdapter,
-                    jmxConnector, displayName, metricWriteHelper);
-            for (Map mbeanFromConfig : mBeansListFromConfig) {
-                domainMetricsProcessor.populateMetricsForMBean(mbeanFromConfig);
-            }
             metricWriteHelper.printMetric(this.configuration.getMetricPrefix() +
                             Constants.METRIC_SEPARATOR + this.displayName + Constants.METRIC_SEPARATOR + "kafka.server" +
                             Constants.METRIC_SEPARATOR + "HeartBeat",
                     connectionStatus.toString(),
                     Constants.AVERAGE, Constants.AVERAGE, Constants.INDIVIDUAL);
+            if(connectionStatus.equals(BigDecimal.ONE)) {
+                List<Map<String, ?>> mBeansListFromConfig = (List<Map<String, ?>>) configuration.getConfigYml()
+                        .get(Constants.MBEANS);
+                DomainMetricsProcessor domainMetricsProcessor = new DomainMetricsProcessor(configuration, jmxAdapter,
+                        jmxConnector, displayName, metricWriteHelper);
+                for (Map mbeanFromConfig : mBeansListFromConfig) {
+                    domainMetricsProcessor.populateMetricsForMBean(mbeanFromConfig);
+                }
+            }
+
         } catch (Exception e) {
             logger.error("Error while opening JMX connection: {}  {}", this.kafkaServer.get(Constants.DISPLAY_NAME), e);
         } finally {

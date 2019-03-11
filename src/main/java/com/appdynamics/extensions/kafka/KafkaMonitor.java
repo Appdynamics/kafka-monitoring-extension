@@ -40,6 +40,7 @@ public class KafkaMonitor extends ABaseMonitor {
         //#TODO We need to find a better way to handle SSL in JMX.
         SslUtils sslUtils = new SslUtils();
         sslUtils.setSslProperties(configMap);
+
     }
 
     protected String getDefaultMetricPrefix () {
