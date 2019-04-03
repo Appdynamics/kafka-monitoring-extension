@@ -11,23 +11,23 @@ metricPrefix: 'Custom Metrics|Kafka'
 servers:
   - host: "${KAFKA_HOST_1}"
     port: "${KAFKA_PORT_1}"
-    username: "${KAFKA_USERNAME}"
-    password: "${PLAINTEXT_PWD}"
-    encryptedPassword:
+    username: ""
+    password: ""
+    encryptedPassword: ""
     displayName: 'Local Kafka Server'
-    useSsl: true # set to true if you're using SSL for this server656
+    useSsl: true # set to true if you're using SSL for this server
 
   - host: "${KAFKA_HOST_2}"
     port: "${KAFKA_PORT_2}"
-    username: "${KAFKA_USERNAME}"
-    password:
-    encryptedPassword: "old"
+    username: ""
+    password: ""
+    encryptedPassword: ""
     displayName: 'Local Kafka Server2'
     useSsl: false # set to true if you're using SSL for this server
 
 
   # Provide the encryption key for the encrypted password
-encryptionKey: "${ENCRYPTION_KEY}"
+encryptionKey: ""
 
 # Configure the following connection section ONLY if:
 # the config property [useSsl] is set to true in any of the servers in the 'servers' section
@@ -60,10 +60,10 @@ customDashboard:
 
 controllerInfo:
     controllerHost: "${APPDYNAMICS_CONTROLLER_HOST_NAME}"
-    controllerPort: 8090
+    controllerPort: 8080
     account: "${APPDYNAMICS_AGENT_ACCOUNT_NAME}"
-    username: "admin"
-    password: "admin"
+    username: "user1"
+    password: "welcome"
     encryptedPassword: ""
     encryptionKey: ""
     controllerSslEnabled: false
