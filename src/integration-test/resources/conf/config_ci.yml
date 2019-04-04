@@ -59,7 +59,7 @@ customDashboard:
     #pathToNormalDashboard: "monitors/SampleMonitor/normalDashboard.json"
 
 controllerInfo:
-    controllerHost: "${APPDYNAMICS_CONTROLLER_HOST_NAME}"
+    controllerHost: "controller"
     controllerPort: 8080
     account: "${APPDYNAMICS_AGENT_ACCOUNT_NAME}"
     username: "user1"
