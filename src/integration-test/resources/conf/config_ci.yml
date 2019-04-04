@@ -55,13 +55,13 @@ customDashboard:
     enabled: true
     dashboardName: "Kafka BTD Dashboard"
     # Update the path to the dashboard file.
-    pathToSIMDashboard: "/opt/appdynamics/monitors/KafkaMonitor/CustomDashboard_Kafka+BTD+Dashbaord_1550505032301.json"
+    pathToSIMDashboard: "monitors/KafkaMonitor/CustomDashboard_Kafka+BTD+Dashbaord_1550505032301.json"
     #pathToNormalDashboard: "monitors/SampleMonitor/normalDashboard.json"
 
 controllerInfo:
     controllerHost: "controller"
     controllerPort: 8080
-    account: "${APPDYNAMICS_AGENT_ACCOUNT_NAME}"
+    account: "customer1"
     username: "user1"
     password: "welcome"
     encryptedPassword: ""
