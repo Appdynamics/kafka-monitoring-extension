@@ -1,4 +1,5 @@
 package com.appdynamics.extensions.kafka;
+
 import com.appdynamics.extensions.conf.processor.ConfigProcessor;
 import com.appdynamics.extensions.controller.*;
 import com.appdynamics.extensions.controller.apiservices.ControllerAPIService;
@@ -20,93 +21,59 @@ import static com.appdynamics.extensions.Constants.ENCRYPTION_KEY;
  */
 
 
-/***
- * This class is not needed , it will eventually be removed as it
- * can be used directly from Commons code.
- * This class was created just because this code
- * was not merged to master branch of commons.
- *
- *
- * */
-
-//TODO: will the objects work if the code is moved to commons?
 public class IntegrationTestUtils {
 
-     static ControllerInfo controllerInfo;
-     static ControllerClient controllerClient;
-     static  ControllerAPIService controllerAPIService;
-     static MetricAPIService metricAPIService;
-     static CustomDashboardAPIService customDashboardAPIService;
-     static final Logger logger = ExtensionsLoggerFactory.getLogger(IntegrationTestUtils.class);
+    private static final Logger logger = ExtensionsLoggerFactory.getLogger(IntegrationTestUtils.class);
+    private static File installDir = new File("src/integration-test/resources/conf/");
+    private static File configFile = new File("src/integration-test/resources/conf/config_ci.yml");
 
-    public static MetricAPIService setUpMetricAPIService (File configFile, File installDir){
-
-        Map<String, ?> config = YmlReader.readFromFileAsMap(configFile);
-        config = ConfigProcessor.process(config);
-        Map controllerInfoMap = (Map) config.get("controllerInfo");
-        if(controllerInfoMap == null) {
-            controllerInfoMap = Maps.newHashMap();
+    static MetricAPIService initializeMetricAPIService() {
+        ControllerAPIService controllerAPIService = initializeControllerAPIService();
+        if (controllerAPIService != null) {
+            logger.info("Attempting to setup Metric API Service");
+            return controllerAPIService.getMetricAPIService();
+        } else {
+            logger.error("Failed to setup Metric API Service");
+            return null;
         }
-        //this is for test purposes only
-        controllerInfoMap.put("controllerHost","localhost");
-        controllerInfoMap.put(ENCRYPTION_KEY, config.get(ENCRYPTION_KEY));
-        try {
-            controllerInfo = ControllerInfoFactory.initialize(controllerInfoMap, installDir);
-            logger.info("Initialized ControllerInfo");
-            ControllerInfoValidator controllerInfoValidator = new ControllerInfoValidator(controllerInfo);
-            if (controllerInfoValidator.isValidated()) {
-                controllerClient = ControllerClientFactory.initialize(controllerInfo,
-                        (Map<String, ?>) config.get("connection"), (Map<String, ?>) config.get("proxy"),
-                        (String) config.get(ENCRYPTION_KEY));
-                logger.debug("Initialized ControllerClient");
-                controllerAPIService = ControllerAPIServiceFactory.initialize(controllerInfo, controllerClient);
-                logger.debug("Initialized ControllerAPIService");
-                metricAPIService = controllerAPIService.getMetricAPIService();
-                logger.debug("Initialized metricAPIService");
-                return metricAPIService;
-            }
-            logger.warn("ControllerInfo instance is not validated and resolved.....the ControllerClient and ControllerAPIService are null");
-        } catch (Exception e) {
-            logger.error("Unable to initialize the ControllerModule properly.....the ControllerClient and ControllerAPIService will be set to null", e);
-        }
+    }
 
-        //TODO: check if this is ok
-        return null;
+    static CustomDashboardAPIService initializeCustomDashboardAPIService() {
+        ControllerAPIService controllerAPIService = initializeControllerAPIService();
+        if (controllerAPIService != null) {
+            logger.info("Attempting to setup Dashboard API Service");
+            return controllerAPIService.getCustomDashboardAPIService();
+        } else {
+            logger.error("Failed to setup Dashboard API Service");
+            return null;
+        }
     }
 
 
-    public static CustomDashboardAPIService setUpCustomDashBoardAPIService (File configFile, File installDir){
-
+    private static ControllerAPIService initializeControllerAPIService() {
         Map<String, ?> config = YmlReader.readFromFileAsMap(configFile);
         config = ConfigProcessor.process(config);
         Map controllerInfoMap = (Map) config.get("controllerInfo");
-        if(controllerInfoMap == null) {
+        if (controllerInfoMap == null) {
             controllerInfoMap = Maps.newHashMap();
         }
         //this is for test purposes only
         controllerInfoMap.put("controllerHost","localhost");
         controllerInfoMap.put(ENCRYPTION_KEY, config.get(ENCRYPTION_KEY));
         try {
-            controllerInfo = ControllerInfoFactory.initialize(controllerInfoMap, installDir);
+            ControllerInfo controllerInfo = ControllerInfoFactory.initialize(controllerInfoMap, installDir);
             logger.info("Initialized ControllerInfo");
             ControllerInfoValidator controllerInfoValidator = new ControllerInfoValidator(controllerInfo);
             if (controllerInfoValidator.isValidated()) {
-                controllerClient = ControllerClientFactory.initialize(controllerInfo,
+                ControllerClient controllerClient = ControllerClientFactory.initialize(controllerInfo,
                         (Map<String, ?>) config.get("connection"), (Map<String, ?>) config.get("proxy"),
                         (String) config.get(ENCRYPTION_KEY));
                 logger.debug("Initialized ControllerClient");
-                controllerAPIService = ControllerAPIServiceFactory.initialize(controllerInfo, controllerClient);
-                logger.debug("Initialized ControllerAPIService");
-                customDashboardAPIService = controllerAPIService.getCustomDashboardAPIService();
-                logger.debug("Initialized customDashboardAPIService");
-                return customDashboardAPIService;
+                return ControllerAPIServiceFactory.initialize(controllerInfo, controllerClient);
             }
-            logger.warn("ControllerInfo instance is not validated and resolved.....the ControllerClient and ControllerAPIService are null");
-        } catch (Exception e) {
-            logger.error("Unable to initialize the ControllerModule properly.....the ControllerClient and ControllerAPIService will be set to null", e);
+        } catch (Exception ex) {
+            logger.error("Failed to initialize the Controller API Service");
         }
-
-        //TODO: check if this is ok
         return null;
     }
 
