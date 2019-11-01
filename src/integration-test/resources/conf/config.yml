@@ -55,7 +55,7 @@ customDashboard:
     enabled: true
     dashboardName: "Kafka BTD Dashboard"
     # Update the path to the dashboard file.
-    pathToSIMDashboard: "monitors/KafkaMonitor/CustomDashboard_Kafka+BTD+Dashbaord_1550505032301.json"
+    pathToSIMDashboard: "monitors/KafkaMonitor/Kafka+Dashboard.json"
     #pathToNormalDashboard: "monitors/SampleMonitor/normalDashboard.json"
 
 controllerInfo:

@@ -102,9 +102,6 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
             Map<String, String> requestMap = buildRequestMap();
             jmxAdapter = JMXConnectionAdapter.create(requestMap);
             Map<String, Object> connectionMap = (Map<String, Object>) getConnectionParameters();
-            connectionMap.put(Constants.USE_SSL, this.kafkaServer.get(Constants.USE_SSL));
-            logger.debug("[useSsl] is set [{}] for server [{}]", connectionMap.get(Constants.USE_SSL),
-                    this.kafkaServer.get(Constants.DISPLAY_NAME));
             if (configuration.getConfigYml().containsKey(Constants.ENCRYPTION_KEY) &&
                     !Strings.isNullOrEmpty(configuration.getConfigYml().get(Constants.ENCRYPTION_KEY).toString())) {
                 connectionMap.put(Constants.ENCRYPTION_KEY, configuration.getConfigYml().get(Constants.ENCRYPTION_KEY).toString());

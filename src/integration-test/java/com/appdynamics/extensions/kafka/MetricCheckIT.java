@@ -31,11 +31,6 @@ public class MetricCheckIT {
         customDashboardAPIService = IntegrationTestUtils.initializeCustomDashboardAPIService();
     }
 
-    @After
-    public void tearDown() {
-        //todo: shutdown client
-    }
-
     @Test
     public void whenInstanceIsUpThenHeartBeatIs1ForServerWithSSLDisabled() {
         JsonNode jsonNode = null;

@@ -31,6 +31,10 @@ import java.util.Properties;
 
 public  class SSLUtilsTest {
 
+    /**
+     * This class has unit tests when machine agent is started with SSL system properties
+     */
+
     @Before
     public void setUpConnectionWithoutSSL(){
 

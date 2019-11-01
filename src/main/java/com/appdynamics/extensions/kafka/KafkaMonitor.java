@@ -11,7 +11,6 @@ package com.appdynamics.extensions.kafka;
 import com.appdynamics.extensions.ABaseMonitor;
 import com.appdynamics.extensions.TasksExecutionServiceProvider;
 import com.appdynamics.extensions.kafka.utils.Constants;
-import com.appdynamics.extensions.kafka.utils.SslUtils;
 import com.appdynamics.extensions.util.AssertUtils;
 import com.google.common.collect.Maps;
 import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException;
@@ -34,15 +33,6 @@ import static com.appdynamics.extensions.kafka.utils.Constants.DEFAULT_METRIC_PR
 public class KafkaMonitor extends ABaseMonitor {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(KafkaMonitor.class);
 
-    @Override
-    protected void onConfigReload (File file) {
-        Map<String, ?> configMap = this.getContextConfiguration().getConfigYml();
-        //#TODO We need to find a better way to handle SSL in JMX.
-        SslUtils sslUtils = new SslUtils();
-        sslUtils.setSslProperties(configMap);
-
-    }
-
     protected String getDefaultMetricPrefix () {
         return DEFAULT_METRIC_PREFIX;
     }
@@ -63,13 +53,6 @@ public class KafkaMonitor extends ABaseMonitor {
             tasksExecutionServiceProvider.submit(kafkaServer.get(Constants.DISPLAY_NAME), task);
         }
     }
-
-//    protected int getTaskCount () {
-//        List<Map<String, String>> servers = (List<Map<String, String>>) getContextConfiguration().
-//                getConfigYml().get(Constants.SERVERS);
-//        AssertUtils.assertNotNull(servers, "The 'servers' section in config.yml is not initialized");
-//        return servers.size();
-//    }
 
     @Override
     protected List<Map<String, ?>> getServers () {
