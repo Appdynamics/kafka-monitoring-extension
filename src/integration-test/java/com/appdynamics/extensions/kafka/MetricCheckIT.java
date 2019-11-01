@@ -109,10 +109,10 @@ public class MetricCheckIT {
     }
 
     @Test
-    public void checkDashboardsUploaded() {//TODO: have a good dashboard
+    public void checkDashboardsUploaded() {
         if (customDashboardAPIService != null) {
             JsonNode allDashboardsNode = customDashboardAPIService.getAllDashboards();
-            boolean dashboardPresent = isDashboardPresent("Kafka BTD Dashboard", allDashboardsNode);
+            boolean dashboardPresent = isDashboardPresent("Kafka Dashboard", allDashboardsNode);
             Assert.assertTrue(dashboardPresent);
         }
     }
@@ -144,18 +144,4 @@ public class MetricCheckIT {
             Assert.assertNotNull("Metric Value is  null in last 15min, maybe a stale metric ", metricValue);
         }
     }
-
-
-    @Test
-    public void checkWorkBenchUrlIsUp() {
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        HttpGet get = new HttpGet("http://0.0.0.0:9089");
-        try {
-            CloseableHttpResponse response = httpClient.execute(get);
-            Assert.assertEquals(200, response.getStatusLine());
-        } catch (IOException ioe) {
-
-        }
-    }
-
 }
