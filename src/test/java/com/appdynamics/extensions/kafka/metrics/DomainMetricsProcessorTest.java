@@ -42,10 +42,9 @@ public class DomainMetricsProcessorTest {
 
         MonitorContextConfiguration contextConfiguration = new MonitorContextConfiguration
                 ("Kafka Monitor",
-                        "Custom Metrics|Kafka|", PathResolver.resolveDirectory(AManagedMonitor.class),
-                        Mockito.mock(AMonitorJob.class));
+                        "Custom Metrics|Kafka|", PathResolver.resolveDirectory(AManagedMonitor.class));
 
-        contextConfiguration.setConfigYml("src/test/resources/conf/config_for_non_composite_metrics.yml");
+        contextConfiguration.loadConfigYml("src/test/resources/conf/config_for_non_composite_metrics.yml");
         Map config = contextConfiguration.getConfigYml();
         List<Map> mBeans = (List<Map>) config.get("mbeans");
         Set<ObjectInstance> objectInstances = Sets.newHashSet();
@@ -98,11 +97,10 @@ public class DomainMetricsProcessorTest {
         ArgumentCaptor<List> pathCaptor = ArgumentCaptor.forClass(List.class);
         MonitorContextConfiguration contextConfiguration = new MonitorContextConfiguration
                 ("Kafka Monitor",
-                        "Custom Metrics|Kafka|", PathResolver.resolveDirectory(AManagedMonitor.class),
-                        Mockito.mock(AMonitorJob.class));
+                        "Custom Metrics|Kafka|", PathResolver.resolveDirectory(AManagedMonitor.class));
 
 
-        contextConfiguration.setConfigYml("src/test/resources/conf/config_for_composite_metrics.yml");
+        contextConfiguration.loadConfigYml("src/test/resources/conf/config_for_composite_metrics.yml");
         Map config = contextConfiguration.getConfigYml();
         List<Map<String, ?>> mBeans = (List<Map<String, ?>>) config.get("mbeans");
         Set<ObjectInstance> objectInstances = Sets.newHashSet();
@@ -151,10 +149,9 @@ public class DomainMetricsProcessorTest {
         ArgumentCaptor<List> pathCaptor = ArgumentCaptor.forClass(List.class);
         MonitorContextConfiguration contextConfiguration = new MonitorContextConfiguration
                 ("Kafka Monitor",
-                        "Custom Metrics|Kafka|", PathResolver.resolveDirectory(AManagedMonitor.class),
-                        Mockito.mock(AMonitorJob.class));
+                        "Custom Metrics|Kafka|", PathResolver.resolveDirectory(AManagedMonitor.class));
 
-        contextConfiguration.setConfigYml("src/test/resources/conf/config_composite_and_non_composite_metrics.yml");
+        contextConfiguration.loadConfigYml("src/test/resources/conf/config_composite_and_non_composite_metrics.yml");
         Map config = contextConfiguration.getConfigYml();
         List<Map<String, ?>> mBeans = (List<Map<String, ?>>) config.get("mbeans");
         Set<ObjectInstance> objectInstances = Sets.newHashSet();

@@ -1,22 +1,33 @@
 #If SIM is enabled, use this
-#metricPrefix: 'Custom Metrics|Kafka'
+metricPrefix: 'Custom Metrics|Kafka'
 
 #If SIM is not enabled, then use this
-metricPrefix: 'Server|Component:<Component-ID>|Custom Metrics|Kafka'
+#metricPrefix: 'Server|Component:<Component-ID>|Custom Metrics|Kafka'
 
 # To know your Component-ID, Please refer the link
 # https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695
 
+kubernetes:
+  useKubernetes: "true"
+  namespace: "default"
+  containerImageNameToMatch: "kafka"
+  #If there is only 1 container port then extension uses that and no need to provide the containerPortName here.
+  #If there are multiple container ports then provide the containerPortName to filter out the port.
+  containerPortName:
+  podLabels:
+    - name: "run"
+      value: "my-kafka"
+
 # Add your Kafka Instances below
 servers:
-  - serviceUrl: 'service:jmx:rmi:///jndi/rmi://127.0.0.1:9999/jmxrmi' #provide jmx service URL [OR] provide [host][port] pair
+  - serviceUrl: 'service:jmx:rmi:///jndi/rmi://${host}:${port}/jmxrmi' #provide jmx service URL [OR] provide [host][port] pair
     host: ''
     port: ''
     username: ''
     password: ''
     encryptedPassword: ''
-    displayName: 'Local Kafka Server'
-    useSsl: false # set to true if you're using SSL for this server
+    displayName:
+    useSsl: 'false' # set to true if you're using SSL for this server
 
   # Provide the encryption key for the encrypted password
 encryptionKey: ''
@@ -30,14 +41,14 @@ encryptionKey: ''
 
 # If you are using the connection section,
 # any change to the connection section below requires a machine agent restart for the changes to reflect
-connection:
-  socketTimeout: 3000
-  connectTimeout: 1000
-  sslProtocols: 'TLSv1.2'
-  sslCipherSuites: ''
-  sslTrustStorePath: '' #if [sslTrustStorePath]: '' empty, it defaults to <MachineAgent_Home>/conf/cacerts.jks
-  sslTrustStorePassword: '' # [sslTrustStorePassword: ""] defaults to ''
-  sslTrustStoreEncryptedPassword: '' #provide encrypted Password if encryption is needed
+#connection:
+#  socketTimeout: 3000
+#  connectTimeout: 1000
+#  sslProtocols: 'TLSv1.2'
+#  sslCipherSuites: ''
+#  sslTrustStorePath: '' #if [sslTrustStorePath]: '' empty, it defaults to <MachineAgent_Home>/conf/cacerts.jks
+#  sslTrustStorePassword: '' # [sslTrustStorePassword: ""] defaults to ''
+#  sslTrustStoreEncryptedPassword: '' #provide encrypted Password if encryption is needed
 
 # Each Kafka server needs 1 thread each, so please configure this according to the number of servers you are monitoring
 # [numberOfThreads] = Number_of_Kafka_Servers_Monitored
