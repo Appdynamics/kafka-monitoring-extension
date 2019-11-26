@@ -137,8 +137,7 @@
 
                                     <fileset dir="src/main/resources/conf" includes="config.yml"/>
                                     <fileset dir="src/main/resources/conf" includes="monitor.xml"/>
-                                    <fileset dir="src/test/resources/keystore/" includes="kafka.client.truststore.jks" />
-                                    <fileset dir="src/integration-test/resources/" includes="Kafka+Dashboard.json"/>
+                                    <fileset dir="src/main/resources/dashboards/" includes="Kafka+Dashboard.json"/>
                                 </copy>
                                 <copy todir="${target.dir}">
                                     <fileset dir="${build.directory}" includes="${project.artifactId}.${project.packaging}"/>
