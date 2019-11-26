@@ -32,22 +32,21 @@ customDashboard:
     pathToSIMDashboard: "monitors/KafkaMonitor/Kafka+Dashboard.json"
 
 controllerInfo:
-    controllerHost: "controller"
-    controllerPort: 8080
-    account: "customer1"
-    username: "user1"
-    password: "welcome"
-    encryptedPassword: ""
-    encryptionKey: ""
-    controllerSslEnabled: false
-    enableOrchestration: false
-    uniqueHostId: ""
-    accountAccessKey: "${APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY}"
-    machinePath: ""
-    simEnabled: true
-    applicationName: ""
-    tierName: ""
-    nodeName: ""
+  controllerHost: "${APPDYNAMICS_CONTROLLER_HOST_NAME}"
+  controllerPort: 8080
+  controllerSslEnabled: false
+  enableOrchestration: false
+  uniqueHostId: ""
+  username: "${APPDYNAMICS_CONTROLLER_USER}"
+  password: "${APPDYNAMICS_CONTROLLER_PWD}"
+  encryptedPassword: ""
+  accountAccessKey: "${APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY}"
+  account: "${APPDYNAMICS_AGENT_ACCOUNT_NAME}"
+  machinePath: ""
+  simEnabled: true #
+  applicationName: ""
+  tierName: ""
+  nodeName: ""
 
 metricPathReplacements:
   - replace: "Percent"
@@ -98,3 +97,5 @@ mbeans:
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
           clusterRollUpType: 'INDIVIDUAL'
+
+enableHealthChecks: true

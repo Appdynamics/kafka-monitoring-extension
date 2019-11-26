@@ -1,36 +1,15 @@
-FROM dtr.corp.appdynamics.com/appdynamics/machine-agent:latest AS MA
-RUN pwd
-RUN apt-get update && \
-    apt-get install -y openjdk-8-jdk && \
-    apt-get install -y ant && \
-    apt-get clean;
-
-# Fix certificate issues
-RUN apt-get update && \
-    apt-get install ca-certificates-java && \
-    apt-get clean && \
-    update-ca-certificates -f;
-
+FROM alpine:latest
+RUN apk add --no-cache openjdk8
+RUN apk add --no-cache curl
+WORKDIR /opt/appdynamics/machine-agent
+COPY --from=dtr.corp.appdynamics.com/appdynamics/machine-agent /opt/appdynamics/machine-agent .
+WORKDIR /opt/appdynamics/machine-agent/monitors
+COPY target/KafkaMonitor-*.zip KafkaMonitor.zip
+RUN unzip -q KafkaMonitor.zip && \
+    rm KafkaMonitor.zip
+WORKDIR /opt/appdynamics/machine-agent/monitors/KafkaMonitor
+COPY src/integration-test/resources/conf/config.yml config.yml
 # Setup JAVA_HOME
-ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
-RUN export JAVA_HOME
-
-ARG ENCRYPTION_KEY
-ARG PLAINTEXT_PWD
-
-ENV ENCRYPTION_KEY=$ENCRYPTION_KEY
-ENV PLAINTEXT_PWD=$PLAINTEXT_PWD
-ADD target/KafkaMonitor-*.zip /opt/appdynamics/machine-agent/monitors
-COPY /src/test/resources/keystore/kafka.client.truststore.jks /opt/appdynamics
-RUN unzip -q "/opt/appdynamics/machine-agent/monitors/KafkaMonitor-*.zip" -d /opt/appdynamics/machine-agent/monitors
-#RUN java -DENCRYPTION_KEY=${ENCRYPTION_KEY} -DPLAINTEXT_PWD=${PLAINTEXT_PWD} -cp  "/opt/appdynamics/monitors/KafkaMonitor/kafka-monitoring-extension.jar" com.appdynamics.extensions.crypto.Encryptor > tmp1.txt
-RUN java -cp "/opt/appdynamics/machine-agent/monitors/KafkaMonitor/kafka-monitoring-extension.jar" com.appdynamics.extensions.crypto.Encryptor $ENCRYPTION_KEY $PLAINTEXT_PWD  > tmp1.txt
-RUN cat tmp1.txt
-COPY /src/integration-test/resources/conf/config_ci.yml /opt/appdynamics/monitors/machine-agent/KafkaMonitor/config.yml
-RUN export KAFKA_ENCRYPTED_PWD="$(head -2 tmp1.txt | tail -1)" && echo $KAFKA_ENCRYPTED_PWD && \
-sed -i "s@old@${KAFKA_ENCRYPTED_PWD}@g" /opt/appdynamics/machine-agent/monitors/KafkaMonitor/config.yml
-RUN find /opt/appdynamics/machine-agent/monitors/ -name '*.zip' -delete
-CMD ["sh", "-c" , "java  -jar  /opt/appdynamics/machine-agent/monitors/KafkaMonitor/kafka-monitoring-extension.jar localhost 9089"]
-
-
-
+ENV JAVA_HOME=/usr/lib/jvm/java-1.8-openjdk
+ENV PATH="$JAVA_HOME/bin:${PATH}"
+CMD ["sh", "-c", "java -jar kafka-monitoring-extension.jar"]
