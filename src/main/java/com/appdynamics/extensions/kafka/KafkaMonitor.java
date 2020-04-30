@@ -12,23 +12,14 @@ import com.appdynamics.extensions.ABaseMonitor;
 import com.appdynamics.extensions.TasksExecutionServiceProvider;
 import com.appdynamics.extensions.kafka.utils.Constants;
 import com.appdynamics.extensions.util.AssertUtils;
-import com.google.common.collect.Maps;
-import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.PatternLayout;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import static com.appdynamics.extensions.kafka.utils.Constants.DEFAULT_METRIC_PREFIX;
+
+;
 
 public class KafkaMonitor extends ABaseMonitor {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(KafkaMonitor.class);
@@ -60,28 +51,4 @@ public class KafkaMonitor extends ABaseMonitor {
                 getConfigYml().get(Constants.SERVERS);
     }
 
-    public static void main(String[] args) throws TaskExecutionException, IOException {
-
-        ConsoleAppender ca = new ConsoleAppender();
-        ca.setWriter(new OutputStreamWriter(System.out));
-        ca.setLayout(new PatternLayout("%-5p [%t]: %m%n"));
-        ca.setThreshold(Level.DEBUG);
-        org.apache.log4j.Logger.getRootLogger().addAppender(ca);
-
-
-        KafkaMonitor monitor = new KafkaMonitor();
-        final Map<String, String> taskArgs = Maps.newHashMap();
-        taskArgs.put("config-file", "/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension-ci/src/main/resources/conf/config.yml");
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.scheduleAtFixedRate(new Runnable() {
-            public void run() {
-                try {
-                    monitor.execute(taskArgs, null);
-                } catch (Exception e) {
-                    logger.error("Error while running the task", e);
-                }
-            }
-        }, 2, 60, TimeUnit.SECONDS);
-
-    }
 }
