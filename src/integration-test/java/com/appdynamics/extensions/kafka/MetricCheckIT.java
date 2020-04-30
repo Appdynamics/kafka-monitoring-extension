@@ -76,7 +76,7 @@ public class MetricCheckIT {
         if (customDashboardAPIService != null) {
             JsonNode allDashboardsNode = customDashboardAPIService.getAllDashboards();
             Assert.assertNotNull(allDashboardsNode);
-            boolean dashboardPresent = isDashboardPresent("Kafka Dashboard", allDashboardsNode);
+            boolean dashboardPresent = isDashboardPresent("Kafka BTD Dashboard", allDashboardsNode);
             Assert.assertTrue(dashboardPresent);
         }
     }
