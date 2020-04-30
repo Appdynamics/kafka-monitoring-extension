@@ -98,4 +98,14 @@ mbeans:
           timeRollUpType: 'AVERAGE'
           clusterRollUpType: 'INDIVIDUAL'
 
+  - objectName: 'kafka.server:type=KafkaRequestHandlerPool,name=RequestHandlerAvgIdlePercent'
+    metrics:
+      - OneMinuteRate:
+          alias: 'OneMinuteRate'
+          multiplier: '100'
+          delta: false
+          aggregationType: 'AVERAGE'
+          timeRollUpType: 'AVERAGE'
+          clusterRollUpType: 'INDIVIDUAL'
+
 enableHealthChecks: true
