@@ -119,9 +119,7 @@ public class DomainMetricsProcessor {
         String token = null;
         token =   buildName(instance)+ attributeName;
         String[] tokens = token.split("\\|");
-        Metric metric = new Metric(attributeName, String.valueOf(attributeValue), metricPropertiesMap, metricPrefix, tokens);
-        return metric;
-
+        return new Metric(attributeName, String.valueOf(attributeValue), metricPropertiesMap, metricPrefix, tokens);
     }
 
     private String buildName (ObjectInstance instance) {

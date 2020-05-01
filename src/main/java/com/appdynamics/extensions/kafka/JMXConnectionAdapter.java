@@ -23,8 +23,6 @@ import javax.management.*;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
-import javax.management.remote.rmi.RMIConnectorServer;
-import javax.rmi.ssl.SslRMIClientSocketFactory;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.HashMap;
@@ -55,13 +53,6 @@ public class JMXConnectionAdapter {
     JMXConnector open(Map<String, Object> connectionMap) throws IOException {
         JMXConnector jmxConnector;
         final Map<String, Object> env = new HashMap<>();
-
-        if(Boolean.valueOf(connectionMap.get(Constants.USE_SSL).toString())) {
-            //TODO this is not needed as even if you comment it the SSL connections still work.
-            SslRMIClientSocketFactory sslRMIClientSocketFactory = new SslRMIClientSocketFactory();
-            env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, sslRMIClientSocketFactory);
-        }
-
         if (!Strings.isNullOrEmpty(this.username)) {
             env.put(JMXConnector.CREDENTIALS, new String[]{username, password});
         }

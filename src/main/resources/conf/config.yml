@@ -15,32 +15,9 @@ servers:
     password: ""
     encryptedPassword:
     displayName: 'Local Kafka Server'
-    useSsl: false # set to true if you're using SSL for this server
-
-
 
   # Provide the encryption key for the encrypted password
 encryptionKey: ""
-
-# Configure the following connection section ONLY if:
-# the config property [useSsl] is set to true in any of the servers in the 'servers' section
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#  Please REMOVE/COMMENT OUT the connection section below if:
-#  SSL is not being used for ANY of the Kafka servers listed in the 'servers' section
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-# If you are using the connection section,
-# any change to the connection section below requires a machine agent restart for the changes to reflect
-#connection:
-#  socketTimeout: 3000
-#  connectTimeout: 1000
-#  sslProtocols: 'TLSv1.2'
-#  sslCipherSuites: ''
-#  sslTrustStorePath: '/opt/appdynamics/kafka.client.truststore.jks' #if [sslTrustStorePath]: '' empty, it defaults to <MachineAgent_Home>/conf/cacerts.jks
-#  sslTrustStorePassword: 'test1234' # [sslTrustStorePassword: ""] defaults to ''
-#  sslTrustStoreEncryptedPassword: '' #provide encrypted Password if encryption is needed
-
-
 
 metricPathReplacements:
   - replace: "Percent"
@@ -56,7 +33,7 @@ customDashboard:
     dashboardName: "Kafka Monitor Dashboard"
 
     # Update the path to the dashboard file.
-    pathToSIMDashboard: "/Users/vishaka.sekar/AppDynamics/kafka-monitoring-extension-ci/src/integration-test/resources/CustomDashboard_Kafka+BTD+Dashbaord_1550505032301.json"
+    pathToSIMDashboard: "monitors/KafkaMonitor/Kafka+Dashboard.json"
     #pathToNormalDashboard: "monitors/SampleMonitor/normalDashboard.json"
 
 controllerInfo:
@@ -76,6 +53,9 @@ controllerInfo:
     applicationName: ""
     tierName: ""
     nodeName: ""
+
+enableHealthChecks: true
+
 
 # Each Kafka server needs 1 thread each, so please configure this according to the number of servers you are monitoring
 # [numberOfThreads] = Number_of_Kafka_Servers_Monitored

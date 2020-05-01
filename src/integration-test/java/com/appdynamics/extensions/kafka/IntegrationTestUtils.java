@@ -25,7 +25,7 @@ public class IntegrationTestUtils {
 
     private static final Logger logger = ExtensionsLoggerFactory.getLogger(IntegrationTestUtils.class);
     private static File installDir = new File("src/integration-test/resources/conf/");
-    private static File configFile = new File("src/integration-test/resources/conf/config_ci.yml");
+    private static File configFile = new File("src/integration-test/resources/conf/config.yml");
 
     static MetricAPIService initializeMetricAPIService() {
         ControllerAPIService controllerAPIService = initializeControllerAPIService();
@@ -57,8 +57,7 @@ public class IntegrationTestUtils {
         if (controllerInfoMap == null) {
             controllerInfoMap = Maps.newHashMap();
         }
-        //this is for test purposes only
-        controllerInfoMap.put("controllerHost","localhost");
+        controllerInfoMap.put("controllerHost","localhost"); // this is needed because integration test
         controllerInfoMap.put(ENCRYPTION_KEY, config.get(ENCRYPTION_KEY));
         try {
             ControllerInfo controllerInfo = ControllerInfoFactory.initialize(controllerInfoMap, installDir);

@@ -38,11 +38,4 @@ public class Constants {
 
     public static final String INDIVIDUAL = "INDIVIDUAL";
 
-    public static final String TRUST_STORE_PATH = "sslTrustStorePath";
-
-    public static final String TRUST_STORE_PASSWORD = "sslTrustStorePassword";
-
-    public static final String TRUST_STORE_ENCRYPTED_PASSWORD = "sslTrustStoreEncryptedPassword";
-
-    public static final String USE_SSL = "useSsl";
 }

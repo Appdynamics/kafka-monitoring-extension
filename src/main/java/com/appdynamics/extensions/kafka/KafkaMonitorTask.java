@@ -44,11 +44,11 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
     private JMXConnector jmxConnector;
 
     KafkaMonitorTask (TasksExecutionServiceProvider serviceProvider, MonitorContextConfiguration configuration,
-                      Map kafkaServer) {
+                      Map<String, String> kafkaServer) {
         this.configuration = configuration;
         this.kafkaServer = kafkaServer;
         this.metricWriteHelper = serviceProvider.getMetricWriteHelper();
-        this.displayName = (String) kafkaServer.get(Constants.DISPLAY_NAME);
+        this.displayName = kafkaServer.get(Constants.DISPLAY_NAME);
     }
 
     public void onTaskComplete () {
@@ -102,9 +102,6 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
             Map<String, String> requestMap = buildRequestMap();
             jmxAdapter = JMXConnectionAdapter.create(requestMap);
             Map<String, Object> connectionMap = (Map<String, Object>) getConnectionParameters();
-            connectionMap.put(Constants.USE_SSL, this.kafkaServer.get(Constants.USE_SSL));
-            logger.debug("[useSsl] is set [{}] for server [{}]", connectionMap.get(Constants.USE_SSL),
-                    this.kafkaServer.get(Constants.DISPLAY_NAME));
             if (configuration.getConfigYml().containsKey(Constants.ENCRYPTION_KEY) &&
                     !Strings.isNullOrEmpty(configuration.getConfigYml().get(Constants.ENCRYPTION_KEY).toString())) {
                 connectionMap.put(Constants.ENCRYPTION_KEY, configuration.getConfigYml().get(Constants.ENCRYPTION_KEY).toString());
@@ -141,16 +138,12 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
         Map<String, ?> configMap = configuration.getConfigYml();
         java.util.Map<String, String> cryptoMap = Maps.newHashMap();
         cryptoMap.put(Constants.PASSWORD, password);
-        //TODO:commenting out to because CryptoUtil in latest appd-ext-commons is changed.
-        //TODO: this will have to re-written
         if (configMap.containsKey(Constants.ENCRYPTION_KEY)) {
             String encryptionKey = configMap.get(Constants.ENCRYPTION_KEY).toString();
             String encryptedPassword = this.kafkaServer.get(Constants.ENCRYPTED_PASSWORD);
             if (!Strings.isNullOrEmpty(encryptionKey) && !Strings.isNullOrEmpty(encryptedPassword)) {
-
                 cryptoMap.put(Constants.ENCRYPTED_PASSWORD, encryptedPassword);
                 cryptoMap.put(Constants.ENCRYPTION_KEY, encryptionKey);
-
             }
         }
         return CryptoUtils.getPassword(cryptoMap);
@@ -160,8 +153,7 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
         if (configuration.getConfigYml().containsKey(Constants.CONNECTION))
             return (Map<String, ?>) configuration.getConfigYml().get(Constants.CONNECTION);
         else
-            return new HashMap<>();
+            return new HashMap<String, String>();
     }
-
 
 }

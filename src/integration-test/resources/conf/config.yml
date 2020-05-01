@@ -1,0 +1,111 @@
+#If SIM is enabled, use this
+metricPrefix: 'Custom Metrics|Kafka'
+
+#If SIM is not enabled, then use this
+#metricPrefix: 'Server|Component:<Component-ID>|Custom Metrics|Kafka'
+
+# To know your Component-ID, Please refer the link
+# https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695
+
+# Add your Kafka Instances below
+servers:
+  - host: "${KAFKA_HOST_1}"
+    port: "${KAFKA_PORT_1}"
+    username: "${KAFKA_USERNAME}"
+    password: ""
+    encryptedPassword: "${ENCRYPTED_PWD}"
+    displayName: 'Local Kafka Server'
+
+  - host: "${KAFKA_HOST_2}"
+    port: "${KAFKA_PORT_2}"
+    username: ""
+    password: ""
+    encryptedPassword: ""
+    displayName: 'Local Kafka Server2'
+
+encryptionKey: "${ENCRYPTION_KEY}"
+
+# Generate a custom dashboard based on the provided template
+customDashboard:
+    enabled: true
+    dashboardName: "Kafka BTD Dashboard"
+    pathToSIMDashboard: "monitors/KafkaMonitor/Kafka+Dashboard.json"
+
+controllerInfo:
+  controllerHost: "${APPDYNAMICS_CONTROLLER_HOST_NAME}"
+  controllerPort: 8080
+  controllerSslEnabled: false
+  enableOrchestration: false
+  uniqueHostId: ""
+  username: "user1"
+  password: "welcome"
+  encryptedPassword: ""
+  accountAccessKey: "${APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY}"
+  account: "customer1"
+  machinePath: ""
+  simEnabled: true #
+  applicationName: ""
+  tierName: ""
+  nodeName: ""
+
+metricPathReplacements:
+  - replace: "Percent"
+    replaceWith: "%"
+  - replace: "OneMinuteRate"
+    replaceWith: "1 min Rate"
+
+numberOfThreads: 10
+
+mbeans:
+# sample metrics
+  - objectName: 'kafka.server:type=ReplicaManager,name=UnderReplicatedPartitions'
+    metrics:
+      - Value:
+          alias: 'UnderReplicatedPartitions'
+          multiplier: ''
+          delta: false
+          aggregationType: 'OBSERVATION'
+          timeRollUpType: 'CURRENT'
+          clusterRollUpType: 'INDIVIDUAL'
+
+  - objectName: 'kafka.controller:type=KafkaController,name=OfflinePartitionsCount'
+    metrics:
+      - Value:
+          alias: 'Value'
+          multiplier: ''
+          delta: false
+          aggregationType: 'OBSERVATION'
+          timeRollUpType: 'CURRENT'
+          clusterRollUpType: 'INDIVIDUAL'
+
+  - objectName: 'kafka.controller:type=KafkaController,name=ActiveControllerCount'
+    metrics:
+      - Value:
+          alias: 'Value'
+          multiplier: ''
+          delta: false
+          aggregationType: 'OBSERVATION'
+          timeRollUpType: 'CURRENT'
+          clusterRollUpType: 'INDIVIDUAL'
+
+  - objectName: 'kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec'
+    metrics:
+      - OneMinuteRate:
+          alias: 'OneMinuteRate'
+          multiplier: ''
+          delta: false
+          aggregationType: 'AVERAGE'
+          timeRollUpType: 'AVERAGE'
+          clusterRollUpType: 'INDIVIDUAL'
+
+  - objectName: 'kafka.server:type=KafkaRequestHandlerPool,name=RequestHandlerAvgIdlePercent'
+    metrics:
+      - OneMinuteRate:
+          alias: 'OneMinuteRate'
+          multiplier: '100'
+          delta: false
+          aggregationType: 'AVERAGE'
+          timeRollUpType: 'AVERAGE'
+          clusterRollUpType: 'INDIVIDUAL'
+
+enableHealthChecks: true
