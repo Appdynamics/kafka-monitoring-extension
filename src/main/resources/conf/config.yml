@@ -53,8 +53,6 @@ controllerInfo:
     tierName: ""
     nodeName: ""
 
-enableHealthChecks: false
-
 
 # Each Kafka server needs 1 thread each, so please configure this according to the number of servers you are monitoring
 # [numberOfThreads] = Number_of_Kafka_Servers_Monitored
