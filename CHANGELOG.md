@@ -1,6 +1,9 @@
 # AppDynamics Kafka Monitoring Extension 
 ## CHANGELOG
 
+#### 2.0.4 - Jan 4, 2021
+Updated to appd-exts-commons v2.2.4
+
 #### 2.0.4 - July 5, 2020
 Moved to appd-exts-commons v2.2.3
 Added dashboard support and healthCheck module
