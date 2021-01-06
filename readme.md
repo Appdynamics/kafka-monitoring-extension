@@ -164,9 +164,10 @@ Always feel free to fork and contribute any changes directly via [GitHub](https:
 ## Version
 | Name                        |  Version                    | 
 | :---------------------------| :---------------------------|
-| Extension Version:          | 2.0.4                   |
+| Extension Version:          | 2.0.5                   |
 | Controller Compatibility:   | 4.0 or Later                |
+| Agent Compatibility:   | 4.5.13 or Later                |
 | Tested On:                  | Apache Kafka 2.0.0         |
 | Operating System Tested On: | Mac OS, Linux               |
-| Last updated On:            | Apr 30, 2020          |
+| Last updated On:            | 04/01/2021          |
 | List of changes to this extension| [Change log](https://github.com/Appdynamics/kafka-monitoring-extension/blob/master/CHANGELOG.md)

@@ -1,8 +1,8 @@
 #If SIM is enabled, use this
-metricPrefix: 'Custom Metrics|Kafka'
+#metricPrefix: 'Custom Metrics|Kafka'
 
 #If SIM is not enabled, then use this
-#metricPrefix: 'Server|Component:<Component-ID>|Custom Metrics|Kafka'
+metricPrefix: 'Server|Component:<Component-ID>|Custom Metrics|Kafka'
 
 # To know your Component-ID, Please refer the link
 # https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695
@@ -42,8 +42,7 @@ controllerInfo:
     account: ""
     username: ""
     password: ""
-    encryptedPassword: ""
-    encryptionKey: ""
+#    encryptedPassword: ""
     controllerSslEnabled: false
     enableOrchestration: false
     uniqueHostId: ""
@@ -53,8 +52,6 @@ controllerInfo:
     applicationName: ""
     tierName: ""
     nodeName: ""
-
-enableHealthChecks: true
 
 
 # Each Kafka server needs 1 thread each, so please configure this according to the number of servers you are monitoring
