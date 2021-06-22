@@ -3,7 +3,7 @@ Kafka Monitoring Extension for AppDynamics
 
 ## Use Case ##
 Apache Kafka® is a distributed, fault-tolerant streaming platform. It can be used to process streams of data in
-real-time.The Kafka Monitoring extension can be used with a stand alone machine agent to provide metrics for multiple 
+real-time.The Kafka Monitoring extension can be used with a standalone machine agent to provide metrics for multiple 
 Apache Kafka.
 
 ## Prerequisites ##
@@ -20,6 +20,8 @@ or [SIM Agent](https://docs.appdynamics.com/display/PRO44/Server+Visibility).For
 - In the newly created directory <b>"KafkaMonitor"</b>, edit the config.yml to configure the parameters (See Configuration section below)
 - Restart the Machine Agent
 - In the AppDynamics Metric Browser, look for: In the AppDynamics Metric Browser, look for: <b>Application Infrastructure Performance|\<Tier\>|Custom Metrics|Kafka</b>. If SIM is enabled, look for the Metric Browser for the following metric path under the Servers tab: <b>Application Infrastructure Performance|Root|Custom Metrics|Kafka</b>.
+
+## Configuration ##
 
 ##### 1. Configuring ports
 -  According to [Oracle's explanation](https://bugs.java.com/bugdatabase/view_bug.do?bug_id=8035404), JMX opens 3 different ports:
@@ -130,7 +132,7 @@ Configure the Kafka monitoring extension by editing the config.yml file in `<MAC
 - Please copy all the contents of the config.yml file and go to [YamlLint](http://www.yamllint.com/).
 - On reaching the website, paste the contents and press the “Go” button on the bottom left.<br>
 - If you get a valid output, that means your formatting is correct and you may move on to the next step.
-##### 8. Metrics
+## Metrics ##
 - This extension collects metrics via JMX and can be configured to report any of the metrics that Kafka exposes. It provides metrics on Kafka server, controller and the network.
 - In addition, it also provides the JVM metrics:<br/>
 `HeapMemoryUsage.committed, HeapMemoryUsage.max, NonHeapMemoryUsage.committed, NonHeapMemoryUsage.max`
