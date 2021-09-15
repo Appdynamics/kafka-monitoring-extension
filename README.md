@@ -7,15 +7,14 @@ real-time.The Kafka Monitoring extension can be used with a standalone machine a
 Apache Kafka.
 
 ## Prerequisites ##
-- In order to use this extension, you do need a [Standalone JAVA Machine Agent](https://docs.appdynamics.com/display/PRO44/Standalone+Machine+Agents).
-or [SIM Agent](https://docs.appdynamics.com/display/PRO44/Server+Visibility).For more details on downloading these products, please  visit [Downloads](https://download.appdynamics.com/).<br>
+- Before the extension is installed, the prerequisites mentioned [here](https://community.appdynamics.com/t5/Knowledge-Base/Extensions-Prerequisites-Guide/ta-p/35213) need to be met. Please do not proceed with the extension installation if the specified prerequisites are not met.
 - The extension also needs a [Kafka](https://kafka.apache.org/quickstart) server installed.
 - The extension needs to be able to connect to Kafka in order to collect and send metrics. 
   To do this, you will have to either establish a remote connection in between the extension and the product, 
   or have an agent on the same machine running the product in order for the extension to collect and send the metrics.
   
 ## Installation ##
-- To build from source, clone this repository and run 'mvn clean install'. This will produce a KafkaMonitor-VERSION.zip in the target directory Alternatively, download the latest release archive from [GitHub](#https://github.com/Appdynamics/kafka-monitoring-extension)
+- To build from source, clone this repository and run 'mvn clean install'. This will produce a KafkaMonitor-VERSION.zip in the target directory.
 - Unzip the file KafkaMonitor-\[version\].zip into <b><MACHINE_AGENT_HOME>/monitors/</b>
 - In the newly created directory <b>"KafkaMonitor"</b>, edit the config.yml to configure the parameters (See Configuration section below)
 - Restart the Machine Agent
@@ -100,9 +99,9 @@ Configure the Kafka monitoring extension by editing the config.yml file in `<MAC
        | Metric Property   |   Default value |         Possible values         |                                              Description                                                                                                |
        | :---------------- | :-------------- | :------------------------------ | :------------------------------------------------------------------------------------------------------------- |
        | alias             | metric name     | Any string                      | The substitute name to be used in the metric browser instead of metric name.                                   |
-       | aggregationType   | "AVERAGE"       | "AVERAGE", "SUM", "OBSERVATION" | [Aggregation qualifier](https://docs.appdynamics.com/display/PRO44/Build+a+Monitoring+Extension+Using+Java)    |
-       | timeRollUpType    | "AVERAGE"       | "AVERAGE", "SUM", "CURRENT"     | [Time roll-up qualifier](https://docs.appdynamics.com/display/PRO44/Build+a+Monitoring+Extension+Using+Java)   |
-       | clusterRollUpType | "INDIVIDUAL"    | "INDIVIDUAL", "COLLECTIVE"      | [Cluster roll-up qualifier](https://docs.appdynamics.com/display/PRO44/Build+a+Monitoring+Extension+Using+Java)|
+       | aggregationType   | "AVERAGE"       | "AVERAGE", "SUM", "OBSERVATION" | [Aggregation qualifier](https://docs.appdynamics.com/display/latest/Build+a+Monitoring+Extension+Using+Java)    |
+       | timeRollUpType    | "AVERAGE"       | "AVERAGE", "SUM", "CURRENT"     | [Time roll-up qualifier](https://docs.appdynamics.com/display/latest/Build+a+Monitoring+Extension+Using+Java)   |
+       | clusterRollUpType | "INDIVIDUAL"    | "INDIVIDUAL", "COLLECTIVE"      | [Cluster roll-up qualifier](https://docs.appdynamics.com/display/latest/Build+a+Monitoring+Extension+Using+Java)|
        | multiplier        | 1               | Any number                      | Value with which the metric needs to be multiplied.                                                            |
        | convert           | null            | Any key value map               | Set of key value pairs that indicates the value to which the metrics need to be transformed. eg: UP:0, DOWN:1  |
        | delta             | false           | true, false                     | If enabled, gives the delta values of metrics instead of actual values.                                        |
@@ -129,16 +128,14 @@ Configure the Kafka monitoring extension by editing the config.yml file in `<MAC
                          clusterRollUpType: "INDIVIDUAL"
     **All these metric properties are optional, and the default value shown in the table is applied to the metric(if a property has not been specified) by default.** If you need a metric from a specific object under an mBean, `objectName: kafka.server:type=ReplicaManager,name=IsrExpandsPerSec`   will return only those metrics corresponding to the `IsrExpandsPerSec` object.
 ##### 7. Validating config.yml:
-- Please copy all the contents of the config.yml file and go to [YamlLint](http://www.yamllint.com/).
-- On reaching the website, paste the contents and press the “Go” button on the bottom left.<br>
+- Please copy all the contents of the config.yml file and go to [Yaml Validator](https://jsonformatter.org/yaml-validator).
+- On reaching the website, paste the contents and press the “Validate YAML” button.<br>
 - If you get a valid output, that means your formatting is correct and you may move on to the next step.
 ## Metrics ##
 - This extension collects metrics via JMX and can be configured to report any of the metrics that Kafka exposes. It provides metrics on Kafka server, controller and the network.
 - In addition, it also provides the JVM metrics:<br/>
 `HeapMemoryUsage.committed, HeapMemoryUsage.max, NonHeapMemoryUsage.committed, NonHeapMemoryUsage.max`
 - There is also a `HeartBeat` metric under`kafka.server` which denotes whether the connection from the extension to the Kafka server was successful(1 = Successful, 0 = Unsuccessful).
-- By default, a Machine agent or a AppServer agent can send a fixed number of metrics to the controller.
-  To change this limit, please follow the instructions mentioned [here](http://docs.appdynamics.com/display/PRO14S/Metrics+Limits).
 ## Credentials Encryption
 Please visit [this](https://community.appdynamics.com/t5/Knowledge-Base/How-to-use-Password-Encryption-with-Extensions/ta-p/29397) page to get detailed instructions on password encryption. The steps in this document will guide you through the whole process.
 ## Extensions Workbench
@@ -153,9 +150,9 @@ Always feel free to fork and contribute any changes directly via [GitHub](https:
 | Name                        |  Version                    | 
 | :---------------------------| :---------------------------|
 | Extension Version:          | 2.0.5                   |
-| Controller Compatibility:   | 4.0 or Later                |
-| Agent Compatibility:   | 4.5.13 or Later                |
 | Tested On:                  | Apache Kafka 2.0.0         |
 | Operating System Tested On: | Mac OS, Linux               |
 | Last updated On:            | 04/01/2021          |
 | List of changes to this extension| [Change log](https://github.com/Appdynamics/kafka-monitoring-extension/blob/master/CHANGELOG.md)
+  
+**Note**: While extensions are maintained and supported by customers under the open-source licensing model, they interact with agents and Controllers that are subject to [AppDynamics’ maintenance and support policy](https://docs.appdynamics.com/latest/en/product-and-release-announcements/maintenance-support-for-software-versions). Some extensions have been tested with AppDynamics 4.5.13+ artifacts, but you are strongly recommended against using versions that are no longer supported.  
