@@ -8,17 +8,18 @@ Apache Kafka.
 
 ## Prerequisites ##
 - Before the extension is installed, the prerequisites mentioned [here](https://community.appdynamics.com/t5/Knowledge-Base/Extensions-Prerequisites-Guide/ta-p/35213) need to be met. Please do not proceed with the extension installation if the specified prerequisites are not met.
+- Download and install [Apache Maven](https://maven.apache.org/) which is configured with `Java 8` to build the extension artifact from source. You can check the java version used in maven using command `mvn -v` or `mvn --version`. If your maven is using some other java version then please download java 8 for your platform and set JAVA_HOME parameter before starting maven.
 - The extension also needs a [Kafka](https://kafka.apache.org/quickstart) server installed.
 - The extension needs to be able to connect to Kafka in order to collect and send metrics. 
   To do this, you will have to either establish a remote connection in between the extension and the product, 
   or have an agent on the same machine running the product in order for the extension to collect and send the metrics.
   
 ## Installation ##
-- To build from source, clone this repository and run 'mvn clean install'. This will produce a KafkaMonitor-VERSION.zip in the target directory.
+- Clone the "kafka-monitoring-extension" repo using `git clone <repoUrl>` command.
+- Run 'mvn clean install' from "kafka-monitoring-extension". This will produce a KafkaMonitor-VERSION.zip in the target directory.
 - Unzip the file KafkaMonitor-\[version\].zip into <b><MACHINE_AGENT_HOME>/monitors/</b>
 - In the newly created directory <b>"KafkaMonitor"</b>, edit the config.yml to configure the parameters (See Configuration section below)
 - Restart the Machine Agent
-- In the AppDynamics Metric Browser, look for: In the AppDynamics Metric Browser, look for: <b>Application Infrastructure Performance|\<Tier\>|Custom Metrics|Kafka</b>. If SIM is enabled, look for the Metric Browser for the following metric path under the Servers tab: <b>Application Infrastructure Performance|Root|Custom Metrics|Kafka</b>.
 
 ## Configuration ##
 
