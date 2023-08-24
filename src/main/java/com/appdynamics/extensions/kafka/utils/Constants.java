@@ -14,6 +14,8 @@ public class Constants {
 
     public static final String PORT = "port";
 
+    public static final String CONSUMER_PORT = "consumer_port";
+
     public static final String USERNAME = "username";
 
     public static final String PASSWORD = "password";
@@ -37,5 +39,12 @@ public class Constants {
     public static final String AVERAGE = "AVERAGE";
 
     public static final String INDIVIDUAL = "INDIVIDUAL";
+
+    public static final String CONSUMERGROUPS = "consumerGroups";
+
+    public static final String GROUPID = "group_id";
+
+    public static final String TOPIC = "topic";
+
 
 }
