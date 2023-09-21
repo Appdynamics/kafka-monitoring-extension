@@ -21,14 +21,6 @@ servers:
         topic: "kafka1.test.data"
       - group_id: 'testGroup2'
         topic: "kafka1.test.data"
-      - group_id: 'testGroup1'
-        topic: "kafka2.test.data"
-      - group_id: 'testGroup2'
-        topic: "kafka2.test.data"
-      - group_id: 'testGroup1'
-        topic: "kafka3.test.data"
-      - group_id: 'testGroup2'
-        topic: "kafka3.test.data"
 
 
   # Provide the encryption key for the encrypted password
@@ -119,7 +111,7 @@ mbeans:
     metrics:
       - OneMinuteRate:
           alias: 'OneMinuteRate'
-          multiplier: '1'
+          multiplier: ''
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
@@ -130,7 +122,7 @@ mbeans:
     metrics:
       - OneMinuteRate:
           alias: 'OneMinuteRate'
-          multiplier: '1'
+          multiplier: ''
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
@@ -141,7 +133,7 @@ mbeans:
     metrics:
       - OneMinuteRate:
           alias: 'OneMinuteRate'
-          multiplier: '1'
+          multiplier: ''
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
@@ -152,7 +144,7 @@ mbeans:
     metrics:
       - OneMinuteRate:
           alias: 'OneMinuteRate'
-          multiplier: '1'
+          multiplier: ''
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
@@ -174,7 +166,7 @@ mbeans:
     metrics:
       - OneMinuteRate:
           alias: 'OneMinuteRate'
-          multiplier: '1'
+          multiplier: ''
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
@@ -185,7 +177,7 @@ mbeans:
     metrics:
       - OneMinuteRate:
           alias: 'OneMinuteRate'
-          multiplier: '1'
+          multiplier: ''
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
@@ -196,7 +188,7 @@ mbeans:
     metrics:
       - Value:
           alias: 'Value'
-          multiplier: '1'
+          multiplier: ''
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
@@ -231,7 +223,7 @@ mbeans:
     metrics:
       - Value:
           alias: 'Value'
-          multiplier: '1'
+          multiplier: ''
           delta: false
           aggregationType: 'OBSERVATION'
           timeRollUpType: 'CURRENT'
@@ -243,7 +235,7 @@ mbeans:
     metrics:
       - OneMinuteRate:
           alias: 'OneMinuteRate'
-          multiplier: '1'
+          multiplier: ''
           delta: false
           aggregationType: 'OBSERVATION'
           timeRollUpType: 'CURRENT'
@@ -254,7 +246,7 @@ mbeans:
     metrics:
       - OneMinuteRate:
           alias: 'OneMinuteRate'
-          multiplier: '1'
+          multiplier: ''
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
@@ -266,7 +258,7 @@ mbeans:
     metrics:
       - OneMinuteRate:
           alias: 'OneMinuteRate'
-          multiplier: '1'
+          multiplier: ''
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
@@ -279,7 +271,7 @@ mbeans:
     metrics:
       - OneMinuteRate:
           alias: 'OneMinuteRate'
-          multiplier: '1'
+          multiplier: ''
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
@@ -290,7 +282,7 @@ mbeans:
     metrics:
       - HeapMemoryUsage.committed:
           alias: 'Heap Memory Usage | Committed (bytes)'
-          multiplier: '1'
+          multiplier: ''
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
@@ -298,7 +290,7 @@ mbeans:
 
       - HeapMemoryUsage.max:
           alias: 'Heap Memory Usage | Max (bytes)'
-          multiplier: '1'
+          multiplier: ''
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
@@ -306,7 +298,7 @@ mbeans:
 
       - HeapMemoryUsage.used:
           alias: 'Heap Memory Usage | Used (bytes)'
-          multiplier: '1'
+          multiplier: ''
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
@@ -314,7 +306,7 @@ mbeans:
 
       - NonHeapMemoryUsage.committed:
           alias: 'Non Heap Memory Usage | Committed (bytes)'
-          multiplier: '1'
+          multiplier: ''
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'

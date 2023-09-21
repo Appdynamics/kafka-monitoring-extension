@@ -1,0 +1,88 @@
+enabled: true
+#This will create this metric in all the tiers, under this path
+#If you have server viz this works
+#metricPrefix: Custom Metrics|MqttBrokers
+#if no server viz need Tier name as component
+metricPrefix: Server|Component:MQTT_Monitoring|Custom Metrics|MqttBrokers
+
+#This will create it in specific Tier. Replace <TIER_NAME>
+#metricPrefix: Server|Component:<TIER_NAME>|Custom Metrics|Memcached
+
+# List of Memcached Servers
+servers:
+  #"MQTT broker URI to connect to. tcp://127.0.0.1:port(1883) or mqtt://127.0.0.1:port(1883).
+  #Use ws:// for Websockets, wss:// for secure Websockets and ssl:// for TLS encrypted TCP connections."
+  - host: "tcp://host.docker.internal:1883"
+    verbose: true
+    displayName: "localhost_test1" #will be used in metric browser so make sure unique
+    clientID: "localtest_1" #unique id for client, if empty uses displayName and timestamp
+    keepAlive: 60 #keep alive in seconds, if nothing set 60 is default
+    username: #if broker requires set here
+    password: #if broker requires set here
+    qos: 0 #we don't want retention etc so valid values are 0, 1, 2
+    clean-session: true #client connects with clean session, we don't expect to pickup stored messages
+    automatic-reconnect: true #auto reconnect on which is likely what we always want for this
+    topics: # a list of topics, we make configurable here, but it's likely following closely to the relevant sys topics outlined: https://github.com/mqtt/mqtt.org/wiki/SYS-Topics
+      - metric_name: "subscription_count"
+        metric_topic: "$SYS/broker/subscriptions/count"
+        metric_type: "OBSERVATION"
+        metric_time_roll_up: "CURRENT"
+        metric_cluster_roll_up: "INDIVIDUAL"
+        metric_delta: false
+      - metric_name: "clients_total"
+        metric_topic: "$SYS/broker/clients/total"
+        metric_type: "OBSERVATION"
+        metric_time_roll_up: "CURRENT"
+        metric_delta: false
+      - metric_name: "messages_count"
+        metric_topic: "$SYS/broker/store/messages/count"
+        metric_type: "OBSERVATION"
+        metric_time_roll_up: "CURRENT"
+        metric_delta: false
+      - metric_name: "messages_received"
+        metric_topic: "$SYS/broker/messages/received"
+        metric_type: "OBSERVATION"
+        metric_time_roll_up: "CURRENT"
+        metric_delta: true
+        metric_delta_cache_in_seconds: 300
+      - metric_name: "messages_sent"
+        metric_topic: "$SYS/broker/messages/sent"
+        metric_type: "OBSERVATION"
+        metric_time_roll_up: "CURRENT"
+        metric_delta: true
+        metric_delta_cache_in_seconds: 180
+      - metric_name: "connection_load_1min"
+        metric_topic: "$SYS/broker/load/connections/1min"
+        metric_type: "AVERAGE"
+        metric_time_roll_up: "AVERAGE"
+        metric_delta: false
+      - metric_name: "socket_load_1min"
+        metric_topic: "$SYS/broker/load/sockets/1min"
+        metric_type: "AVERAGE"
+        metric_time_roll_up: "AVERAGE"
+        metric_delta: false
+
+
+
+
+#timeout in ms to get data for all the servers
+timeout: 60000
+numberOfThreads: 5
+
+
+controllerInfo:
+  controllerHost: ""
+  controllerPort: 8090
+  account: ""
+  username: ""
+  password: ""
+  encryptedPassword: ""
+  controllerSslEnabled: false
+  enableOrchestration: false
+  uniqueHostId: ""
+  accountAccessKey: ""
+  machinePath: ""
+  simEnabled: true
+  applicationName: ""
+  tierName: ""
+  nodeName: ""

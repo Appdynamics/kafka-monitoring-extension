@@ -11,6 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
@@ -20,6 +22,8 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 
 public class ConsumerGroupLag {
 private final String monitoringConsumerGroupID = "monitoring_consumer_" + UUID.randomUUID().toString();
+private AdminClient adminClient;
+
 public Map<TopicPartition, PartionOffsets> getConsumerGroupOffsets(String host, String topic, String groupId) {
     Map<TopicPartition, Long> logEndOffset = getLogEndOffset(topic, host);
 
@@ -27,7 +31,8 @@ public Map<TopicPartition, PartionOffsets> getConsumerGroupOffsets(String host, 
     for (Entry<TopicPartition, Long> s : logEndOffset.entrySet()) {
         topicPartitions.add(s.getKey());
     }
-    
+    adminClient = getAdminClient(host);
+
     KafkaConsumer<String, Object> consumer = createNewConsumer(groupId, host);
     Map<TopicPartition, OffsetAndMetadata> comittedOffsetMeta = consumer.committed(topicPartitions);
 
@@ -69,6 +74,13 @@ private static KafkaConsumer<String, Object> createNewConsumer(String groupId, S
     properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
     return new KafkaConsumer<>(properties);
 }
+
+private AdminClient getAdminClient(String host) {
+    Properties properties = new Properties();
+    properties.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, host);
+    return AdminClient.create(properties);
+}
+
 
 static class PartionOffsets {
     public long lag;
