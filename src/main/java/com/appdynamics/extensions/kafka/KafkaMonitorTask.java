@@ -98,7 +98,40 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
     }
     public void populateAndPrintLagMetrics () {
         try {
-            List<Map> groups = (List<Map>) this.kafkaServer.get(Constants.CONSUMERGROUPS);
+            /*
+            Change getting a group map from config of group id and topic to using admin client
+
+            List<Map> groups = (List<Map>) [];
+
+            Properties props = ...//here you put your properties
+            AdminClient kafkaClient = AdminClient.create(props);
+
+            //Here you get all the consumer groups
+            List<String> groupIds = kafkaClient.listConsumerGroups().all().get().
+                                   stream().map(s -> s.groupId()).collect(Collectors.toList());
+            Set<String> topics = kafkaClient.listTopics().names().get();
+
+            //Here you get all the descriptions for the groups
+            Map<String, ConsumerGroupDescription> groups = kafkaClient.
+                                                           describeConsumerGroups(groupIds).all().get();
+            for (final String groupId : groupIds) {
+                ConsumerGroupDescription descr = groups.get(groupId);
+                //find if any description is connected to the topic with topicName
+                for (final String topicName : topics) {
+                    Optional<TopicPartition> tp = descr.members().stream().
+                                                  map(s -> s.assignment().topicPartitions()).
+                                                  flatMap(coll -> coll.stream()).
+                                                  filter(s -> s.topic().equals(topicName)).findAny();
+                            if (tp.isPresent()) {
+                                //you found the consumer, so collect the group id somewhere
+                                groups.append({Constants.GROUPID: groupId, Constants.TOPIC: topicName})
+                            }
+                           }
+            }
+             */
+
+
+            //List<Map> groups = (List<Map>) this.kafkaServer.get(Constants.CONSUMERGROUPS);
             logger.info("HERE2");
             String host = (String) this.kafkaServer.get(Constants.HOST) + ':' + (String) this.kafkaServer.get(Constants.CONSUMER_PORT);
             ConsumerGroupLag cgl = new ConsumerGroupLag();
