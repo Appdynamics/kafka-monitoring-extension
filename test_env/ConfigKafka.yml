@@ -2,7 +2,7 @@
 metricPrefix: 'Custom Metrics|KafkaBrokers'
 
 #If SIM is not enabled, then use this
-#metricPrefix: 'Server|Component:KafkaBrokers|Custom Metrics|Kafka'
+#metricPrefix: 'Server|Component:<Component-ID>|Custom Metrics|Kafka'
 
 # To know your Component-ID, Please refer the link
 # https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695
@@ -16,11 +16,8 @@ servers:
     password: ""
     encryptedPassword:
     displayName: 'kafka1'
-    consumerGroups:
-      - group_id: 'testGroup1'
-        topic: "kafka1.test.data"
-      - group_id: 'testGroup2'
-        topic: "kafka1.test.data"
+    lagTopics: '.*'
+
 
   # Provide the encryption key for the encrypted password
 encryptionKey: ""
@@ -74,7 +71,7 @@ mbeans:
     metrics:
       - Value:
           alias: 'UnderReplicatedPartitions'
-          multiplier: ''
+          multiplier: '1'
           delta: false
           aggregationType: 'OBSERVATION'
           timeRollUpType: 'CURRENT'
@@ -86,7 +83,7 @@ mbeans:
     metrics:
       - Value:
           alias: 'Value'
-          multiplier: ''
+          multiplier: '1'
           delta: false
           aggregationType: 'OBSERVATION'
           timeRollUpType: 'CURRENT'
@@ -99,7 +96,7 @@ mbeans:
     metrics:
       - Value:
           alias: 'Value'
-          multiplier: ''
+          multiplier: '1'
           delta: false
           aggregationType: 'OBSERVATION'
           timeRollUpType: 'CURRENT'
@@ -110,7 +107,7 @@ mbeans:
     metrics:
       - OneMinuteRate:
           alias: 'OneMinuteRate'
-          multiplier: ''
+          multiplier: '1'
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
@@ -121,7 +118,7 @@ mbeans:
     metrics:
       - OneMinuteRate:
           alias: 'OneMinuteRate'
-          multiplier: ''
+          multiplier: '1'
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
@@ -132,7 +129,7 @@ mbeans:
     metrics:
       - OneMinuteRate:
           alias: 'OneMinuteRate'
-          multiplier: ''
+          multiplier: '1'
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
@@ -143,7 +140,7 @@ mbeans:
     metrics:
       - OneMinuteRate:
           alias: 'OneMinuteRate'
-          multiplier: ''
+          multiplier: '1'
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
@@ -154,7 +151,7 @@ mbeans:
     metrics:
       - OneMinuteRate:
           alias: 'OneMinuteRate'
-          multiplier: ''
+          multiplier: '1'
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
@@ -165,7 +162,7 @@ mbeans:
     metrics:
       - OneMinuteRate:
           alias: 'OneMinuteRate'
-          multiplier: ''
+          multiplier: '1'
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
@@ -176,7 +173,7 @@ mbeans:
     metrics:
       - OneMinuteRate:
           alias: 'OneMinuteRate'
-          multiplier: ''
+          multiplier: '1'
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
@@ -187,7 +184,7 @@ mbeans:
     metrics:
       - Value:
           alias: 'Value'
-          multiplier: ''
+          multiplier: '1'
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
@@ -222,7 +219,7 @@ mbeans:
     metrics:
       - Value:
           alias: 'Value'
-          multiplier: ''
+          multiplier: '1'
           delta: false
           aggregationType: 'OBSERVATION'
           timeRollUpType: 'CURRENT'
@@ -234,7 +231,7 @@ mbeans:
     metrics:
       - OneMinuteRate:
           alias: 'OneMinuteRate'
-          multiplier: ''
+          multiplier: '1'
           delta: false
           aggregationType: 'OBSERVATION'
           timeRollUpType: 'CURRENT'
@@ -245,7 +242,7 @@ mbeans:
     metrics:
       - OneMinuteRate:
           alias: 'OneMinuteRate'
-          multiplier: ''
+          multiplier: '1'
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
@@ -257,7 +254,7 @@ mbeans:
     metrics:
       - OneMinuteRate:
           alias: 'OneMinuteRate'
-          multiplier: ''
+          multiplier: '1'
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
@@ -270,7 +267,7 @@ mbeans:
     metrics:
       - OneMinuteRate:
           alias: 'OneMinuteRate'
-          multiplier: ''
+          multiplier: '1'
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
@@ -281,7 +278,7 @@ mbeans:
     metrics:
       - HeapMemoryUsage.committed:
           alias: 'Heap Memory Usage | Committed (bytes)'
-          multiplier: ''
+          multiplier: '1'
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
@@ -289,7 +286,7 @@ mbeans:
 
       - HeapMemoryUsage.max:
           alias: 'Heap Memory Usage | Max (bytes)'
-          multiplier: ''
+          multiplier: '1'
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
@@ -297,7 +294,7 @@ mbeans:
 
       - HeapMemoryUsage.used:
           alias: 'Heap Memory Usage | Used (bytes)'
-          multiplier: ''
+          multiplier: '1'
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'
@@ -305,7 +302,7 @@ mbeans:
 
       - NonHeapMemoryUsage.committed:
           alias: 'Non Heap Memory Usage | Committed (bytes)'
-          multiplier: ''
+          multiplier: '1'
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'

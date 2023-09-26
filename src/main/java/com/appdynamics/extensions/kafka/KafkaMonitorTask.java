@@ -16,6 +16,7 @@
 
 package com.appdynamics.extensions.kafka;
 
+import org.apache.kafka.clients.admin.*;
 import com.appdynamics.extensions.AMonitorTaskRunnable;
 import com.appdynamics.extensions.MetricWriteHelper;
 import com.appdynamics.extensions.TasksExecutionServiceProvider;
@@ -31,9 +32,11 @@ import org.slf4j.LoggerFactory;
 import javax.management.remote.JMXConnector;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.HashMap;
+import java.util.*;
+import java.util.regex.*;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class KafkaMonitorTask implements AMonitorTaskRunnable {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(KafkaMonitorTask.class);
@@ -58,10 +61,10 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
 
     public void run () {
         try {
-            logger.info("Starting Kafka Monitoring task for Kafka server: {} ", this.kafkaServer.get(Constants.DISPLAY_NAME));
+            logger.debug("Starting Kafka Monitoring task for Kafka server: {} ", this.kafkaServer.get(Constants.DISPLAY_NAME));
             populateAndPrintMetrics();
             populateAndPrintLagMetrics();
-            logger.info("Completed Kafka Monitoring task for Kafka server: {}",
+            logger.debug("Completed Kafka Monitoring task for Kafka server: {}",
                     this.kafkaServer.get(Constants.DISPLAY_NAME));
         } catch (Exception e) {
             logger.error("Exception occurred while collecting metrics for: {} {}",
@@ -73,8 +76,8 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
         try {
             BigDecimal connectionStatus = openJMXConnection();
             metricWriteHelper.printMetric(this.configuration.getMetricPrefix() +
-                            Constants.METRIC_SEPARATOR + this.displayName + Constants.METRIC_SEPARATOR + "kafka.server" +
-                            Constants.METRIC_SEPARATOR + "HeartBeat", connectionStatus.toString(), Constants.AVERAGE, Constants.AVERAGE, Constants.INDIVIDUAL);
+                    Constants.METRIC_SEPARATOR + this.displayName + Constants.METRIC_SEPARATOR + "kafka.server" +
+                    Constants.METRIC_SEPARATOR + "HeartBeat", connectionStatus.toString(), Constants.AVERAGE, Constants.AVERAGE, Constants.INDIVIDUAL);
             if(connectionStatus.equals(BigDecimal.ONE)) {
                 List<Map<String, ?>> mBeansListFromConfig = (List<Map<String, ?>>) configuration.getConfigYml()
                         .get(Constants.MBEANS);
@@ -98,73 +101,54 @@ public class KafkaMonitorTask implements AMonitorTaskRunnable {
     }
     public void populateAndPrintLagMetrics () {
         try {
-            /*
-            Change getting a group map from config of group id and topic to using admin client
 
-            List<Map> groups = (List<Map>) [];
-
-            Properties props = ...//here you put your properties
-            AdminClient kafkaClient = AdminClient.create(props);
-
-            //Here you get all the consumer groups
-            List<String> groupIds = kafkaClient.listConsumerGroups().all().get().
-                                   stream().map(s -> s.groupId()).collect(Collectors.toList());
-            Set<String> topics = kafkaClient.listTopics().names().get();
-
-            //Here you get all the descriptions for the groups
-            Map<String, ConsumerGroupDescription> groups = kafkaClient.
-                                                           describeConsumerGroups(groupIds).all().get();
-            for (final String groupId : groupIds) {
-                ConsumerGroupDescription descr = groups.get(groupId);
-                //find if any description is connected to the topic with topicName
-                for (final String topicName : topics) {
-                    Optional<TopicPartition> tp = descr.members().stream().
-                                                  map(s -> s.assignment().topicPartitions()).
-                                                  flatMap(coll -> coll.stream()).
-                                                  filter(s -> s.topic().equals(topicName)).findAny();
-                            if (tp.isPresent()) {
-                                //you found the consumer, so collect the group id somewhere
-                                groups.append({Constants.GROUPID: groupId, Constants.TOPIC: topicName})
-                            }
-                           }
-            }
-             */
-
-
-            //List<Map> groups = (List<Map>) this.kafkaServer.get(Constants.CONSUMERGROUPS);
-            logger.info("HERE2");
+            String topicRegex =  (String) this.kafkaServer.get(Constants.TOPIC);
             String host = (String) this.kafkaServer.get(Constants.HOST) + ':' + (String) this.kafkaServer.get(Constants.CONSUMER_PORT);
+
+            Properties properties = new Properties();
+            properties.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, host);
+            AdminClient kafkaAdmin = AdminClient.create(properties);
+
+            List<String> groupIds = kafkaAdmin.listConsumerGroups().all().get().stream().map(s -> s.groupId()).collect(Collectors.toList());
+            Set<String> topics = kafkaAdmin.listTopics().names().get();
             ConsumerGroupLag cgl = new ConsumerGroupLag();
-            logger.info("HERE3");
-            for (Map<String, ?> group : groups) {
-                logger.info("HERE4");
-                String groupid = (String) group.get(Constants.GROUPID);
-                String topic = (String) group.get(Constants.TOPIC);
-                Map<TopicPartition, ConsumerGroupLag.PartionOffsets> lag = cgl.getConsumerGroupOffsets(host, topic, groupid);
-                logger.info(lag.toString());
+            Map<TopicPartition, Long> lagSet = new ConcurrentHashMap<>();
 
-                for (Map.Entry<TopicPartition, ConsumerGroupLag.PartionOffsets> entry : lag.entrySet()) {
-                    String key = String.valueOf(entry.getKey());
-                    ConsumerGroupLag.PartionOffsets offsets = entry.getValue();
-                    logger.info("Key = " + entry.getKey() + ", Value = " + offsets.toString());
+            logger.debug("AA Scanning Groups to check for lags");
 
-                    metricWriteHelper.printMetric(this.configuration.getMetricPrefix() +
-                                    Constants.METRIC_SEPARATOR + "ConsumerLag" + Constants.METRIC_SEPARATOR + offsets.getTopic() + '-' + groupid + Constants.METRIC_SEPARATOR + offsets.getPartition() +
-                                    Constants.METRIC_SEPARATOR + "currentOffset", String.valueOf(offsets.getCurrentOffset()),
-                            Constants.AVERAGE, Constants.AVERAGE, Constants.INDIVIDUAL);
-
-                    metricWriteHelper.printMetric(this.configuration.getMetricPrefix() +
-                                    Constants.METRIC_SEPARATOR + "ConsumerLag" + Constants.METRIC_SEPARATOR + offsets.getTopic() + '-' + groupid + Constants.METRIC_SEPARATOR + offsets.getPartition() +
-                                    Constants.METRIC_SEPARATOR + "endOffset",  String.valueOf(offsets.endOffset),
-                            Constants.AVERAGE, Constants.AVERAGE, Constants.INDIVIDUAL);
-
-                    metricWriteHelper.printMetric(this.configuration.getMetricPrefix() +
-                                    Constants.METRIC_SEPARATOR + "ConsumerLag" + Constants.METRIC_SEPARATOR + offsets.getTopic() + '-' + groupid + Constants.METRIC_SEPARATOR + offsets.getPartition() +
-                                    Constants.METRIC_SEPARATOR + "lag", String.valueOf(offsets.getLag()),
-                            Constants.AVERAGE, Constants.AVERAGE, Constants.INDIVIDUAL);
-
+            for (final String topicName : topics) {
+                logger.debug("AA ReviewingTopic:" + topicName);
+                boolean isMatch = Pattern.matches(topicRegex, topicName);
+                if (isMatch) {
+                    for (final String groupId : groupIds) {
+                        logger.debug("AA ReviewingTopic:" + topicName + " GroupName:" + groupId);
+                        Map<TopicPartition, ConsumerGroupLag.PartionOffsets> lag = cgl.getConsumerGroupOffsets(host, topicName, groupId);
+                        for (Map.Entry<TopicPartition, ConsumerGroupLag.PartionOffsets> entry : lag.entrySet()) {
+                            ConsumerGroupLag.PartionOffsets offsets = entry.getValue();
+                            if (lagSet.containsKey(entry.getKey())) {
+                                logger.debug("AA Updating TopicPartition:" + entry.getKey().toString() + "  CurrLag:" + lagSet.get(entry.getKey()) + "  AddingLag:" + offsets.getLag());
+                                lagSet.put(entry.getKey(), (long) (lagSet.get(entry.getKey()) + offsets.getLag()));
+                            } else {
+                                logger.debug("AA Inserting TopicPartition:" + entry.getKey().toString() + "  CurrLag:NONE   AddingLag:" + offsets.getLag());
+                                lagSet.put(entry.getKey(), (long) offsets.getLag());
+                            }
+                        }
+                    }
                 }
             }
+
+            logger.debug("AA DONE  Scanning Groups. Writing Metrics. ");
+            for (Map.Entry<TopicPartition, Long> entry : lagSet.entrySet()) {
+                logger.debug("AA METRIC WRITE Topic:" + entry.getKey().topic() + ", Partition:" + entry.getKey().partition() + ", Lag:" + entry.getValue());
+
+                metricWriteHelper.printMetric(this.configuration.getMetricPrefix() +
+                        Constants.METRIC_SEPARATOR + this.displayName + Constants.METRIC_SEPARATOR + "kafka.lag" +
+                        Constants.METRIC_SEPARATOR + entry.getKey().topic( ) + Constants.METRIC_SEPARATOR + entry.getKey().partition() +
+                        Constants.METRIC_SEPARATOR + "lag", String.valueOf(entry.getValue()), Constants.AVERAGE, Constants.AVERAGE, Constants.INDIVIDUAL);
+            }
+            logger.debug("AA DONE Writing Metrics. Closing connection ");
+            kafkaAdmin.close();
+
         } catch (Exception e) {
             logger.error("Error while getting Lag metrics: {}  {}", this.kafkaServer.get(Constants.DISPLAY_NAME), e);
         }

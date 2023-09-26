@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <controller-info>
-    <application-name>JeremyDavis_MQTTExt_TEST</application-name>
-    <tier-name>MQTT_Monitoring</tier-name>
-    <node-name>Container_1</node-name>
+    <application-name>BGD_KafkaCluster_Test</application-name>
+    <tier-name>Kafka_Monitoring_MA</tier-name>
+    <node-name>Kafka_MAContainer</node-name>
     <!-- For more detailed information on different configurations that an agent can support and the respective rules,
     consult the online documentation. In general, configuration properties may be set in different ways. Here is the
     order of precedence of how the agent will read and respect specific configurations.
@@ -45,12 +45,12 @@
 
     This can be overridden with the environment variable 'APPDYNAMICS_AGENT_UNIQUE_HOST_ID' or the system property
     '-Dappdynamics.agent.uniqueHostId' -->
-    <unique-host-id>JeremyDavis_MQTT</unique-host-id>
+    <unique-host-id>BrendanDonnelly_KafkaHost</unique-host-id>
 
     <!-- This key is generated at installation time and can be found by viewing the license information in the
     controller settings. This can be overridden with the environment variable 'APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY' or
     the system property '-Dappdynamics.agent.accountAccessKey' -->
-    <account-access-key>5rfv    </account-access-key>
+    <account-access-key>ii7d3di3aco5</account-access-key>
 
     <!-- If the AppDynamics Controller is running in multi-tenant mode or you are using the AppDynamics SaaS Controller,
     you must specify the account name for this agent to authenticate with the controller. If you are running in
@@ -61,7 +61,7 @@
     <!-- If this agent is licensed for Server Monitoring, set this flag to 'true' to enable Server Monitoring expanded
     metrics. This can be overridden with the environment variable 'APPDYNAMICS_SIM_ENABLED' or the system property
     '-Dappdynamics.sim.enabled' -->
-    <sim-enabled>false</sim-enabled>
+    <sim-enabled>true</sim-enabled>
 
     <!-- This value is used to create the hierarchy infrastructure view in the UI for this machine. Each hierarchy level
     should be separated with a vertical bar ("|"). For example, if this machine belongs to "DataRack1" and it is located

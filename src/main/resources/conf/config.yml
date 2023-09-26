@@ -16,20 +16,7 @@ servers:
     password: ""
     encryptedPassword:
     displayName: 'Local Kafka Server'
-    consumerGroups:
-      - group_id: 'testGroup1'
-        topic: "kafka1.test.data"
-      - group_id: 'testGroup2'
-        topic: "kafka1.test.data"
-      - group_id: 'testGroup1'
-        topic: "kafka2.test.data"
-      - group_id: 'testGroup2'
-        topic: "kafka2.test.data"
-      - group_id: 'testGroup1'
-        topic: "kafka3.test.data"
-      - group_id: 'testGroup2'
-        topic: "kafka3.test.data"
-
+    lagTopics: '.*'
 
   # Provide the encryption key for the encrypted password
 encryptionKey: ""
@@ -83,7 +70,7 @@ mbeans:
     metrics:
       - Value:
           alias: 'UnderReplicatedPartitions'
-          multiplier: ''
+          multiplier: '1'
           delta: false
           aggregationType: 'OBSERVATION'
           timeRollUpType: 'CURRENT'
@@ -95,7 +82,7 @@ mbeans:
     metrics:
       - Value:
           alias: 'Value'
-          multiplier: ''
+          multiplier: '1'
           delta: false
           aggregationType: 'OBSERVATION'
           timeRollUpType: 'CURRENT'
@@ -108,7 +95,7 @@ mbeans:
     metrics:
       - Value:
           alias: 'Value'
-          multiplier: ''
+          multiplier: '1'
           delta: false
           aggregationType: 'OBSERVATION'
           timeRollUpType: 'CURRENT'
@@ -163,7 +150,7 @@ mbeans:
     metrics:
       - OneMinuteRate:
           alias: 'OneMinuteRate'
-          multiplier: ''
+          multiplier: '1'
           delta: false
           aggregationType: 'AVERAGE'
           timeRollUpType: 'AVERAGE'

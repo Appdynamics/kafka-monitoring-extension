@@ -34,7 +34,6 @@ if __name__ == "__main__":
     #maybe try os.system, we can't identify each consumer but who cares, let it output to stdout and we will do 2
     #consumers and should work for load system
     os.system(f'/usr/bin/kafka-console-consumer --bootstrap-server localhost:{bootstrap_port} --topic {hostname}.test.data --group testGroup1')
-    os.system(f'/usr/bin/kafka-console-consumer --bootstrap-server localhost:{bootstrap_port} --topic {hostname}.test.data --group testGroup2')  #Adding another to test metric output
     # 2 at a time doesn't really work either we will go with 1
     #os.system(f'/usr/bin/kafka-console-consumer --bootstrap-server localhost:{bootstrap_port} --topic {hostname}.test.data')
 

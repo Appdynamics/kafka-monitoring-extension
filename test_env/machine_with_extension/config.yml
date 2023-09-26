@@ -1,88 +1,321 @@
-enabled: true
-#This will create this metric in all the tiers, under this path
-#If you have server viz this works
-#metricPrefix: Custom Metrics|MqttBrokers
-#if no server viz need Tier name as component
-metricPrefix: Server|Component:MQTT_Monitoring|Custom Metrics|MqttBrokers
+#If SIM is enabled, use this
+metricPrefix: 'Custom Metrics|KafkaBrokers'
 
-#This will create it in specific Tier. Replace <TIER_NAME>
-#metricPrefix: Server|Component:<TIER_NAME>|Custom Metrics|Memcached
+#If SIM is not enabled, then use this
+#metricPrefix: 'Server|Component:<Component-ID>|Custom Metrics|Kafka'
 
-# List of Memcached Servers
+# To know your Component-ID, Please refer the link
+# https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695
+
+# Add your Kafka Instances below
 servers:
-  #"MQTT broker URI to connect to. tcp://127.0.0.1:port(1883) or mqtt://127.0.0.1:port(1883).
-  #Use ws:// for Websockets, wss:// for secure Websockets and ssl:// for TLS encrypted TCP connections."
-  - host: "tcp://host.docker.internal:1883"
-    verbose: true
-    displayName: "localhost_test1" #will be used in metric browser so make sure unique
-    clientID: "localtest_1" #unique id for client, if empty uses displayName and timestamp
-    keepAlive: 60 #keep alive in seconds, if nothing set 60 is default
-    username: #if broker requires set here
-    password: #if broker requires set here
-    qos: 0 #we don't want retention etc so valid values are 0, 1, 2
-    clean-session: true #client connects with clean session, we don't expect to pickup stored messages
-    automatic-reconnect: true #auto reconnect on which is likely what we always want for this
-    topics: # a list of topics, we make configurable here, but it's likely following closely to the relevant sys topics outlined: https://github.com/mqtt/mqtt.org/wiki/SYS-Topics
-      - metric_name: "subscription_count"
-        metric_topic: "$SYS/broker/subscriptions/count"
-        metric_type: "OBSERVATION"
-        metric_time_roll_up: "CURRENT"
-        metric_cluster_roll_up: "INDIVIDUAL"
-        metric_delta: false
-      - metric_name: "clients_total"
-        metric_topic: "$SYS/broker/clients/total"
-        metric_type: "OBSERVATION"
-        metric_time_roll_up: "CURRENT"
-        metric_delta: false
-      - metric_name: "messages_count"
-        metric_topic: "$SYS/broker/store/messages/count"
-        metric_type: "OBSERVATION"
-        metric_time_roll_up: "CURRENT"
-        metric_delta: false
-      - metric_name: "messages_received"
-        metric_topic: "$SYS/broker/messages/received"
-        metric_type: "OBSERVATION"
-        metric_time_roll_up: "CURRENT"
-        metric_delta: true
-        metric_delta_cache_in_seconds: 300
-      - metric_name: "messages_sent"
-        metric_topic: "$SYS/broker/messages/sent"
-        metric_type: "OBSERVATION"
-        metric_time_roll_up: "CURRENT"
-        metric_delta: true
-        metric_delta_cache_in_seconds: 180
-      - metric_name: "connection_load_1min"
-        metric_topic: "$SYS/broker/load/connections/1min"
-        metric_type: "AVERAGE"
-        metric_time_roll_up: "AVERAGE"
-        metric_delta: false
-      - metric_name: "socket_load_1min"
-        metric_topic: "$SYS/broker/load/sockets/1min"
-        metric_type: "AVERAGE"
-        metric_time_roll_up: "AVERAGE"
-        metric_delta: false
+  - host: "kafka1"
+    port: "9099"
+    consumer_port: "9092"
+    username: ""
+    password: ""
+    encryptedPassword:
+    displayName: 'kafka1'
+    consumerGroups:
+      - group_id: 'testGroup1'
+        topic: "kafka1.test.data"
+      - group_id: 'testGroup2'
+        topic: "kafka1.test.data"
+      - group_id: 'testGroup1'
+        topic: "kafka2.test.data"
+      - group_id: 'testGroup2'
+        topic: "kafka2.test.data"
+      - group_id: 'testGroup1'
+        topic: "kafka3.test.data"
+      - group_id: 'testGroup2'
+        topic: "kafka3.test.data"
+
+
+  # Provide the encryption key for the encrypted password
+encryptionKey: ""
+
+metricPathReplacements:
+  - replace: "Percent"
+    replaceWith: "%"
+  - replace: "OneMinuteRate"
+    replaceWith: "1 min Rate"
 
 
 
+# Generate a custom dashboard based on the provided template
+customDashboard:
+    enabled: false
+    dashboardName: "Kafka Monitor Dashboard"
 
-#timeout in ms to get data for all the servers
-timeout: 60000
-numberOfThreads: 5
-
+    # Update the path to the dashboard file.
+    pathToSIMDashboard: "monitors/KafkaMonitor/Kafka+Dashboard.json"
+    #pathToNormalDashboard: "monitors/SampleMonitor/normalDashboard.json"
 
 controllerInfo:
-  controllerHost: ""
-  controllerPort: 8090
-  account: ""
-  username: ""
-  password: ""
-  encryptedPassword: ""
-  controllerSslEnabled: false
-  enableOrchestration: false
-  uniqueHostId: ""
-  accountAccessKey: ""
-  machinePath: ""
-  simEnabled: true
-  applicationName: ""
-  tierName: ""
-  nodeName: ""
+    controllerHost: ""
+    controllerPort: 8090
+    account: ""
+    username: ""
+    password: ""
+#    encryptedPassword: ""
+    controllerSslEnabled: false
+    enableOrchestration: false
+    uniqueHostId: ""
+    accountAccessKey: ""
+    machinePath: ""
+    simEnabled: true
+    applicationName: ""
+    tierName: ""
+    nodeName: ""
+
+
+# Each Kafka server needs 1 thread each, so please configure this according to the number of servers you are monitoring
+# [numberOfThreads] = Number_of_Kafka_Servers_Monitored
+numberOfThreads: 10
+
+# The configuration of different metrics from all mbeans exposed by Kafka server
+mbeans:
+  # Each "objectName" is fully qualified path of the object of the Kafka server
+  # For example "kafka.server:type=ReplicaManager,*" will return all objects nested under ReplicaManager type
+  # Each of the entries in the "metrics" section is an attribute of the objectName under which it's listed
+
+  - objectName: 'kafka.server:type=ReplicaManager,name=UnderReplicatedPartitions'
+    metrics:
+      - Value:
+          alias: 'UnderReplicatedPartitions'
+          multiplier: '1'
+          delta: false
+          aggregationType: 'OBSERVATION'
+          timeRollUpType: 'CURRENT'
+          clusterRollUpType: 'INDIVIDUAL'
+
+  #    Number of partitions that don’t have an active leader and are hence not writable or readable.
+  #  Alert if value is greater than 0.
+  - objectName: 'kafka.controller:type=KafkaController,name=OfflinePartitionsCount'
+    metrics:
+      - Value:
+          alias: 'Value'
+          multiplier: '1'
+          delta: false
+          aggregationType: 'OBSERVATION'
+          timeRollUpType: 'CURRENT'
+          clusterRollUpType: 'INDIVIDUAL'
+
+  #    Number of active controllers in the cluster.
+  #  Alert if the aggregated sum across all brokers in the cluster is anything other than 1,
+  #  because there should be exactly one controller per cluster.
+  - objectName: 'kafka.controller:type=KafkaController,name=ActiveControllerCount'
+    metrics:
+      - Value:
+          alias: 'Value'
+          multiplier: '1'
+          delta: false
+          aggregationType: 'OBSERVATION'
+          timeRollUpType: 'CURRENT'
+          clusterRollUpType: 'INDIVIDUAL'
+
+  # Aggregate incoming byte rate.
+  - objectName: 'kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec'
+    metrics:
+      - OneMinuteRate:
+          alias: 'OneMinuteRate'
+          multiplier: '1'
+          delta: false
+          aggregationType: 'AVERAGE'
+          timeRollUpType: 'AVERAGE'
+          clusterRollUpType: 'INDIVIDUAL'
+
+  # Aggregate incoming byte rate.
+  - objectName: 'kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec'
+    metrics:
+      - OneMinuteRate:
+          alias: 'OneMinuteRate'
+          multiplier: '1'
+          delta: false
+          aggregationType: 'AVERAGE'
+          timeRollUpType: 'AVERAGE'
+          clusterRollUpType: 'INDIVIDUAL'
+
+  # Request rate.
+  - objectName: 'kafka.network:type=RequestMetrics,name=RequestsPerSec,request={Produce|FetchConsumer|FetchFollower}'
+    metrics:
+      - OneMinuteRate:
+          alias: 'OneMinuteRate'
+          multiplier: '1'
+          delta: false
+          aggregationType: 'AVERAGE'
+          timeRollUpType: 'AVERAGE'
+          clusterRollUpType: 'INDIVIDUAL'
+
+  # Produce request rate.
+  - objectName: 'kafka.server:type=BrokerTopicMetrics,name=TotalProduceRequestsPerSec'
+    metrics:
+      - OneMinuteRate:
+          alias: 'OneMinuteRate'
+          multiplier: '1'
+          delta: false
+          aggregationType: 'AVERAGE'
+          timeRollUpType: 'AVERAGE'
+          clusterRollUpType: 'INDIVIDUAL'
+
+  #     Fetch request rate.
+  - objectName: 'kafka.server:type=BrokerTopicMetrics,name=TotalFetchRequestsPerSec'
+    metrics:
+      - OneMinuteRate:
+          alias: 'OneMinuteRate'
+          multiplier: '1'
+          delta: false
+          aggregationType: 'AVERAGE'
+          timeRollUpType: 'AVERAGE'
+          clusterRollUpType: 'INDIVIDUAL'
+
+  #     Produce request rate for requests that failed.
+  - objectName: 'kafka.server:type=BrokerTopicMetrics,name=FailedProduceRequestsPerSec'
+    metrics:
+      - OneMinuteRate:
+          alias: 'OneMinuteRate'
+          multiplier: '1'
+          delta: false
+          aggregationType: 'AVERAGE'
+          timeRollUpType: 'AVERAGE'
+          clusterRollUpType: 'INDIVIDUAL'
+
+  #    Fetch request rate for requests that failed.
+  - objectName: 'kafka.server:type=BrokerTopicMetrics,name=FailedFetchRequestsPerSec'
+    metrics:
+      - OneMinuteRate:
+          alias: 'OneMinuteRate'
+          multiplier: '1'
+          delta: false
+          aggregationType: 'AVERAGE'
+          timeRollUpType: 'AVERAGE'
+          clusterRollUpType: 'INDIVIDUAL'
+
+  #     Number of partitions on this broker. This should be mostly even across all brokers.
+  - objectName: 'kafka.server:type=ReplicaManager,name=PartitionCount'
+    metrics:
+      - Value:
+          alias: 'Value'
+          multiplier: '1'
+          delta: false
+          aggregationType: 'AVERAGE'
+          timeRollUpType: 'AVERAGE'
+          clusterRollUpType: 'INDIVIDUAL'
+
+#      Average fraction of time the request handler threads are idle.
+#     Values are between 0 (all resources are used) and 100 (all resources are available)
+  - objectName: 'kafka.server:type=KafkaRequestHandlerPool,name=RequestHandlerAvgIdlePercent'
+    metrics:
+      - OneMinuteRate:
+          alias: 'OneMinuteRate'
+          multiplier: '100'
+          delta: false
+          aggregationType: 'AVERAGE'
+          timeRollUpType: 'AVERAGE'
+          clusterRollUpType: 'INDIVIDUAL'
+
+  #     Average fraction of time the network processor threads are idle.
+  #  Values are between 0 (all resources are used) and 100 (all resources are available)
+  - objectName: 'kafka.network:type=SocketServer,name=NetworkProcessorAvgIdlePercent'
+    metrics:
+      - Value:
+          alias: 'Value'
+          multiplier: '100'
+          delta: false
+          aggregationType: 'AVERAGE'
+          timeRollUpType: 'AVERAGE'
+          clusterRollUpType: 'INDIVIDUAL'
+
+  #   Size of the request queue. A congested request queue will not be able to process incoming or outgoing requests
+  - objectName: 'kafka.network:type=RequestChannel,name=RequestQueueSize'
+    metrics:
+      - Value:
+          alias: 'Value'
+          multiplier: '1'
+          delta: false
+          aggregationType: 'OBSERVATION'
+          timeRollUpType: 'CURRENT'
+          clusterRollUpType: 'INDIVIDUAL'
+
+  #   The ZooKeeper session has expired. When a session expires, we can have leader changes and even a new controller.
+  #  It is important to keep an eye on the number of such events across a Kafka cluster and if the overall number is high
+  - objectName: 'kafka.server:type=SessionExpireListener,name=ZooKeeperExpiresPerSec'
+    metrics:
+      - OneMinuteRate:
+          alias: 'OneMinuteRate'
+          multiplier: '1'
+          delta: false
+          aggregationType: 'OBSERVATION'
+          timeRollUpType: 'CURRENT'
+          clusterRollUpType: 'INDIVIDUAL'
+
+  #   Metric Per Topic
+  - objectName: 'kafka.server:type=BrokerTopicMetrics,name=*,topic=*'
+    metrics:
+      - OneMinuteRate:
+          alias: 'OneMinuteRate'
+          multiplier: '1'
+          delta: false
+          aggregationType: 'AVERAGE'
+          timeRollUpType: 'AVERAGE'
+          clusterRollUpType: 'INDIVIDUAL'
+
+  #    When a broker is brought up after a failure, it starts catching up by reading from the leader.
+  #    Once it is caught up, it gets added back to the ISR.
+  - objectName: 'kafka.server:type=ReplicaManager,name=IsrExpandsPerSec'
+    metrics:
+      - OneMinuteRate:
+          alias: 'OneMinuteRate'
+          multiplier: '1'
+          delta: false
+          aggregationType: 'AVERAGE'
+          timeRollUpType: 'AVERAGE'
+          clusterRollUpType: 'INDIVIDUAL'
+
+  #    If a broker goes down, ISR for some of the partitions will shrink.
+  #  When that broker is up again, ISR will be expanded once the replicas are fully caught up.
+  #  Other than that, the expected value for both ISR shrink rate and expansion rate is 0.
+  - objectName: 'kafka.server:type=ReplicaManager,name=IsrShrinksPerSec'
+    metrics:
+      - OneMinuteRate:
+          alias: 'OneMinuteRate'
+          multiplier: '1'
+          delta: false
+          aggregationType: 'AVERAGE'
+          timeRollUpType: 'AVERAGE'
+          clusterRollUpType: 'INDIVIDUAL'
+
+  #   JVM Metrics
+  - objectName: 'java.lang:type=Memory'
+    metrics:
+      - HeapMemoryUsage.committed:
+          alias: 'Heap Memory Usage | Committed (bytes)'
+          multiplier: '1'
+          delta: false
+          aggregationType: 'AVERAGE'
+          timeRollUpType: 'AVERAGE'
+          clusterRollUpType: 'INDIVIDUAL'
+
+      - HeapMemoryUsage.max:
+          alias: 'Heap Memory Usage | Max (bytes)'
+          multiplier: '1'
+          delta: false
+          aggregationType: 'AVERAGE'
+          timeRollUpType: 'AVERAGE'
+          clusterRollUpType: 'INDIVIDUAL'
+
+      - HeapMemoryUsage.used:
+          alias: 'Heap Memory Usage | Used (bytes)'
+          multiplier: '1'
+          delta: false
+          aggregationType: 'AVERAGE'
+          timeRollUpType: 'AVERAGE'
+          clusterRollUpType: 'INDIVIDUAL'
+
+      - NonHeapMemoryUsage.committed:
+          alias: 'Non Heap Memory Usage | Committed (bytes)'
+          multiplier: '1'
+          delta: false
+          aggregationType: 'AVERAGE'
+          timeRollUpType: 'AVERAGE'
+          clusterRollUpType: 'INDIVIDUAL'

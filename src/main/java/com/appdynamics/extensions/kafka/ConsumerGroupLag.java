@@ -45,6 +45,8 @@ public Map<TopicPartition, PartionOffsets> getConsumerGroupOffsets(String host, 
                 long currentOffset = 0;
                 if(committed != null) { //committed offset will be null for unknown consumer groups
                     currentOffset = committed.offset();
+                } else {
+                    currentOffset = entry.getValue();  //set current offset to same as end offset for unknown consumer groups
                 }
                 return new PartionOffsets(entry.getValue(), currentOffset, entry.getKey().partition(), topic);
             }, mergeFunction));
@@ -87,13 +89,13 @@ static class PartionOffsets {
     private long timestamp = System.currentTimeMillis();
     public long endOffset;
     public long currentOffset;
-    public int partion;
+    public int partition;
     public String topic;
 
-    public PartionOffsets(long endOffset, long currentOffset, int partion, String topic) {
+    public PartionOffsets(long endOffset, long currentOffset, int partition, String topic) {
         this.endOffset = endOffset;
         this.currentOffset = currentOffset;
-        this.partion = partion;
+        this.partition = partition;
         this.topic = topic;
         this.lag = endOffset - currentOffset;
     }
@@ -107,7 +109,7 @@ static class PartionOffsets {
         return endOffset;
     }
     public int getPartition() {
-        return partion;
+        return partition;
     }
     public String getTopic() {
         return topic;
@@ -116,7 +118,7 @@ static class PartionOffsets {
     @Override
     public String toString() {
         return "PartionOffsets [lag=" + lag + ", timestamp=" + timestamp + ", endOffset=" + endOffset
-                + ", currentOffset=" + currentOffset + ", partion=" + partion + ", topic=" + topic + "]";
+                + ", currentOffset=" + currentOffset + ", partion=" + partition + ", topic=" + topic + "]";
     }
 
 }
