@@ -1,6 +1,9 @@
 # AppDynamics Kafka Monitoring Extension 
 ## CHANGELOG
 
+#### 2.0.6 - Sep 9, 2024
+Upgrading appd-exts-commons to 2.2.13
+
 #### 2.0.4 - Jan 4, 2021
 Updated to appd-exts-commons v2.2.4
 
