@@ -84,6 +84,7 @@ Configure the Kafka monitoring extension by editing the config.yml file in `<MAC
      - `encryptedPassword`(only if password encryption required).
 
   - Configure consumer lag calculations by configuring the `consumer_port` and the `lagTopics` regex string.
+
           The extension will get the topics and consumer groups from the kafka admin client interface,
           loop through and calculate and report any consumer lag metrics where the topic matches the regex. 
   
