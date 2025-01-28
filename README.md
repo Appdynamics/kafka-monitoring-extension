@@ -77,12 +77,16 @@ Configure the Kafka monitoring extension by editing the config.yml file in `<MAC
      ```
      metricPrefix: "Server|Component:19|Custom Metrics|Kafka"
      ```
-  - Configure the Kafka servers by specifying <b>either</b> `serviceUrl` or `<host,port>` of all Kafka servers.
+  - Configure the Kafka servers by specifying <b>either</b> `<host,port>` of all Kafka servers.
      - Here, `host` is the IP address. 
        of the Kafka server to be monitored, and `port` is the JMX port of the Kafka server.
      - Please provide `username` & `password` (only if authentication enabled).
      - `encryptedPassword`(only if password encryption required).
 
+  - Configure consumer lag calculations by configuring the `consumer_port` and the `lagTopics` regex string.
+          The extension will get the topics and consumer groups from the kafka admin client interface,
+          loop through and calculate and report any consumer lag metrics where the topic matches the regex. 
+  
   - Configure the encyptionKey for encryptionPasswords(only if password encryption required).
 
           For example,
