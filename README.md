@@ -77,7 +77,7 @@ Configure the Kafka monitoring extension by editing the config.yml file in `<MAC
      ```
      metricPrefix: "Server|Component:19|Custom Metrics|Kafka"
      ```
-  - Configure the Kafka servers by specifying <b>either</b> `<host,port>` of all Kafka servers.
+  - Configure the Kafka servers by specifying `<host,port>` of all Kafka servers.
      - Here, `host` is the IP address. 
        of the Kafka server to be monitored, and `port` is the JMX port of the Kafka server.
      - Please provide `username` & `password` (only if authentication enabled).
