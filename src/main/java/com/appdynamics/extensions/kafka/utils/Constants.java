@@ -44,7 +44,7 @@ public class Constants {
 
     public static final String GROUPID = "group_id";
 
-    public static final String TOPIC = "topic";
+    public static final String TOPIC = "lagTopics";
 
 
 }
